@@ -18,4 +18,4 @@ main = do
    print $ show xList
    print $ show $ getGameCell g1 (3,3)
 
---   boot
+   boot

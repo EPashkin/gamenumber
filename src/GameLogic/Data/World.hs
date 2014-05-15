@@ -56,3 +56,7 @@ playersStartPosXList size numPlayers =
     let cols = playersStartPosCols numPlayers
         dist = size `div` cols
     in map (\i -> (i-1)*dist + (dist `div` 2) + 1 ) [1..cols]
+
+-- apply function to all cells
+mapW :: ((WorldPos, Cell) -> a) -> World -> [a]
+mapW func world = map func (assocs world)

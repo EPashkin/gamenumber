@@ -7,3 +7,16 @@ data Cell = Cell { value :: Int
 mkCell v plInd = Cell v plInd
 
 cellChangeValue cell v = cell {value = v}
+
+getCellValue Cell{value=v} = v
+
+getCellPlayerIndex Cell{playerIndex=pi} = pi
+
+isFree :: Cell -> Bool
+isFree Cell{value=v, playerIndex=pi}
+    | v == 0
+        = True
+    | pi == 0
+        = True
+    | otherwise
+        = False
