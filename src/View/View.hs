@@ -11,10 +11,22 @@ drawGame :: Game -> IO Picture
 drawGame game = do
    let world = getWorld game
    let cells = mapW drawCell world
-   let temp = Color red $ Line [(0,0), (700,700)]
-   let list  = temp : cells
+   let halfScale = drawScale / 2
+   let temp = Color red $ Pictures
+           [ Line [(-halfScale, 0), (halfScale, 0)]
+           , Line [(0, -halfScale), (0, halfScale)] ]
 
-   return $ Pictures list
+   let centerPos = gCenterPos game
+   let centered = translateCell centerPos $ Color yellow $ Pictures 
+           [ Line [(-halfScale, -halfScale), (halfScale,  halfScale)]
+           , Line [(-halfScale,  halfScale), (halfScale, -halfScale)] ]
+
+   let worldSize = getWorldSize world
+   let shiftX = - (fromIntegral (fst centerPos) - 0.5) * drawScale
+   let shiftY = - (fromIntegral (snd centerPos) - 0.5) * drawScale
+   let world  = Translate shiftX shiftY $ Pictures $ centered : cells
+
+   return $ Pictures $ [temp, world]
 
 
 drawCell :: (WorldPos, Cell) -> Picture
@@ -28,7 +40,7 @@ drawCell (pos, cell)
             txt = Translate shiftX shiftY $ Scale textScale textScale $ Text $ show $ getCellValue cell
       in translateCell pos $ Color green $ Pictures $ rect : [ txt ]
 
-translateCell:: WorldPos -> Picture -> Picture
+translateCell :: WorldPos -> Picture -> Picture
 translateCell (x,y) pict =
    let xx = (fromIntegral x - 0.5) * drawScale
        yy = (fromIntegral y - 0.5) * drawScale

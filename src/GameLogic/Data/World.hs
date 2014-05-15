@@ -60,3 +60,10 @@ playersStartPosXList size numPlayers =
 -- apply function to all cells
 mapW :: ((WorldPos, Cell) -> a) -> World -> [a]
 mapW func world = map func (assocs world)
+
+-- find first pos owned by playerIndex
+-- can generate error is no pos
+findPlayerPos :: World -> Int -> WorldPos
+findPlayerPos world playerInd = 
+    let [(pos, _)] = take 1 $ filter (\ (_, cell) -> playerIndex cell == playerInd) $ assocs world
+    in pos

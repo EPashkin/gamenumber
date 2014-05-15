@@ -5,6 +5,7 @@ import GameLogic.Data.Cell
 import GameLogic.Data.World
 
 data Game = Game { gWorld :: World
+                 , gCenterPos :: WorldPos -- position in center of screen
                  , gRndGen :: StdGen }
   deriving (Show)
 
@@ -29,11 +30,11 @@ mkStartGame seed = mkStartGameGen gen
        where gen = mkStdGen seed
 
 mkStartGameGen :: StdGen -> Game
-mkStartGameGen gen = Game world gen'
+mkStartGameGen gen = Game { gWorld = world, gRndGen = gen', gCenterPos = findPlayerPos world 1 }
     where
     (world, gen') = mkStartWorld defWorldSize defNumPlayers gen
 
-mkGame world seed = Game world (mkStdGen seed)
+mkGame world seed = Game { gWorld = world, gRndGen = (mkStdGen seed), gCenterPos = findPlayerPos world 1 }
 
 getWorld :: Game -> World
 getWorld game = gWorld game
