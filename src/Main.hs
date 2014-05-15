@@ -15,5 +15,6 @@ main = do
        xList = playersStartPosXList (getWorldSize w2) (length players)
    print $ show positions
    print $ show xList
+   print $ show $ getWorldCell w2 (3,3)
 
 --   boot

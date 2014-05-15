@@ -20,6 +20,9 @@ mkStartWorld size numPlayers gen = placeWorldPlayers (mkEmptyWorld size) numPlay
 setWorldCell :: World -> WorldPos -> Cell -> World
 setWorldCell world pos cell = world // [(pos, cell)]
 
+getWorldCell :: World -> WorldPos -> Cell
+getWorldCell world pos = world ! pos
+
 getWorldSize :: World -> Int
 getWorldSize world = 
     let (startWorldPos, (size, _)) = bounds world
