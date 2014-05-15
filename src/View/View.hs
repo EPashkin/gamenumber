@@ -45,3 +45,10 @@ translateCell (x,y) pict =
    let xx = (fromIntegral x - 0.5) * drawScale
        yy = (fromIntegral y - 0.5) * drawScale
    in Translate xx yy pict
+
+worldPosOfWindowPos :: Game -> (Float, Float) -> WorldPos
+worldPosOfWindowPos game (x, y) =
+   let centerPos = gCenterPos game
+       xi = floor (x / drawScale + 0.5) + fst centerPos :: Int
+       yi = floor (y / drawScale + 0.5) + snd centerPos :: Int
+   in (xi, yi)

@@ -42,3 +42,6 @@ getWorld game = gWorld game
 getGameCell :: Game -> WorldPos -> Cell
 getGameCell game pos = getWorldCell world pos 
     where world = getWorld game
+
+setCenterPos :: Game -> WorldPos -> Game
+setCenterPos game pos = game { gCenterPos = pos }
