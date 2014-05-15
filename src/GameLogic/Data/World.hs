@@ -52,4 +52,4 @@ playersStartPosXList :: Int -> Int -> [Int]
 playersStartPosXList size numPlayers =
     let cols = playersStartPosCols numPlayers
         dist = size `div` cols
-    in map (\i -> (i-1)*dist + (dist `div` 2) - 1) [1..cols]
+    in map (\i -> (i-1)*dist + (dist `div` 2) + 1 ) [1..cols]
