@@ -44,11 +44,9 @@ getGameCell game pos = getWorldCell world pos
     where world = getWorld game
 
 setCenterPos :: Game -> WorldPos -> Game
-setCenterPos game pos 
-    | isPosInWorld game pos
-    = game { gCenterPos = pos }
-    | otherwise
-    = game
+setCenterPos game pos = 
+    let pos' = limitPosToWorld game pos
+    in game { gCenterPos = pos' }
 
 isPosInWorld :: Game -> WorldPos -> Bool
 isPosInWorld game (x, y)
@@ -59,3 +57,18 @@ isPosInWorld game (x, y)
     = True
     | otherwise
     = False
+
+limitPosToWorld :: Game -> WorldPos -> WorldPos
+limitPosToWorld game pos = limitPosToWorld' pos $ getWorldSize $ getWorld game
+
+limitPosToWorld' (x, y) max
+    | x < 1
+    = limitPosToWorld' (1, y) max
+    | x > max
+    = limitPosToWorld' (max, y) max
+    | y < 1
+    = limitPosToWorld' (x, 1) max
+    | y > max
+    = limitPosToWorld' (x, max) max
+    | otherwise
+    = (x,y)
