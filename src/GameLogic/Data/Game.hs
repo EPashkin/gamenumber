@@ -1,13 +1,43 @@
 module GameLogic.Data.Game where
 
 import System.Random
+import GameLogic.Data.Cell
+import GameLogic.Data.World
 
-data Game = Game { gWorld :: Int
+data Game = Game { gWorld :: World
                  , gRndGen :: StdGen }
   deriving (Show)
 
-instance Eq Game where
-    (Game w1 g1) == (Game w2 g2) = (w1 == w2) && (show g1 == show g2)
+--TODO: to config
+defWorldSize = 8
+defNumPlayers = 4
+defSeed = 0::Int -- set not 0 for debug purposes
 
-initialGame seed = Game 1 (mkStdGen seed)
+newGame::IO Game
+newGame = newGame' defSeed
+
+newGame':: Int -> IO Game
+newGame' seed
+    | 0 == seed
+       = newStdGen  >>= \ gen ->
+       return $ mkStartGameGen gen
+    | otherwise
+       = return $ mkStartGame seed
+
+mkStartGame :: Int -> Game
+mkStartGame seed = mkStartGameGen gen
+       where gen = mkStdGen seed
+
+mkStartGameGen :: StdGen -> Game
+mkStartGameGen gen = Game world gen'
+    where
+    (world, gen') = mkStartWorld defWorldSize defNumPlayers gen
+
 mkGame world seed = Game world (mkStdGen seed)
+
+getWorld :: Game -> World
+getWorld game = gWorld game
+
+getGameCell :: Game -> WorldPos -> Cell
+getGameCell game pos = getWorldCell world pos 
+    where world = getWorld game

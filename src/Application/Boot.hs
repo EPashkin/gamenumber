@@ -5,5 +5,5 @@ import GameLogic.Data.Facade
 import Application.Game.Engine
 
 boot = do
-           let game = initialGame 100
+           game <- newGame
            trace "Starting" $ runEngine game

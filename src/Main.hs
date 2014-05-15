@@ -8,13 +8,14 @@ import System.Random
 main = do
    gen1 <- newStdGen
 --   let gen1 = mkStdGen 100
-   let (w2, gen2) = mkStartWorld 8 4 gen1
---   print $ show w2
-   let players = [1..4]
+   g1 <- newGame
+   print $ show g1
+   let players = [1..defNumPlayers]
+       w2 = getWorld g1
        positions = [calcStartPos w2 (length players) pl | pl <- players]
-       xList = playersStartPosXList (getWorldSize w2) (length players)
+       xList = playersStartPosXList defWorldSize defNumPlayers
    print $ show positions
    print $ show xList
-   print $ show $ getWorldCell w2 (3,3)
+   print $ show $ getGameCell g1 (3,3)
 
 --   boot
