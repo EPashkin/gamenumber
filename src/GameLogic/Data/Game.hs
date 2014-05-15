@@ -11,7 +11,7 @@ data Game = Game { gWorld :: World
 
 --TODO: to config
 defWorldSize = 8
-defNumPlayers = 4
+defNumPlayers = 16
 defSeed = 0::Int -- set not 0 for debug purposes
 
 newGame::IO Game

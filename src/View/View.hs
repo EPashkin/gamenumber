@@ -35,10 +35,11 @@ drawCell (pos, cell)
       = translateCell pos $ Pictures [ Color emptyCellColor $ rectangleWire 30 30 ]
    | otherwise
       = let rect = rectangleWire 30 30
+            color = playerColor $ playerIndex cell
             shiftX = - drawScale / 3
             shiftY = - drawScale / 2.5
             txt = Translate shiftX shiftY $ Scale textScale textScale $ Text $ show $ getCellValue cell
-      in translateCell pos $ Color green $ Pictures $ rect : [ txt ]
+      in translateCell pos $ Color color $ Pictures $ rect : [ txt ]
 
 translateCell :: WorldPos -> Picture -> Picture
 translateCell (x,y) pict =
