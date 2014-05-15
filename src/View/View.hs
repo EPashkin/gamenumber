@@ -12,21 +12,18 @@ drawGame game = do
    let world = getWorld game
    let cells = mapW drawCell world
    let halfScale = drawScale / 2
-   let temp = Color red $ Pictures
-           [ Line [(-halfScale, 0), (halfScale, 0)]
-           , Line [(0, -halfScale), (0, halfScale)] ]
 
    let centerPos = gCenterPos game
-   let centered = translateCell centerPos $ Color yellow $ Pictures 
-           [ Line [(-halfScale, -halfScale), (halfScale,  halfScale)]
-           , Line [(-halfScale,  halfScale), (halfScale, -halfScale)] ]
+   let firstPlayerColor = playerColor 1
+   --TODO: replace centered to last
+   let centered = translateCell centerPos $ Color firstPlayerColor $ rectangleWire 26 26
 
    let worldSize = getWorldSize world
    let shiftX = - (fromIntegral (fst centerPos) - 0.5) * drawScale
    let shiftY = - (fromIntegral (snd centerPos) - 0.5) * drawScale
    let world  = Translate shiftX shiftY $ Pictures $ centered : cells
 
-   return $ Pictures $ [temp, world]
+   return $ Pictures $ [world]
 
 
 drawCell :: (WorldPos, Cell) -> Picture
