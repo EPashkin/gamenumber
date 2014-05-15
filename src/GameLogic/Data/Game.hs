@@ -44,4 +44,18 @@ getGameCell game pos = getWorldCell world pos
     where world = getWorld game
 
 setCenterPos :: Game -> WorldPos -> Game
-setCenterPos game pos = game { gCenterPos = pos }
+setCenterPos game pos 
+    | isPosInWorld game pos
+    = game { gCenterPos = pos }
+    | otherwise
+    = game
+
+isPosInWorld :: Game -> WorldPos -> Bool
+isPosInWorld game (x, y)
+    | x >= 1
+    , x <= getWorldSize (getWorld game)
+    , y >= 1
+    , y <= getWorldSize (getWorld game)
+    = True
+    | otherwise
+    = False
