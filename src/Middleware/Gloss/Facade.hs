@@ -10,7 +10,7 @@ playerColor playerInd =
     in makeColor8 (r*4) (g*4) (b*4) 255
 
 
-playerColor' (-1) = (0, 0,42)	-- possible background color
+playerColor' (-1) = (0, 0,42)        -- possible background color
 
 playerColor' 1 = ( 0,42, 0)
 playerColor' 2 = (39,17,25)

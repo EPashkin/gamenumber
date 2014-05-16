@@ -31,7 +31,7 @@ getWorldSize world =
 placeWorldPlayers :: World -> Int -> StdGen -> (World, StdGen)
 placeWorldPlayers world numPlayers gen =
     let players = [1..numPlayers]
-	positions = [calcStartPos world numPlayers pl | pl <- players]
+        positions = [calcStartPos world numPlayers pl | pl <- players]
         (positions', gen') = shuffle gen positions
         playersPosition = zipWith (\a b -> (a,b)) positions' players
         world' = foldl (\w (pos, pl) -> setWorldCell w pos (mkCell 1 pl)) world playersPosition :: World

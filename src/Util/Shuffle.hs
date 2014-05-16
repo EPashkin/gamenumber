@@ -18,4 +18,4 @@ fisherYates gen l =
     initial x gen = (singleton 0 x, gen)
 
 shuffle :: RandomGen g => g -> [a] -> ([a], g)
-shuffle = fisherYates	
+shuffle = fisherYates
