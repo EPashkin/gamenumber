@@ -4,18 +4,21 @@ import Application.Boot
 
 import GameLogic.Data.Facade
 import System.Random
+import Debug.Trace
 
 main = do
+   runStartupTest
+   boot
+
+runStartupTest = do
    gen1 <- newStdGen
 --   let gen1 = mkStdGen 100
    g1 <- newGame
-   print $ show g1
+   traceIO $ show g1
    let players = [1..defNumPlayers]
        w2 = getWorld g1
        positions = [calcStartPos w2 (length players) pl | pl <- players]
        xList = playersStartPosXList defWorldSize defNumPlayers
-   print $ show positions
-   print $ show xList
-   print $ show $ getGameCell g1 (3,3)
-
-   boot
+   traceIO $ show positions
+   traceIO $ show xList
+   traceIO $ show $ getGameCell g1 (3,3)
