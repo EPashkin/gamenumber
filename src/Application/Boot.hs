@@ -2,8 +2,8 @@ module Application.Boot where
 
 import Debug.Trace
 import GameLogic.Data.Facade
+import GameLogic.StartLogic
 import Application.Game.Engine
-import System.Random
 
 boot = do
   runStartupTest
@@ -11,8 +11,6 @@ boot = do
   trace "Starting" $ runEngine game
 
 runStartupTest = do
-   gen1 <- newStdGen
---   let gen1 = mkStdGen 100
    g1 <- newGame
    traceIO $ show g1
    let players = [1..defNumPlayers]

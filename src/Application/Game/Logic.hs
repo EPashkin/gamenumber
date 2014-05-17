@@ -1,6 +1,7 @@
 module Application.Game.Logic where
 
 import GameLogic.Data.Facade
+import GameLogic.Logic
 import Middleware.Gloss.Facade
 import View.View
 
