@@ -14,6 +14,7 @@ type World = Array WorldPos Cell
 mkEmptyWorld :: Int -> World
 mkEmptyWorld size = array (startWorldPos, (size, size)) [(pos, mkCell 0 0) | x <- [1..size], y <- [1..size], let pos = (x,y)]
 
+{-# ANN mkStartWorld "HLint: ignore Eta reduce" #-}
 mkStartWorld :: Int ->Int -> StdGen -> (World, StdGen)
 mkStartWorld size numPlayers gen = placeWorldPlayers (mkEmptyWorld size) numPlayers gen
 

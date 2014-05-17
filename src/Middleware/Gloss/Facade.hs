@@ -6,7 +6,7 @@ emptyCellColor = makeColor8 100 100 100 255
 
 
 playerColor playerInd = 
-    let (r, g, b) = playerColor' $ playerInd
+    let (r, g, b) = playerColor' playerInd
     in makeColor8 (r*4) (g*4) (b*4) 255
 
 

@@ -4,7 +4,7 @@ data Cell = Cell { value :: Int
                  , playerIndex :: Int }
   deriving (Show)
 
-mkCell v plInd = Cell v plInd
+mkCell v plInd = Cell { value = v, playerIndex = plInd }
 
 cellChangeValue cell v = cell {value = v}
 

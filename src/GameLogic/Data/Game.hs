@@ -34,13 +34,13 @@ mkStartGameGen gen = Game { gWorld = world, gRndGen = gen', gCenterPos = findPla
     where
     (world, gen') = mkStartWorld defWorldSize defNumPlayers gen
 
-mkGame world seed = Game { gWorld = world, gRndGen = (mkStdGen seed), gCenterPos = findPlayerPos world 1 }
+mkGame world seed = Game { gWorld = world, gRndGen = mkStdGen seed, gCenterPos = findPlayerPos world 1 }
 
 getWorld :: Game -> World
-getWorld game = gWorld game
+getWorld = gWorld
 
 getGameCell :: Game -> WorldPos -> Cell
-getGameCell game pos = getWorldCell world pos 
+getGameCell game = getWorldCell world
     where world = getWorld game
 
 setCenterPos :: Game -> WorldPos -> Game

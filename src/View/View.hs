@@ -23,7 +23,7 @@ drawGame game = do
    let shiftY = - (fromIntegral (snd centerPos) - 0.5) * drawScale
    let world  = Translate shiftX shiftY $ Pictures $ centered : cells
 
-   return $ Pictures $ [world]
+   return $ Pictures [world]
 
 
 drawCell :: (WorldPos, Cell) -> Picture

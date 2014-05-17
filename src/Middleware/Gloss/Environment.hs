@@ -2,4 +2,5 @@ module Middleware.Gloss.Environment where
 
 import Graphics.Gloss.Interface.IO.Game
 
-runEnvironment game drawGame eventHandler doGameStep = playIO (InWindow "GameNumber" (800, 550) (10, 10)) black 1 game drawGame eventHandler doGameStep
+runEnvironment:: game -> (game -> IO Picture) -> (Event -> game -> IO game) -> (Float -> game -> IO game) -> IO ()
+runEnvironment = playIO (InWindow "GameNumber" (800, 550) (10, 10)) black 1
