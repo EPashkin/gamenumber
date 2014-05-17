@@ -6,6 +6,7 @@ import GameLogic.Data.World
 
 data Game = Game { gWorld :: World
                  , gCenterPos :: WorldPos -- position in center of screen
+                 , gSelectedPos :: WorldPos -- current action position for active player
                  , gRndGen :: StdGen }
   deriving (Show)
 
@@ -13,6 +14,7 @@ data Game = Game { gWorld :: World
 defWorldSize = 8
 defNumPlayers = 16
 defSeed = 0::Int -- set not 0 for debug purposes
+activePlayerIndex = 1
 
 newGame::IO Game
 newGame = newGame' defSeed
@@ -30,11 +32,19 @@ mkStartGame seed = mkStartGameGen gen
        where gen = mkStdGen seed
 
 mkStartGameGen :: StdGen -> Game
-mkStartGameGen gen = Game { gWorld = world, gRndGen = gen', gCenterPos = findPlayerPos world 1 }
+mkStartGameGen gen = mkGameDef world gen'
     where
     (world, gen') = mkStartWorld defWorldSize defNumPlayers gen
 
-mkGame world seed = Game { gWorld = world, gRndGen = mkStdGen seed, gCenterPos = findPlayerPos world 1 }
+mkGame world seed = mkGameDef world $ mkStdGen seed
+
+mkGameDef world gen 
+    = Game { 
+    gWorld = world
+    , gRndGen = gen
+    , gCenterPos = findPlayerPos world activePlayerIndex
+    , gSelectedPos = findPlayerPos world activePlayerIndex
+    }  
 
 getWorld :: Game -> World
 getWorld = gWorld
@@ -47,6 +57,13 @@ setCenterPos :: Game -> WorldPos -> Game
 setCenterPos game pos = 
     let pos' = limitPosToWorld game pos
     in game { gCenterPos = pos' }
+    
+doCellAction :: Game -> WorldPos -> Game
+doCellAction game pos
+    | not $ isPosInWorld game pos
+    = game
+    | otherwise
+    = game { gSelectedPos = pos }
 
 isPosInWorld :: Game -> WorldPos -> Bool
 isPosInWorld game (x, y)

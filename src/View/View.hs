@@ -14,14 +14,13 @@ drawGame game = do
    let halfScale = drawScale / 2
 
    let centerPos = gCenterPos game
-   let firstPlayerColor = playerColor 1
-   --TODO: replace centered to last
-   let centered = translateCell centerPos $ Color firstPlayerColor $ rectangleWire 26 26
+   let firstPlayerColor = playerColor activePlayerIndex
+   let selected = drawSelectedCellBox (gSelectedPos game) firstPlayerColor
 
    let worldSize = getWorldSize world
    let shiftX = - (fromIntegral (fst centerPos) - 0.5) * drawScale
    let shiftY = - (fromIntegral (snd centerPos) - 0.5) * drawScale
-   let world  = Translate shiftX shiftY $ Pictures $ centered : cells
+   let world = Translate shiftX shiftY $ Pictures $ selected : cells
 
    return $ Pictures [world]
 
@@ -37,6 +36,16 @@ drawCell (pos, cell)
             shiftY = - drawScale / 2.5
             txt = Translate shiftX shiftY $ Scale textScale textScale $ Text $ show $ getCellValue cell
       in translateCell pos $ Color color $ Pictures $ rect : [ txt ]
+
+drawSelectedCellBox pos color =
+    translateCell pos $ Color color $ Pictures [
+        line [(-radius, 0), (delta-radius, 0)],
+        line [(radius, 0), (radius-delta, 0)],
+        rectangleWire diametr diametr
+    ] where
+        diametr = 26
+        radius = diametr / 2
+        delta = radius / 4 
 
 translateCell :: WorldPos -> Picture -> Picture
 translateCell (x,y) pict =
