@@ -1,5 +1,6 @@
 module GameLogic.Logic where
 
+import GameLogic.Data.Cell
 import GameLogic.Data.World
 import GameLogic.Data.Game
 
@@ -11,9 +12,29 @@ setCenterPos game pos =
 doCellAction :: Game -> WorldPos -> Game
 doCellAction game pos
     | not $ isPosInWorld game pos
+    = game 
+    | otherwise
+    = doCellAction' game' pos cell activePlayerIndex 
+    where
+        game' = game { gSelectedPos = pos }
+        cell = getGameCell game pos
+    
+doCellAction' :: Game -> WorldPos -> Cell -> Int -> Game
+doCellAction' game pos cell playerInd
+    | getCellPlayerIndex cell == playerInd
+    = increaseCell game pos cell 
+    | isFree cell
+    = increaseCell game pos $ mkCell 0 playerInd
+    | otherwise
+    = game
+    
+increaseCell :: Game -> WorldPos -> Cell -> Game
+increaseCell game pos cell
+    | getCellValue cell >= 9
     = game
     | otherwise
-    = game { gSelectedPos = pos }
+    = setGameCell game pos cell'
+    where cell' = changeCellValue cell $ getCellValue cell + 1
 
 isPosInWorld :: Game -> WorldPos -> Bool
 isPosInWorld game (x, y)

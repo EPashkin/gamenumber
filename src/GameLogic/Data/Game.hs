@@ -34,3 +34,7 @@ getWorld = gWorld
 getGameCell :: Game -> WorldPos -> Cell
 getGameCell game = getWorldCell world
     where world = getWorld game
+
+setGameCell :: Game -> WorldPos -> Cell -> Game
+setGameCell game pos cell = game {gWorld = world'}
+    where world' = setWorldCell (getWorld game) pos cell

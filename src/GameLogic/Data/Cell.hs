@@ -6,7 +6,7 @@ data Cell = Cell { value :: Int
 
 mkCell v plInd = Cell { value = v, playerIndex = plInd }
 
-cellChangeValue cell v = cell {value = v}
+changeCellValue cell v = cell {value = v}
 
 getCellValue Cell{value=v} = v
 
