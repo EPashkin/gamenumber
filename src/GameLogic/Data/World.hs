@@ -7,6 +7,15 @@ import GameLogic.Data.Cell
 type WorldPos = (Int, Int)
 startWorldPos = (1,1)
 
+--TODO: find way do only +
+instance (Num a,Num b) => Num (a, b) where
+    (a,b) + (c,d) = (a+c, b+d)
+    (a,b) * (c,d) = undefined
+    (a,b) - (c,d) = undefined
+    abs     (a,b) = undefined 
+    signum  (a,b) = undefined 
+    fromInteger i = undefined
+
 type World = Array WorldPos Cell
 
 mkEmptyWorld :: Int -> World
@@ -33,3 +42,40 @@ findPlayerPos :: World -> Int -> WorldPos
 findPlayerPos world playerInd = 
     let [(pos, _)] = take 1 $ filter (\ (_, cell) -> playerIndex cell == playerInd) $ assocs world
     in pos
+
+isPosInWorld :: World -> WorldPos -> Bool
+isPosInWorld world (x, y)
+    | x >= 1
+    , x <= size
+    , y >= 1
+    , y <= size
+    = True
+    | otherwise
+    = False
+    where size = getWorldSize world
+
+getNearestOwnedCells :: World -> WorldPos -> Int -> [(WorldPos, Cell)]
+getNearestOwnedCells world pos playerInd
+    = filter (isOwnedBy playerInd . snd) $ getNearestCells world pos
+
+getNearestCells :: World -> WorldPos -> [(WorldPos, Cell)]
+getNearestCells world pos = map (\pos' -> (pos', getWorldCell world pos')) $ getNearestWorldPoses world pos
+
+getNearestWorldPoses :: World -> WorldPos -> [WorldPos]
+getNearestWorldPoses world pos
+    = filter (isPosInWorld world) $ getNearestPoses pos  
+
+getNearestPoses :: WorldPos -> [WorldPos]
+getNearestPoses pos = map (\add -> pos + add) nearestCellsPosAdds    
+
+nearestCellsPosAdds
+    = [
+        (-1, -1),
+        (0, -1),
+        (1, -1),
+        (1, 0),
+        (1, 1),
+        (0, 1),
+        (-1, 1),
+        (-1, 0)
+      ]

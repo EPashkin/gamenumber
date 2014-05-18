@@ -15,8 +15,15 @@ getCellPlayerIndex Cell{playerIndex=pi} = pi
 isFree :: Cell -> Bool
 isFree Cell{value=v, playerIndex=pi}
     | v == 0
-        = True
+    = True
     | pi == 0
-        = True
+    = True
     | otherwise
-        = False
+    = False
+
+isOwnedBy :: Int -> Cell -> Bool
+isOwnedBy playerInd Cell{playerIndex=pi} 
+    | pi == playerInd
+    = True
+    | otherwise
+    = False

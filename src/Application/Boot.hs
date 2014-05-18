@@ -20,3 +20,4 @@ runStartupTest = do
    traceIO $ show positions
    traceIO $ show xList
    traceIO $ show $ getGameCell g1 (3,3)
+   traceIO $ show $ getNearestPoses (2,3)
