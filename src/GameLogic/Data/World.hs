@@ -29,9 +29,7 @@ getWorldCell :: World -> WorldPos -> Cell
 getWorldCell world pos = world ! pos
 
 getWorldSize :: World -> Int
-getWorldSize world = 
-    let (startWorldPos, (size, _)) = bounds world
-    in size
+getWorldSize = fst . snd . bounds 
 
 -- apply function to all cells
 mapW :: ((WorldPos, Cell) -> a) -> World -> [a]
@@ -41,27 +39,20 @@ mapW func world = map func (assocs world)
 -- can generate error is no pos
 findPlayerPos :: World -> Int -> WorldPos
 findPlayerPos world playerInd = 
-    let p (_, cell) = playerIndex cell == playerInd
+    let p (_, cell) = isOwnedBy playerInd cell
         [(pos, _)] = take 1 $ filter p $ assocs world
     in pos
 
 isPosInWorld :: World -> WorldPos -> Bool
-isPosInWorld world (x, y)
-    | x >= 1
-    , x <= size
-    , y >= 1
-    , y <= size
-    = True
-    | otherwise
-    = False
-    where size = getWorldSize world
+isPosInWorld world = inRange $ bounds world
 
 getNearestOwnedCells :: World -> WorldPos -> Int -> [(WorldPos, Cell)]
 getNearestOwnedCells world pos playerInd
     = filter (isOwnedBy playerInd . snd) $ getNearestCells world pos
 
 getNearestCells :: World -> WorldPos -> [(WorldPos, Cell)]
-getNearestCells world pos = map (\pos' -> (pos', getWorldCell world pos')) $ getNearestWorldPoses world pos
+getNearestCells world pos = map p $ getNearestWorldPoses world pos
+    where p pos' = (pos', getWorldCell world pos')
 
 getNearestWorldPoses :: World -> WorldPos -> [WorldPos]
 getNearestWorldPoses world pos

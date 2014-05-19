@@ -1,13 +1,14 @@
 module GameLogic.Logic where
 
+import Control.Lens
 import GameLogic.Data.Cell
 import GameLogic.Data.World
 import GameLogic.Data.Game
 
-setCenterPos :: Game -> WorldPos -> Game
-setCenterPos game pos = 
+setCenterPosLimited :: Game -> WorldPos -> Game
+setCenterPosLimited game pos = 
     let pos' = limitPosToWorld game pos
-    in game { gCenterPos = pos' }
+    in set centerPos pos' game
     
 doCellAction :: Game -> WorldPos -> Game
 doCellAction game pos
@@ -16,7 +17,7 @@ doCellAction game pos
     | otherwise
     = doCellAction' game' pos cell activePlayerIndex 
       where
-        game' = game { gSelectedPos = pos }
+        game' = setSelectedPos game pos
         cell = getGameCell game pos
     
 doCellAction' :: Game -> WorldPos -> Cell -> Int -> Game
@@ -39,7 +40,7 @@ increaseCellWithMax game pos cell maxVal
     = game
     | otherwise
     = setGameCell game pos cell'
-    where cell' = changeCellValue cell $ getCellValue cell + 1
+    where cell' = setCellValue cell $ getCellValue cell + 1
 
 isPosInGame :: Game -> WorldPos -> Bool
 isPosInGame game = isPosInWorld $ getWorld game

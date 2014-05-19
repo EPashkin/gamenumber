@@ -12,7 +12,7 @@ eventHandler (EventKey key keyState mods pos) game
     = return $ doCellAction game $ worldPosOfWindowPos game pos
     | MouseButton RightButton == key
     , Down                    == keyState
-    = return $ setCenterPos game $ worldPosOfWindowPos game pos
+    = return $ setCenterPosLimited game $ worldPosOfWindowPos game pos
 
 eventHandler _ game
     = return game

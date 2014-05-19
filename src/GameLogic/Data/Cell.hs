@@ -1,19 +1,26 @@
+{-# LANGUAGE TemplateHaskell #-}
 module GameLogic.Data.Cell where
 
-data Cell = Cell { value :: Int
-                 , playerIndex :: Int }
+import Control.Lens
+
+data Cell = Cell { _value :: Int
+                 , _playerIndex :: Int }
   deriving (Show)
 
-mkCell v plInd = Cell { value = v, playerIndex = plInd }
+makeLenses ''Cell
 
-changeCellValue cell v = cell {value = v}
+mkCell v plInd = Cell { _value = v, _playerIndex = plInd }
 
-getCellValue Cell{value=v} = v
+setCellValue cell v = set value v cell
 
-getCellPlayerIndex Cell{playerIndex=pi} = pi
+getCellValue :: Cell -> Int
+getCellValue = view value
+
+getCellPlayerIndex :: Cell -> Int
+getCellPlayerIndex = view playerIndex
 
 isFree :: Cell -> Bool
-isFree Cell{value=v, playerIndex=pi}
+isFree Cell{_value=v, _playerIndex=pi}
     | v == 0
     = True
     | pi == 0
@@ -22,7 +29,7 @@ isFree Cell{value=v, playerIndex=pi}
     = False
 
 isOwnedBy :: Int -> Cell -> Bool
-isOwnedBy playerInd Cell{playerIndex=pi} 
+isOwnedBy playerInd Cell{_playerIndex=pi} 
     | pi == playerInd
     = True
     | otherwise

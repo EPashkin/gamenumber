@@ -13,9 +13,9 @@ drawGame game = do
    let cells = mapW drawCell world
    let halfScale = drawScale / 2
 
-   let centerPos = gCenterPos game
+   let centerPos = getCenterPos game
    let firstPlayerColor = playerColor activePlayerIndex
-   let selected = drawSelectedCellBox (gSelectedPos game) firstPlayerColor
+   let selected = drawSelectedCellBox (getSelectedPos game) firstPlayerColor
 
    let worldSize = getWorldSize world
    let shiftX = - (fromIntegral (fst centerPos) - 0.5) * drawScale
@@ -31,7 +31,7 @@ drawCell (pos, cell)
       = translateCell pos $ Pictures [ Color emptyCellColor $ rectangleWire 30 30 ]
    | otherwise
       = let rect = rectangleWire 30 30
-            color = playerColor $ playerIndex cell
+            color = playerColor $ getCellPlayerIndex cell
             shiftX = - drawScale / 3
             shiftY = - drawScale / 2.5
             txt = Translate shiftX shiftY $ Scale textScale textScale 
@@ -56,7 +56,7 @@ translateCell (x,y) pict =
 
 worldPosOfWindowPos :: Game -> (Float, Float) -> WorldPos
 worldPosOfWindowPos game (x, y) =
-   let centerPos = gCenterPos game
+   let centerPos = getCenterPos game
        xi = floor (x / drawScale + 0.5) + fst centerPos :: Int
        yi = floor (y / drawScale + 0.5) + snd centerPos :: Int
    in (xi, yi)
