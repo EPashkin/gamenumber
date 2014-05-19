@@ -19,7 +19,8 @@ instance (Num a,Num b) => Num (a, b) where
 type World = Array WorldPos Cell
 
 mkEmptyWorld :: Int -> World
-mkEmptyWorld size = array (startWorldPos, (size, size)) [(pos, mkCell 0 0) | x <- [1..size], y <- [1..size], let pos = (x,y)]
+mkEmptyWorld size = array (startWorldPos, (size, size))
+    [(pos, mkCell 0 0) | x <- [1..size], y <- [1..size], let pos = (x,y)]
 
 setWorldCell :: World -> WorldPos -> Cell -> World
 setWorldCell world pos cell = world // [(pos, cell)]
@@ -40,7 +41,8 @@ mapW func world = map func (assocs world)
 -- can generate error is no pos
 findPlayerPos :: World -> Int -> WorldPos
 findPlayerPos world playerInd = 
-    let [(pos, _)] = take 1 $ filter (\ (_, cell) -> playerIndex cell == playerInd) $ assocs world
+    let p (_, cell) = playerIndex cell == playerInd
+        [(pos, _)] = take 1 $ filter p $ assocs world
     in pos
 
 isPosInWorld :: World -> WorldPos -> Bool

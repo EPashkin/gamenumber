@@ -1,9 +1,10 @@
 module GameLogic.StartLogic where
 
+import System.Random
+import Control.Monad
 import GameLogic.Data.Cell
 import GameLogic.Data.World
 import GameLogic.Data.Game
-import System.Random
 import Util.Shuffle
 
 
@@ -13,8 +14,7 @@ newGame = newGame' defSeed
 newGame':: Int -> IO Game
 newGame' seed
     | 0 == seed
-    = newStdGen  >>= \ gen ->
-        return $ mkStartGameGen gen
+    = liftM mkStartGameGen newStdGen
     | otherwise
     = return $ mkStartGame seed
 
@@ -36,7 +36,8 @@ placeWorldPlayers world numPlayers gen =
         positions = [calcStartPos world numPlayers pl | pl <- players]
         (positions', gen') = shuffle gen positions
         playersPosition = zip positions' players
-        world' = foldl (\w (pos, pl) -> setWorldCell w pos (mkCell 1 pl)) world playersPosition :: World
+        p w (pos, pl) = setWorldCell w pos (mkCell 1 pl)
+        world' = foldl p world playersPosition
     in (world', gen')
 
 calcStartPos :: World -> Int -> Int -> WorldPos

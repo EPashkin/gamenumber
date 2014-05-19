@@ -34,7 +34,8 @@ drawCell (pos, cell)
             color = playerColor $ playerIndex cell
             shiftX = - drawScale / 3
             shiftY = - drawScale / 2.5
-            txt = Translate shiftX shiftY $ Scale textScale textScale $ Text $ show $ getCellValue cell
+            txt = Translate shiftX shiftY $ Scale textScale textScale 
+                $ Text $ show $ getCellValue cell
       in translateCell pos $ Color color $ Pictures $ rect : [ txt ]
 
 drawSelectedCellBox pos color =
