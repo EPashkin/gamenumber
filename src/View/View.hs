@@ -1,5 +1,6 @@
 module View.View where
 
+import Control.Lens
 import GameLogic.Data.Facade
 import Middleware.Gloss.Facade
 
@@ -13,13 +14,13 @@ drawGame game = do
    let cells = mapW drawCell world
    let halfScale = drawScale / 2
 
-   let centerPos = getCenterPos game
+   let centerPos' = view centerPos game
    let firstPlayerColor = playerColor activePlayerIndex
-   let selected = drawSelectedCellBox (getSelectedPos game) firstPlayerColor
+   let selected = drawSelectedCellBox (view selectedPos game) firstPlayerColor
 
    let worldSize = getWorldSize world
-   let shiftX = - (fromIntegral (fst centerPos) - 0.5) * drawScale
-   let shiftY = - (fromIntegral (snd centerPos) - 0.5) * drawScale
+   let shiftX = - (fromIntegral (fst centerPos') - 0.5) * drawScale
+   let shiftY = - (fromIntegral (snd centerPos') - 0.5) * drawScale
    let world = Translate shiftX shiftY $ Pictures $ selected : cells
 
    return $ Pictures [world]
@@ -56,7 +57,7 @@ translateCell (x,y) pict =
 
 worldPosOfWindowPos :: Game -> (Float, Float) -> WorldPos
 worldPosOfWindowPos game (x, y) =
-   let centerPos = getCenterPos game
-       xi = floor (x / drawScale + 0.5) + fst centerPos :: Int
-       yi = floor (y / drawScale + 0.5) + snd centerPos :: Int
+   let centerPos' = view centerPos game
+       xi = floor (x / drawScale + 0.5) + fst centerPos' :: Int
+       yi = floor (y / drawScale + 0.5) + snd centerPos' :: Int
    in (xi, yi)

@@ -1,11 +1,15 @@
 module Application.Game.Engine where
 
-import Application.Game.Logic
-import Middleware.Gloss.Facade
-import Middleware.Gloss.Environment
-import View.View
+import GameLogic.Data.Facade (Game)
+import Application.Game.Logic (eventHandler)
+import GameLogic.Logic (doGameStep)
+import Middleware.Gloss.Environment (runEnvironment)
+import View.View (drawGame)
 
-runEngine game = runEnvironment game drawGame eventHandler doGameStep
+ticksPerSecond = 10
 
-doGameStep :: Float -> game -> IO game
-doGameStep _ = return
+runEngine game = runEnvironment ticksPerSecond game drawGame eventHandler runGameStep
+
+
+runGameStep :: Float -> Game -> IO Game
+runGameStep _ = return . doGameStep

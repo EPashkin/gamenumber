@@ -7,14 +7,29 @@ import GameLogic.Data.Game
 
 setCenterPosLimited :: WorldPos -> Game -> Game
 setCenterPosLimited pos game = 
-    setCenterPos (limitPosToWorld pos game) game
+    set centerPos (limitPosToWorld pos game) game
+    
+doSelectCellAction :: WorldPos -> Game -> Game
+doSelectCellAction pos game
+    | not $ isPosInGame game pos
+    = game 
+    | otherwise
+    = set selectedPos pos game
+    
+doGameStep :: Game -> Game
+doGameStep game
+    | view leftClickDown game
+     = doCellAction (view selectedPos game) game
+    | otherwise
+    = game
+
     
 doCellAction :: WorldPos -> Game -> Game
 doCellAction pos game
     | not $ isPosInGame game pos
     = game 
     | otherwise
-    = doCellAction' pos activePlayerIndex $ setSelectedPos pos game
+    = doCellAction' pos activePlayerIndex game -- $ set selectedPos pos game
     
 doCellAction' :: WorldPos -> Int -> Game -> Game
 doCellAction' pos playerInd game

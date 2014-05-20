@@ -11,6 +11,7 @@ import GameLogic.Data.World
 data Game = Game { _world :: World
                  , _centerPos :: WorldPos -- position in center of screen
                  , _selectedPos :: WorldPos -- current action position for active player
+                 , _leftClickDown :: Bool
                  , _rndGen :: StdGen }
   deriving (Show)
   
@@ -32,23 +33,12 @@ mkGameDef world gen
     , _rndGen = gen
     , _centerPos = pos
     , _selectedPos = pos
+    , _leftClickDown = False
     } where pos = findPlayerPos activePlayerIndex world
 
 
 getWorld :: Game -> World
 getWorld = view world
-
-getCenterPos :: Game -> WorldPos
-getCenterPos = view centerPos
-
-setCenterPos :: WorldPos -> Game -> Game
-setCenterPos = set centerPos
-
-getSelectedPos :: Game -> WorldPos
-getSelectedPos = view selectedPos
-
-setSelectedPos :: WorldPos -> Game -> Game
-setSelectedPos = set selectedPos
 
 getGameCell :: WorldPos -> Game -> Cell
 getGameCell pos = view (world . toCell pos) 
