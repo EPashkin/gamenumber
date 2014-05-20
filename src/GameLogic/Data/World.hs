@@ -42,21 +42,19 @@ mapW func world = map func (assocs world)
 
 -- find first pos owned by playerIndex
 -- can generate error is no pos
-findPlayerPos :: World -> Int -> WorldPos
-findPlayerPos world playerInd = 
-    let p (_, cell) = isOwnedBy playerInd cell
-        [(pos, _)] = take 1 $ filter p $ assocs world
-    in pos
+findPlayerPos :: Int -> World -> WorldPos
+findPlayerPos playerInd
+    = fst . head . take 1 . filter (isOwnedBy playerInd . snd) . assocs
 
 isPosInWorld :: World -> WorldPos -> Bool
 isPosInWorld world = inRange $ bounds world
 
-getNearestOwnedCells :: World -> WorldPos -> Int -> [(WorldPos, Cell)]
-getNearestOwnedCells world pos playerInd
-    = filter (isOwnedBy playerInd . snd) $ getNearestCells world pos
+getNearestOwnedCells :: Int -> World -> WorldPos -> [(WorldPos, Cell)]
+getNearestOwnedCells playerInd world
+    = filter (isOwnedBy playerInd . snd) . getNearestCells world
 
 getNearestCells :: World -> WorldPos -> [(WorldPos, Cell)]
-getNearestCells world pos = map p $ getNearestWorldPoses world pos
+getNearestCells world = map p . getNearestWorldPoses world
     where p pos' = (pos', getWorldCell pos' world)
 
 getNearestWorldPoses :: World -> WorldPos -> [WorldPos]

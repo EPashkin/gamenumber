@@ -30,9 +30,10 @@ mkGameDef world gen
     = Game { 
     _world = world
     , _rndGen = gen
-    , _centerPos = findPlayerPos world activePlayerIndex
-    , _selectedPos = findPlayerPos world activePlayerIndex
-    }
+    , _centerPos = pos
+    , _selectedPos = pos
+    } where pos = findPlayerPos activePlayerIndex world
+
 
 getWorld :: Game -> World
 getWorld = view world
@@ -44,13 +45,13 @@ setCenterPos :: WorldPos -> Game -> Game
 setCenterPos = set centerPos
 
 getSelectedPos :: Game -> WorldPos
-getSelectedPos = _selectedPos
+getSelectedPos = view selectedPos
 
-setSelectedPos :: Game -> WorldPos -> Game
-setSelectedPos game pos = set selectedPos pos game
+setSelectedPos :: WorldPos -> Game -> Game
+setSelectedPos = set selectedPos
 
 getGameCell :: WorldPos -> Game -> Cell
 getGameCell pos = view (world . toCell pos) 
 
-setGameCell :: WorldPos -> Cell -> Game -> Game
-setGameCell pos = over world . set (toCell pos)
+overGameCell :: WorldPos -> (Cell -> Cell) -> Game -> Game
+overGameCell pos = over world . over (toCell pos)

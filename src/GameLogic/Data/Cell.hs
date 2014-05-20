@@ -11,7 +11,8 @@ makeLenses ''Cell
 
 mkCell v plInd = Cell { _value = v, _playerIndex = plInd }
 
-setCellValue cell v = set value v cell
+overCellValue :: (Int -> Int) -> Cell ->Cell
+overCellValue = over value
 
 getCellValue :: Cell -> Int
 getCellValue = view value

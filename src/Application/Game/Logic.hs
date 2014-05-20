@@ -9,7 +9,7 @@ eventHandler :: Event -> Game -> IO Game
 eventHandler (EventKey key keyState mods pos) game
     | MouseButton LeftButton == key
     , Down                   == keyState
-    = return $ doCellAction game $ worldPosOfWindowPos game pos
+    = return $ doCellAction (worldPosOfWindowPos game pos) game
     | MouseButton RightButton == key
     , Down                    == keyState
     = return $ setCenterPosLimited (worldPosOfWindowPos game pos) game 
