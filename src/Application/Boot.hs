@@ -19,5 +19,5 @@ runStartupTest = do
        xList = playersStartPosXList defWorldSize defNumPlayers
    traceIO $ show positions
    traceIO $ show xList
-   traceIO $ show $ getGameCell g1 (3,3)
+   traceIO $ show $ getGameCell (2,2) g1
    traceIO $ show $ getNearestPoses (2,3)

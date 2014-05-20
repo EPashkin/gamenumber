@@ -7,6 +7,7 @@ import Data.Maybe
 import GameLogic.Data.Cell
 import GameLogic.Data.World
 
+
 data Game = Game { _world :: World
                  , _centerPos :: WorldPos -- position in center of screen
                  , _selectedPos :: WorldPos -- current action position for active player
@@ -39,8 +40,8 @@ getWorld = view world
 getCenterPos :: Game -> WorldPos
 getCenterPos = view centerPos
 
-setCenterPos :: Game -> WorldPos -> Game
-setCenterPos game pos = set centerPos pos game
+setCenterPos :: WorldPos -> Game -> Game
+setCenterPos = set centerPos
 
 getSelectedPos :: Game -> WorldPos
 getSelectedPos = _selectedPos
@@ -48,10 +49,8 @@ getSelectedPos = _selectedPos
 setSelectedPos :: Game -> WorldPos -> Game
 setSelectedPos game pos = set selectedPos pos game
 
-getGameCell :: Game -> WorldPos -> Cell
-getGameCell game pos = fromMaybe undefined mcell
-    where mcell = view world game ^? ix pos  
+getGameCell :: WorldPos -> Game -> Cell
+getGameCell pos = view (world . toCell pos) 
 
-setGameCell :: Game -> WorldPos -> Cell -> Game
-setGameCell game pos cell = (world `over` f) game
-  where f world = setWorldCell world pos cell
+setGameCell :: WorldPos -> Cell -> Game -> Game
+setGameCell pos = over world . set (toCell pos)

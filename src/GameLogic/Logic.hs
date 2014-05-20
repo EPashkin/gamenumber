@@ -5,10 +5,11 @@ import GameLogic.Data.Cell
 import GameLogic.Data.World
 import GameLogic.Data.Game
 
-setCenterPosLimited :: Game -> WorldPos -> Game
-setCenterPosLimited game pos = 
-    let pos' = limitPosToWorld game pos
-    in set centerPos pos' game
+setCenterPosLimited :: WorldPos -> Game -> Game
+setCenterPosLimited pos game = 
+--    let pos' = limitPosToWorld pos game
+--    in set centerPos pos' game
+    setCenterPos (limitPosToWorld pos game) game
     
 doCellAction :: Game -> WorldPos -> Game
 doCellAction game pos
@@ -18,7 +19,7 @@ doCellAction game pos
     = doCellAction' game' pos cell activePlayerIndex 
       where
         game' = setSelectedPos game pos
-        cell = getGameCell game pos
+        cell = getGameCell pos game
     
 doCellAction' :: Game -> WorldPos -> Cell -> Int -> Game
 doCellAction' game pos cell playerInd
@@ -39,14 +40,14 @@ increaseCellWithMax game pos cell maxVal
     | getCellValue cell >= maxVal
     = game
     | otherwise
-    = setGameCell game pos cell'
+    = setGameCell pos cell' game
     where cell' = setCellValue cell $ getCellValue cell + 1
 
 isPosInGame :: Game -> WorldPos -> Bool
 isPosInGame game = isPosInWorld $ getWorld game
 
-limitPosToWorld :: Game -> WorldPos -> WorldPos
-limitPosToWorld game pos = limitPosToWorld' pos $ getWorldSize $ getWorld game
+limitPosToWorld :: WorldPos -> Game -> WorldPos
+limitPosToWorld pos = limitPosToWorld' pos . getWorldSize . getWorld
 
 limitPosToWorld' (x, y) max
     | x < 1
