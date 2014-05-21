@@ -18,9 +18,7 @@ drawGame game = do
    let firstPlayerColor = playerColor activePlayerIndex
    let selected = drawSelectedCellBox (view selectedPos game) firstPlayerColor
 
-   let worldSize = getWorldSize world
-   let shiftX = - (fromIntegral (fst centerPos') - 0.5) * drawScale
-   let shiftY = - (fromIntegral (snd centerPos') - 0.5) * drawScale
+   let (shiftX, shiftY) = windowPosOfWorldPos game startWorldPos
    let world = Translate shiftX shiftY $ Pictures $ selected : cells
 
    return $ Pictures [world]
@@ -55,9 +53,16 @@ translateCell (x,y) pict =
        yy = (fromIntegral y - 0.5) * drawScale
    in Translate xx yy pict
 
+windowPosOfWorldPos :: Game -> WorldPos -> (Float, Float)
+windowPosOfWorldPos game pos =
+   let centerPos' = view centerPos game
+       xf = (fromIntegral (fst (pos - centerPos')) - 0.5) * drawScale
+       yf = (fromIntegral (snd (pos - centerPos')) - 0.5) * drawScale
+   in (xf, yf)
+
 worldPosOfWindowPos :: Game -> (Float, Float) -> WorldPos
 worldPosOfWindowPos game (x, y) =
    let centerPos' = view centerPos game
-       xi = floor (x / drawScale + 0.5) + fst centerPos' :: Int
-       yi = floor (y / drawScale + 0.5) + snd centerPos' :: Int
+       xi = floor (x / drawScale + 0.5) + fst centerPos'
+       yi = floor (y / drawScale + 0.5) + snd centerPos'
    in (xi, yi)
