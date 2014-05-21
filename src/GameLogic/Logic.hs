@@ -18,7 +18,7 @@ doSelectCellAction pos game
     
 doGameStep :: Game -> Game
 doGameStep game
-    | view leftClickDown game
+    | view placementMode game
      = doCellAction (view selectedPos game) game
     | otherwise
     = game

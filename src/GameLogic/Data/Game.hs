@@ -11,7 +11,7 @@ import GameLogic.Data.World
 data Game = Game { _world :: World
                  , _centerPos :: WorldPos -- position in center of screen
                  , _selectedPos :: WorldPos -- current action position for active player
-                 , _leftClickDown :: Bool
+                 , _placementMode :: Bool
                  , _rndGen :: StdGen }
   deriving (Show)
   
@@ -33,7 +33,7 @@ mkGameDef world gen
     , _rndGen = gen
     , _centerPos = pos
     , _selectedPos = pos
-    , _leftClickDown = False
+    , _placementMode = False
     } where pos = findPlayerPos activePlayerIndex world
 
 

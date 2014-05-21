@@ -1,28 +1,25 @@
 module Application.Game.Logic where
 
-import Control.Lens (set, view)
-import GameLogic.Data.Facade (Game, leftClickDown)
-import GameLogic.Logic (doSelectCellAction, setCenterPosLimited)
 import Middleware.Gloss.Facade
-import View.View (worldPosOfWindowPos)
+import View.State
 
-eventHandler :: Event -> Game -> IO Game
-eventHandler (EventKey key keyState mods pos) game
+eventHandler :: Event -> State -> IO State
+eventHandler (EventKey key keyState mods pos) state
     | MouseButton LeftButton == key
     , Down                   == keyState
-    = return $ set leftClickDown True $ doSelectCellAction pos' game 
+    = return $ startPlacement pos state 
     | MouseButton LeftButton == key
     , Up                     == keyState
-    = return $ set leftClickDown False game 
+    = return $ stopPlacement state 
     | MouseButton RightButton == key
     , Down                    == keyState
-    = return $ setCenterPosLimited pos' game
-    where pos' = worldPosOfWindowPos game pos
+    = return $ centering pos state
     
-eventHandler (EventMotion pos) game
-    | view leftClickDown game
-    =return $ doSelectCellAction pos' game 
-    where pos' = worldPosOfWindowPos game pos
+eventHandler (EventMotion pos) state
+    | inPlacementMode state 
+    = return $ drawing pos state
+    | otherwise
+    = return state
 
-eventHandler _ game
-    = return game
+eventHandler _ state
+    = return state
