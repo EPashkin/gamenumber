@@ -51,13 +51,14 @@ increaseCellWithMax pos playerInd
 
 increaseCellWithMax' :: Int -> Int -> Cell -> Cell
 increaseCellWithMax' playerInd maxVal cell
-       | isFree cell
-       = mkCell 1 playerInd
-       | getCellPlayerIndex cell /=  playerInd
-       || getCellValue cell >= maxVal
-       = cell
-       | otherwise
+       | getCellPlayerIndex cell == playerInd
+       && getCellValue cell < maxVal
        = overCellValue (+1) cell
+       | isFree cell
+       && maxVal >= 1
+       = mkCell 1 playerInd
+       | otherwise
+       = cell
 
 isPosInGame :: Game -> WorldPos -> Bool
 isPosInGame = isPosInWorld . getWorld
