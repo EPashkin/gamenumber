@@ -1,9 +1,9 @@
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE Rank2Types #-}
 module GameLogic.Data.Game where
 
 import System.Random
 import Control.Lens
-import Data.Maybe
 import GameLogic.Data.Cell
 import GameLogic.Data.World
 
@@ -36,12 +36,5 @@ mkGameDef world gen
     , _placementMode = False
     } where pos = findPlayerPos activePlayerIndex world
 
-
-getWorld :: Game -> World
-getWorld = view world
-
-getGameCell :: WorldPos -> Game -> Cell
-getGameCell pos = view (world . toCell pos) 
-
-overGameCell :: WorldPos -> (Cell -> Cell) -> Game -> Game
-overGameCell pos = over world . over (toCell pos)
+cellOfGame :: WorldPos -> Traversal' Game Cell 
+cellOfGame pos = world . cellOfWorld pos

@@ -8,18 +8,17 @@ import Middleware.Gloss.Facade
 
 drawGame :: Game -> IO Picture
 drawGame game = do
-   let world = getWorld game
-   let cells = mapW drawCell world
+   let cells = mapW drawCell $ game ^. world
    let halfScale = drawScale / 2
 
-   let centerPos' = view centerPos game
+   let centerPos' = game ^. centerPos
    let firstPlayerColor = playerColor activePlayerIndex
-   let selected = drawSelectedCellBox (view selectedPos game) firstPlayerColor
+   let selected = drawSelectedCellBox (game ^. selectedPos) firstPlayerColor
 
    let (shiftX, shiftY) = windowPosOfWorldPos game startWorldPos
-   let world = Translate shiftX shiftY $ Pictures $ selected : cells
+   let worldPicts = Translate shiftX shiftY $ Pictures $ selected : cells
 
-   return $ Pictures [world]
+   return $ Pictures [worldPicts]
 
 
 drawCell :: (WorldPos, Cell) -> Picture
@@ -28,11 +27,11 @@ drawCell (pos, cell)
       = translateCell pos $ Pictures [ Color emptyCellColor $ rectangleWire 30 30 ]
    | otherwise
       = let rect = rectangleWire 30 30
-            color = playerColor $ getCellPlayerIndex cell
+            color = playerColor $ cell ^. playerIndex
             shiftX = - drawScale / 3
             shiftY = - drawScale / 2.5
             txt = Translate shiftX shiftY $ Scale textScale textScale 
-                $ Text $ show $ getCellValue cell
+                $ Text $ show $ cell ^. value
       in translateCell pos $ Color color $ Pictures $ rect : [ txt ]
 
 drawSelectedCellBox pos color =

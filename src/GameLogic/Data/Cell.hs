@@ -2,6 +2,8 @@
 module GameLogic.Data.Cell where
 
 import Control.Lens
+import Data.Monoid
+
 
 data Cell = Cell { _value :: Int
                  , _playerIndex :: Int }
@@ -9,19 +11,15 @@ data Cell = Cell { _value :: Int
 
 makeLenses ''Cell
 
+-- needed for ix on array 
+instance Monoid Cell where
+  mempty = undefined
+  mappend = undefined
+
 mkCell v plInd = Cell { _value = v, _playerIndex = plInd }
 
-overCellValue :: (Int -> Int) -> Cell ->Cell
-overCellValue = over value
-
-getCellValue :: Cell -> Int
-getCellValue = view value
-
-getCellPlayerIndex :: Cell -> Int
-getCellPlayerIndex = view playerIndex
-
 isFree :: Cell -> Bool
-isFree Cell{_value=v, _playerIndex=pi}
+isFree Cell{ _value = v, _playerIndex = pi }
     | v == 0
     = True
     | pi == 0
@@ -30,7 +28,7 @@ isFree Cell{_value=v, _playerIndex=pi}
     = False
 
 isOwnedBy :: Int -> Cell -> Bool
-isOwnedBy playerInd Cell{_playerIndex=pi} 
+isOwnedBy playerInd Cell{ _playerIndex = pi } 
     | pi == playerInd
     = True
     | otherwise

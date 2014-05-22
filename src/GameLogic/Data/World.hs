@@ -24,14 +24,8 @@ mkEmptyWorld :: Int -> World
 mkEmptyWorld size = array (startWorldPos, (size, size))
     [(pos, mkCell 0 0) | x <- [1..size], y <- [1..size], let pos = (x,y)]
 
-setWorldCell :: WorldPos -> World -> Cell -> World
-setWorldCell pos world cell = world // [(pos, cell)]
-
-getWorldCell :: WorldPos -> World -> Cell
-getWorldCell pos world = world ! pos
-
-toCell :: WorldPos -> Lens' World Cell
-toCell pos = lens (getWorldCell pos) (setWorldCell pos)
+cellOfWorld :: WorldPos -> Traversal' World Cell
+cellOfWorld = ix
 
 getWorldSize :: World -> Int
 getWorldSize = fst . snd . bounds 
@@ -55,7 +49,7 @@ getNearestOwnedCells playerInd world
 
 getNearestCells :: World -> WorldPos -> [(WorldPos, Cell)]
 getNearestCells world = fmap p . getNearestWorldPoses world
-    where p pos' = (pos', getWorldCell pos' world)
+    where p pos' = (pos', world ^. cellOfWorld pos')
 
 getNearestWorldPoses :: World -> WorldPos -> [WorldPos]
 getNearestWorldPoses world pos

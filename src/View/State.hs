@@ -26,12 +26,12 @@ runStartupTest = do
    g1 <- newGame
    traceIO $ show g1
    let players = [1..defNumPlayers]
-       w2 = getWorld g1
+       w2 = g1 ^. world
        positions = [calcStartPos w2 (length players) pl | pl <- players]
        xList = playersStartPosXList defWorldSize defNumPlayers
    traceIO $ show positions
    traceIO $ show xList
-   traceIO $ show $ getGameCell (2,2) g1
+   traceIO $ show $ g1 ^. cellOfGame (2,2) 
    traceIO $ show $ getNearestPoses (2,3)
 
 
@@ -42,21 +42,26 @@ runGameStep :: Float -> State -> IO State
 runGameStep _ = return . over game doGameStep
 
 startPlacement :: (Float, Float) -> State -> State
-startPlacement pos = over game p
-    where p = set placementMode True . doWithWindowPos doSelectCellAction pos
+startPlacement pos = set placementModeOfGame True . doWithWindowPos doSelectCellAction pos
 
 stopPlacement :: State -> State
-stopPlacement = over game $ set placementMode False
+stopPlacement = set placementModeOfGame False
 
 inPlacementMode :: State -> Bool
-inPlacementMode = view placementMode . view game
+inPlacementMode = view placementModeOfGame 
+
+placementModeOfGame :: Lens' State Bool
+placementModeOfGame = game . placementMode
 
 centering :: (Float, Float) -> State -> State
-centering = over game . doWithWindowPos setCenterPosLimited
+centering = doWithWindowPos setCenterPosLimited
 
 drawing :: (Float, Float) -> State -> State
-drawing = over game . doWithWindowPos doSelectCellAction 
+drawing = doWithWindowPos doSelectCellAction 
 
-doWithWindowPos :: (WorldPos -> Game -> Game) -> (Float, Float) -> Game-> Game
-doWithWindowPos action pos game = action pos' game
+doWithWindowPosOnGame :: (WorldPos -> Game -> Game) -> (Float, Float) -> Game-> Game
+doWithWindowPosOnGame action pos game = action pos' game
             where pos' = worldPosOfWindowPos game pos
+
+doWithWindowPos :: (WorldPos -> Game -> Game) -> (Float, Float) -> State-> State
+doWithWindowPos action pos = game %~ doWithWindowPosOnGame action pos
