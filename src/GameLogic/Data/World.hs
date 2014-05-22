@@ -9,7 +9,7 @@ import GameLogic.Data.Cell
 type WorldPos = (Int, Int)
 startWorldPos = (1,1)
 
---TODO: find way do only +
+--TODO: find way do only + -
 instance (Num a,Num b) => Num (a, b) where
     (a,b) + (c,d) = (a+c, b+d)
     (a,b) * (c,d) = undefined
@@ -30,7 +30,7 @@ setWorldCell pos world cell = world // [(pos, cell)]
 getWorldCell :: WorldPos -> World -> Cell
 getWorldCell pos world = world ! pos
 
-toCell :: WorldPos -> Lens World World Cell Cell
+toCell :: WorldPos -> Lens' World Cell
 toCell pos = lens (getWorldCell pos) (setWorldCell pos)
 
 getWorldSize :: World -> Int
@@ -38,7 +38,7 @@ getWorldSize = fst . snd . bounds
 
 -- apply function to all cells
 mapW :: ((WorldPos, Cell) -> a) -> World -> [a]
-mapW func world = map func (assocs world)
+mapW func world = fmap func (assocs world)
 
 -- find first pos owned by playerIndex
 -- can generate error is no pos
@@ -54,7 +54,7 @@ getNearestOwnedCells playerInd world
     = filter (isOwnedBy playerInd . snd) . getNearestCells world
 
 getNearestCells :: World -> WorldPos -> [(WorldPos, Cell)]
-getNearestCells world = map p . getNearestWorldPoses world
+getNearestCells world = fmap p . getNearestWorldPoses world
     where p pos' = (pos', getWorldCell pos' world)
 
 getNearestWorldPoses :: World -> WorldPos -> [WorldPos]
@@ -62,7 +62,7 @@ getNearestWorldPoses world pos
     = filter (isPosInWorld world) $ getNearestPoses pos  
 
 getNearestPoses :: WorldPos -> [WorldPos]
-getNearestPoses pos = map (\add -> pos + add) nearestCellsPosAdds    
+getNearestPoses pos = fmap (\add -> pos + add) nearestCellsPosAdds    
 
 nearestCellsPosAdds
     = [
