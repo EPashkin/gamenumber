@@ -7,10 +7,10 @@ import Middleware.Gloss.Facade (Picture)
 import GameLogic.Data.Facade
 import GameLogic.Logic
 import GameLogic.StartLogic
-import View.View
 import View.Convert
 
 data State = State { _game :: Game
+                   , _windowSize :: (Int, Int) -- current window size
                    }
   deriving (Show)
   
@@ -20,7 +20,7 @@ newState :: IO State
 newState = do
     runStartupTest
     game <- newGame
-    return $ State game   
+    return $ State game (100, 100)
 
 runStartupTest = do
    g1 <- newGame
@@ -34,9 +34,6 @@ runStartupTest = do
    traceIO $ show $ g1 ^. cellOfGame (2,2) 
    traceIO $ show $ getNearestPoses (2,3)
 
-
-drawState :: State -> IO Picture
-drawState = drawGame . view game
 
 runGameStep :: Float -> State -> IO State
 runGameStep _ = return . over game doGameStep
@@ -57,11 +54,17 @@ centering :: (Float, Float) -> State -> State
 centering = doWithWindowPos setCenterPosLimited
 
 drawing :: (Float, Float) -> State -> State
-drawing = doWithWindowPos doSelectCellAction 
+drawing = doWithWindowPos doSelectCellAction
+
+updateWindowSize :: (Int, Int) -> State -> State
+updateWindowSize = set windowSize
 
 doWithWindowPosOnGame :: (WorldPos -> Game -> Game) -> (Float, Float) -> Game-> Game
 doWithWindowPosOnGame action pos game = action pos' game
-            where pos' = worldPosOfWindowPos game pos
+    where pos' = worldPosOfWindowPos game pos
 
 doWithWindowPos :: (WorldPos -> Game -> Game) -> (Float, Float) -> State-> State
-doWithWindowPos action pos = game %~ doWithWindowPosOnGame action pos
+doWithWindowPos action (x, y) = game %~ doWithWindowPosOnGame action pos'
+    where pos' = (x - worldShiftX, y)
+
+worldShiftX = - panelWidth / 2 :: Float

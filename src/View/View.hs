@@ -1,10 +1,17 @@
 module View.View where
 
 import Control.Lens
+import View.State
 import View.Convert
 import GameLogic.Data.Facade
 import Middleware.Gloss.Facade
 
+drawState :: State -> IO Picture
+drawState state = do 
+  world <- state & drawGame . view game
+  let world' = Translate worldShiftX 0 world
+  let panel = drawPanel state 
+  return $ Pictures $ world' : [panel]
 
 drawGame :: Game -> IO Picture
 drawGame game = do
@@ -16,9 +23,9 @@ drawGame game = do
    let selected = drawSelectedCellBox (game ^. selectedPos) firstPlayerColor
 
    let (shiftX, shiftY) = windowPosOfWorldPos game startWorldPos
-   let worldPicts = Translate shiftX shiftY $ Pictures $ selected : cells
+   let worldPicture = Translate shiftX shiftY $ Pictures $ selected : cells
 
-   return $ Pictures [worldPicts]
+   return $ Pictures [worldPicture]
 
 
 drawCell :: (WorldPos, Cell) -> Picture
@@ -42,8 +49,19 @@ drawSelectedCellBox pos color =
     ] where
         diametr = 26
         radius = diametr / 2
-        delta = radius / 4 
+        delta = radius / 4
 
+drawPanel :: State -> Picture
+drawPanel state =
+    let size = state ^. windowSize
+        width = fromIntegral $ fst size
+        height = fromIntegral $ snd size
+        halfWidth = width / 2
+        halfHeight = height / 2
+        shiftX = halfWidth - (panelWidth/2)
+        rect = Color panelBkColor $ rectangleSolid panelWidth height
+    in Translate shiftX 0 rect
+    
 translateCell :: WorldPos -> Picture -> Picture
 translateCell (x,y) pict =
    let xx = (fromIntegral x - 0.5) * drawScale

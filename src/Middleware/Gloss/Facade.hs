@@ -1,9 +1,13 @@
-module Middleware.Gloss.Facade (module G, emptyCellColor, playerColor) where
+module Middleware.Gloss.Facade (module G
+    , emptyCellColor
+    , panelBkColor
+    , playerColor) where
 
 import Graphics.Gloss.Interface.IO.Game as G
 
 emptyCellColor = makeColor8 100 100 100 255
 
+panelBkColor = makeColor8 212 208 200 255
 
 playerColor playerInd = 
     let (r, g, b) = playerColor' playerInd

@@ -21,5 +21,8 @@ eventHandler (EventMotion pos) state
     | otherwise
     = return state
 
+eventHandler (EventResize size) state
+    = return $ updateWindowSize size state
+
 eventHandler _ state
     = return state

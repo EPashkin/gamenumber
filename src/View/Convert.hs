@@ -6,6 +6,7 @@ import GameLogic.Data.Facade
 --TODO: config
 drawScale = 8 * 4 :: Float
 textScale = 8 / drawScale
+panelWidth = 200 :: Float
 
 windowPosOfWorldPos :: Game -> WorldPos -> (Float, Float)
 windowPosOfWorldPos game pos =
