@@ -3,6 +3,7 @@
 module GameLogic.Data.Players where
 
 import System.Random
+import Control.Monad.State
 import Data.Array
 import Control.Lens
 import GameLogic.Data.Config
@@ -30,11 +31,24 @@ mkPlayer aggr = Player {_num = 1
                   , _shield = 0
                   }
 
---TODO: return next random generator
 mkPlayers :: Int -> StdGen -> (Players, StdGen)
 mkPlayers num gen = (players, gen) 
     where players = array (1, num) $ (activePlayerIndex, mkPlayer 0) 
               : [(i, mkPlayer rnd) | (i, rnd) <- list]
           lPlayerNums = [2..num]
-          lRandoms = take (num - 1) $ randomRs (aiAggroMin, aiAggroMax) gen :: [Int]
+          (lRandoms, gen') = runState (getNRndAggros (num - 1)) gen
           list = zip lPlayerNums lRandoms
+
+getRndAggro :: State StdGen Int
+getRndAggro = do
+  gen <- get
+  let (value, gen') = randomR (aiAggroMin, aiAggroMax) gen
+  put gen'
+  return value
+
+getNRndAggros :: Int -> State StdGen [Int]
+getNRndAggros 0 = return []
+getNRndAggros n = do
+  value <- getRndAggro
+  list <- getNRndAggros (n-1)
+  return (value:list)

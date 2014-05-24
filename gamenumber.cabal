@@ -20,6 +20,7 @@ executable gamenumber
                        random,
                        array,
                        containers,
+                       mtl,
                        lens,
                        gloss
   hs-source-dirs:      src
