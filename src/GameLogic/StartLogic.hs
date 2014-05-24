@@ -2,8 +2,10 @@ module GameLogic.StartLogic where
 
 import System.Random
 import Control.Lens
+import GameLogic.Data.Config
 import GameLogic.Data.Cell
 import GameLogic.Data.World
+import GameLogic.Data.Players
 import GameLogic.Data.Game
 import Util.Shuffle
 
@@ -23,8 +25,9 @@ mkStartGame seed = mkStartGameGen gen
     where gen = mkStdGen seed
 
 mkStartGameGen :: StdGen -> Game
-mkStartGameGen gen = mkGameDef world gen'
+mkStartGameGen gen = mkGameDef world players gen''
     where (world, gen') = mkStartWorld defWorldSize defNumPlayers gen
+          (players, gen'') = mkPlayers defNumPlayers gen'
 
 {-# ANN mkStartWorld "HLint: ignore Eta reduce" #-}
 mkStartWorld :: Int ->Int -> StdGen -> (World, StdGen)

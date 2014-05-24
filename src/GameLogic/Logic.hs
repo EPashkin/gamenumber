@@ -1,6 +1,7 @@
 module GameLogic.Logic where
 
 import Control.Lens
+import GameLogic.Data.Config
 import GameLogic.Data.Cell
 import GameLogic.Data.World
 import GameLogic.Data.Game

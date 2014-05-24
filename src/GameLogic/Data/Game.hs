@@ -4,9 +4,10 @@ module GameLogic.Data.Game where
 
 import System.Random
 import Control.Lens
+import GameLogic.Data.Config
 import GameLogic.Data.Cell
 import GameLogic.Data.World
-import GameLogic.Data.Player
+import GameLogic.Data.Players
 
 
 data Game = Game { _world :: World
@@ -19,17 +20,11 @@ data Game = Game { _world :: World
   
 makeLenses ''Game
 
---TODO: to config
-defWorldSize = 8::Int
-defNumPlayers = 16::Int
-defSeed = 0::Int -- set not 0 for debug purposes
-activePlayerIndex = 1::Int
-
-mkGameDef :: World -> StdGen -> Game 
-mkGameDef world gen 
+mkGameDef :: World -> Players -> StdGen -> Game
+mkGameDef world players gen
     = Game { 
     _world = world
-    , _players = mkPlayers defNumPlayers
+    , _players = players
     , _rndGen = gen
     , _centerPos = pos
     , _selectedPos = pos
