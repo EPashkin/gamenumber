@@ -30,10 +30,10 @@ mkStartGameGen gen = mkGameDef world players gen''
           (players, gen'') = mkPlayers defNumPlayers gen'
 
 {-# ANN mkStartWorld "HLint: ignore Eta reduce" #-}
-mkStartWorld :: Int ->Int -> StdGen -> (World, StdGen)
+mkStartWorld :: RandomGen g => Int ->Int -> g -> (World, g)
 mkStartWorld size numPlayers gen = placeWorldPlayers (mkEmptyWorld size) numPlayers gen
 
-placeWorldPlayers :: World -> Int -> StdGen -> (World, StdGen)
+placeWorldPlayers :: RandomGen g => World -> Int -> g -> (World, g)
 placeWorldPlayers world numPlayers gen =
     let players = [1..numPlayers]
         positions = [calcStartPos world numPlayers pl | pl <- players]

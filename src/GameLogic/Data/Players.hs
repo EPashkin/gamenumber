@@ -31,7 +31,7 @@ mkPlayer aggr = Player {_num = 1
                   , _shield = 0
                   }
 
-mkPlayers :: Int -> StdGen -> (Players, StdGen)
+mkPlayers :: RandomGen g => Int -> g -> (Players, g)
 mkPlayers num gen = (players, gen) 
     where players = array (1, num) $ (activePlayerIndex, mkPlayer 0) 
               : [(i, mkPlayer rnd) | (i, rnd) <- list]
@@ -39,14 +39,14 @@ mkPlayers num gen = (players, gen)
           (lRandoms, gen') = runState (getNRndAggros (num - 1)) gen
           list = zip lPlayerNums lRandoms
 
-getRndAggro :: State StdGen Int
+getRndAggro :: RandomGen g => State g Int
 getRndAggro = do
   gen <- get
   let (value, gen') = randomR (aiAggroMin, aiAggroMax) gen
   put gen'
   return value
 
-getNRndAggros :: Int -> State StdGen [Int]
+getNRndAggros :: RandomGen g => Int -> State g [Int]
 getNRndAggros 0 = return []
 getNRndAggros n = do
   value <- getRndAggro
