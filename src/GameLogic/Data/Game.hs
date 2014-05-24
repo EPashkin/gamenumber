@@ -6,9 +6,11 @@ import System.Random
 import Control.Lens
 import GameLogic.Data.Cell
 import GameLogic.Data.World
+import GameLogic.Data.Player
 
 
 data Game = Game { _world :: World
+                 , _players :: Players
                  , _centerPos :: WorldPos -- position in center of screen
                  , _selectedPos :: WorldPos -- current action position for active player
                  , _placementMode :: Bool
@@ -23,13 +25,11 @@ defNumPlayers = 16::Int
 defSeed = 0::Int -- set not 0 for debug purposes
 activePlayerIndex = 1::Int
 
-mkGame :: World -> Int -> Game
-mkGame world seed = mkGameDef world $ mkStdGen seed
-
 mkGameDef :: World -> StdGen -> Game 
 mkGameDef world gen 
     = Game { 
     _world = world
+    , _players = mkPlayers defNumPlayers
     , _rndGen = gen
     , _centerPos = pos
     , _selectedPos = pos
