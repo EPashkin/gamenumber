@@ -11,7 +11,7 @@ drawState state = do
   world <- state & drawGame . view game
   let world' = Translate worldShiftX 0 world
   let panel = drawPanel state 
-  return $ Pictures $ world' : [panel]
+  return . Pictures $ world' : [panel]
 
 drawGame :: Game -> IO Picture
 drawGame game = do
@@ -23,7 +23,7 @@ drawGame game = do
    let selected = drawSelectedCellBox (game ^. selectedPos) firstPlayerColor
 
    let (shiftX, shiftY) = windowPosOfWorldPos game startWorldPos
-   let worldPicture = Translate shiftX shiftY $ Pictures $ selected : cells
+   let worldPicture = Translate shiftX shiftY . Pictures $ selected : cells
 
    return $ Pictures [worldPicture]
 
@@ -37,12 +37,12 @@ drawCell (pos, cell)
             color = playerColor $ cell ^. playerIndex
             shiftX = - drawScale / 3
             shiftY = - drawScale / 2.5
-            txt = Translate shiftX shiftY $ Scale textScale textScale 
-                $ Text $ show $ cell ^. value
-      in translateCell pos $ Color color $ Pictures $ rect : [ txt ]
+            txt = Translate shiftX shiftY . Scale textScale textScale 
+                . Text . show $ cell ^. value
+      in translateCell pos . Color color . Pictures $ rect : [ txt ]
 
 drawSelectedCellBox pos color =
-    translateCell pos $ Color color $ Pictures [
+    translateCell pos . Color color $ Pictures [
         line [(-radius, 0), (delta-radius, 0)],
         line [(radius, 0), (radius-delta, 0)],
         rectangleWire diametr diametr
@@ -67,11 +67,11 @@ drawPanel state =
 drawPlayer :: (Int, Player) -> Picture
 drawPlayer (index, player) =
     let infoWidth = panelWidth*0.9
-        textNum = Translate (infoWidth*textNumShift) 0 $ drawInfoText $ player ^. num
-        textFree = Translate (infoWidth*textFreeShift) 0 $ drawInfoText $ player ^. free
-        textRemain = Translate (infoWidth*textRemainShift) 0 $ drawInfoText $ player ^. remain
-        textShield = Translate (infoWidth*textShieldShift) 0 $ drawInfoText $ shieldText player
-        textAggr = Translate (infoWidth*textAggrShift) 0 $ drawInfoText $ aggrText player
+        textNum = Translate (infoWidth*textNumShift) 0 . drawInfoText $ player ^. num
+        textFree = Translate (infoWidth*textFreeShift) 0 . drawInfoText $ player ^. free
+        textRemain = Translate (infoWidth*textRemainShift) 0 . drawInfoText $ player ^. remain
+        textShield = Translate (infoWidth*textShieldShift) 0 . drawInfoText $ shieldText player
+        textAggr = Translate (infoWidth*textAggrShift) 0 . drawInfoText $ aggrText player
         color = playerColor index
         texts = Color color $ Pictures [textNum, textFree, textRemain, textShield, textAggr]
         shiftY = playerInfoHeight/2 - fromIntegral index * playerInfoHeight
