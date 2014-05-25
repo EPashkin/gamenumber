@@ -60,7 +60,49 @@ drawPanel state =
         halfHeight = height / 2
         shiftX = halfWidth - (panelWidth/2)
         rect = Color panelBkColor $ rectangleSolid panelWidth height
-    in Translate shiftX 0 rect
+        playerPicts = mapP drawPlayer $ state ^. game . players
+        playersPict = Translate 0 (halfHeight - 30) $ Pictures playerPicts
+    in Translate shiftX 0 $ Pictures [rect, playersPict]
+
+drawPlayer :: (Int, Player) -> Picture
+drawPlayer (index, player) =
+    let infoWidth = panelWidth*0.9
+        textNum = Translate (infoWidth*textNumShift) 0 $ drawInfoText $ player ^. num
+        textFree = Translate (infoWidth*textFreeShift) 0 $ drawInfoText $ player ^. free
+        textRemain = Translate (infoWidth*textRemainShift) 0 $ drawInfoText $ player ^. remain
+        textShield = Translate (infoWidth*textShieldShift) 0 $ drawInfoText $ shieldText player
+        textAggr = Translate (infoWidth*textAggrShift) 0 $ drawInfoText $ aggrText player
+        color = playerColor index
+        texts = Color color $ Pictures [textNum, textFree, textRemain, textShield, textAggr]
+        shiftY = playerInfoHeight/2 - fromIntegral index * playerInfoHeight
+    in Translate 0 shiftY texts
+
+drawInfoText :: Show a => a -> Picture
+drawInfoText = Translate 0 (-playerInfoHeight/2) . Scale panelTextScale panelTextScale
+    . Text . show
+
+newtype PlainString = PlainString String
+instance Show PlainString where
+  show (PlainString s) = s
+
+shieldText :: Player -> PlainString
+shieldText player
+    | strength < 128
+    = PlainString $ show strength
+    | active
+    = PlainString "+1"
+    | otherwise 
+    = PlainString "+0"
+    where strength = player ^. shieldStrength
+          active = player ^. shieldActive
+
+aggrText :: Player -> PlainString
+aggrText player
+    | aggro > 0
+    = PlainString $ show aggro
+    | otherwise 
+    = PlainString ""
+    where aggro = player ^. aggr
     
 translateCell :: WorldPos -> Picture -> Picture
 translateCell (x,y) pict =

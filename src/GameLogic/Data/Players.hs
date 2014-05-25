@@ -13,7 +13,9 @@ data Player = Player { _num :: Int    -- sum values of all owned cells
                      , _free :: Int   -- number of values can be placed (used)
                      , _remain :: Int -- counter for _free increase
                      , _aggr :: Int   -- aggro size for AI players
-                     , _shield :: Int -- shield (active flag and activation steps)
+                     , _shieldActive :: Bool  -- shield status
+                     , _shieldStrength :: Int -- shield charge level
+                                              -- (when >=128 shield activated)
                      }
     deriving (Show)
 
@@ -28,7 +30,8 @@ mkPlayer aggr = Player {_num = 1
                   , _free = 0
                   , _remain = 0
                   , _aggr = aggr
-                  , _shield = 0
+                  , _shieldActive = False
+                  , _shieldStrength = 0
                   }
 
 mkPlayers :: RandomGen g => Int -> g -> (Players, g)
@@ -38,6 +41,10 @@ mkPlayers num gen = (players, gen)
           lPlayerNums = [2..num]
           (lRandoms, gen') = runState (getNRndAggros (num - 1)) gen
           list = zip lPlayerNums lRandoms
+
+-- apply function to all cells
+mapP :: ((Int, Player) -> a) -> Players -> [a]
+mapP func = fmap func . assocs
 
 getRndAggro :: RandomGen g => State g Int
 getRndAggro = do
