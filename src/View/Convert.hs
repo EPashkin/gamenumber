@@ -8,12 +8,8 @@ drawScale = 8 * 4 :: Float
 textScale = 8 / drawScale
 panelTextScale = 1 / 8 :: Float
 panelWidth = 200 :: Float
+playerInfoWidth = panelWidth*0.9
 playerInfoHeight = 20 :: Float
-textNumShift = -0.5 :: Float
-textFreeShift = -0.23 :: Float
-textRemainShift = -0.01 :: Float
-textShieldShift = 0.22 :: Float
-textAggrShift = 0.40 :: Float
 
 windowPosOfWorldPos :: Game -> WorldPos -> (Float, Float)
 windowPosOfWorldPos game pos =

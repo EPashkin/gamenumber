@@ -51,6 +51,7 @@ drawSelectedCellBox pos color =
         radius = diametr / 2
         delta = radius / 4
 
+--TODO: move to ViewPanel.hs
 drawPanel :: State -> Picture
 drawPanel state =
     let size = state ^. windowSize
@@ -65,43 +66,44 @@ drawPanel state =
     in Translate shiftX 0 $ Pictures [rect, playersPict]
 
 drawPlayer :: (Int, Player) -> Picture
-drawPlayer (index, player) =
-    let infoWidth = panelWidth*0.9
-        textNum = Translate (infoWidth*textNumShift) 0 . drawInfoText $ player ^. num
-        textFree = Translate (infoWidth*textFreeShift) 0 . drawInfoText $ player ^. free
-        textRemain = Translate (infoWidth*textRemainShift) 0 . drawInfoText $ player ^. remain
-        textShield = Translate (infoWidth*textShieldShift) 0 . drawInfoText $ shieldText player
-        textAggr = Translate (infoWidth*textAggrShift) 0 . drawInfoText $ aggrText player
-        color = playerColor index
-        texts = Color color $ Pictures [textNum, textFree, textRemain, textShield, textAggr]
-        shiftY = playerInfoHeight/2 - fromIntegral index * playerInfoHeight
-    in Translate 0 shiftY texts
+drawPlayer (index, player)
+    = Translate 0 shiftY . Color color . Pictures $ drawPlayerInfoParts player
+    where color = playerColor index
+          shiftY = (0.5 - fromIntegral index) * playerInfoHeight
 
-drawInfoText :: Show a => a -> Picture
-drawInfoText = Translate 0 (-playerInfoHeight/2) . Scale panelTextScale panelTextScale
-    . Text . show
+drawPlayerInfoParts :: Player -> [Picture]
+drawPlayerInfoParts player = fmap p playerInfoParts
+    where p (shift, p) = Translate (playerInfoWidth*shift) 0 . drawInfoText $ p player
 
-newtype PlainString = PlainString String
-instance Show PlainString where
-  show (PlainString s) = s
+playerInfoParts :: [(Float, Player -> String)]
+playerInfoParts = [(-0.50, show.view num)
+                  ,(-0.23, show.view free)
+                  ,(-0.01, show.view remain)
+                  ,( 0.22, shieldText)
+                  ,( 0.40, aggrText)
+                  ]
 
-shieldText :: Player -> PlainString
+drawInfoText :: String -> Picture
+drawInfoText = Translate 0 (-playerInfoHeight/2)
+               . Scale panelTextScale panelTextScale . Text
+
+shieldText :: Player -> String
 shieldText player
     | strength < 128
-    = PlainString $ show strength
+    = show strength
     | active
-    = PlainString "+1"
+    = "+1"
     | otherwise 
-    = PlainString "+0"
+    = "+0"
     where strength = player ^. shieldStrength
           active = player ^. shieldActive
 
-aggrText :: Player -> PlainString
+aggrText :: Player -> String
 aggrText player
     | aggro > 0
-    = PlainString $ show aggro
+    = show aggro
     | otherwise 
-    = PlainString ""
+    = ""
     where aggro = player ^. aggr
     
 translateCell :: WorldPos -> Picture -> Picture
