@@ -64,8 +64,23 @@ doWithWindowPosOnGame :: (WorldPos -> Game -> Game) -> (Float, Float) -> Game-> 
 doWithWindowPosOnGame action pos game = action pos' game
     where pos' = worldPosOfWindowPos game pos
 
-doWithWindowPos :: (WorldPos -> Game -> Game) -> (Float, Float) -> State-> State
-doWithWindowPos action (x, y) = game %~ doWithWindowPosOnGame action pos'
+doWithWindowPosInField :: (WorldPos -> Game -> Game) -> (Float, Float) -> State -> State
+doWithWindowPosInField action pos = game %~ doWithWindowPosOnGame action pos
+
+doWithWindowPos :: (WorldPos -> Game-> Game) -> (Float, Float) -> State -> State
+doWithWindowPos action pos@(x, y) state
+    | inPanel pos state
+    = state
+    | otherwise
+    = doWithWindowPosInField action pos' state
     where pos' = (x - worldShiftX, y)
+
+inPanel :: (Float, Float) -> State -> Bool
+inPanel (x, y) state = x >= panelLeftX state
+
+panelLeftX :: State -> Float
+panelLeftX state = width/2 - panelWidth
+    where size = state ^. windowSize
+          width = fromIntegral $ fst size
 
 worldShiftX = - panelWidth / 2 :: Float
