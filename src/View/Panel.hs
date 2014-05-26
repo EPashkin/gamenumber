@@ -1,4 +1,6 @@
-module View.Panel where
+module View.Panel
+    ( drawPanel
+    ) where
 
 import Control.Lens
 import View.State
@@ -8,6 +10,8 @@ import Middleware.Gloss.Facade
 
 --TODO: Show position
 --TODO: Show minimap
+--TODO: Pause checbox
+--TODO: Colapsible panel
 drawPanel :: State -> Picture
 drawPanel state =
     let size = state ^. windowSize
