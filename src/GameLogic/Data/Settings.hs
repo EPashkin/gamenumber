@@ -1,4 +1,4 @@
-module GameLogic.Data.Config where
+module GameLogic.Data.Settings where
 
 
 --TODO: to config

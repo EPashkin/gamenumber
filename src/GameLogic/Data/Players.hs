@@ -7,7 +7,7 @@ import Control.Monad.State
 import Data.Array
 import qualified Data.Binary as B
 import Control.Lens
-import GameLogic.Data.Config
+import GameLogic.Data.Settings
 
 
 data Player = Player { _num :: Int    -- sum values of all owned cells

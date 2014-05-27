@@ -2,7 +2,7 @@ module GameLogic.StartLogic where
 
 import System.Random
 import Control.Lens
-import GameLogic.Data.Config
+import GameLogic.Data.Settings
 import GameLogic.Data.Cell
 import GameLogic.Data.World
 import GameLogic.Data.Players

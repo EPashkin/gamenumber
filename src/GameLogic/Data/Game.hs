@@ -5,7 +5,7 @@ module GameLogic.Data.Game where
 import System.Random
 import Control.Lens
 import Data.Binary
-import GameLogic.Data.Config
+import GameLogic.Data.Settings
 import GameLogic.Data.Cell
 import GameLogic.Data.World
 import GameLogic.Data.Players
