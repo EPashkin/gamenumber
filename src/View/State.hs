@@ -60,6 +60,17 @@ drawing = doWithWindowPos doSelectCellAction
 updateWindowSize :: (Int, Int) -> State -> State
 updateWindowSize = set windowSize
 
+doSave :: State -> IO State
+doSave state = do 
+    doSaveGame "gamenumber.gn" $ state ^. game
+    return state
+
+doLoad :: State -> IO State
+doLoad state = do
+    let g = state ^. game
+    g' <- doLoadGame "gamenumber.gn" g
+    return $ set game g' state
+
 doWithWindowPosOnGame :: (WorldPos -> Game -> Game) -> (Float, Float) -> Game-> Game
 doWithWindowPosOnGame action pos game = action pos' game
     where pos' = worldPosOfWindowPos game pos

@@ -5,6 +5,7 @@ module GameLogic.Data.Players where
 import System.Random
 import Control.Monad.State
 import Data.Array
+import qualified Data.Binary as B
 import Control.Lens
 import GameLogic.Data.Config
 
@@ -59,3 +60,24 @@ getNRndAggros n = do
   value <- getRndAggro
   list <- getNRndAggros (n-1)
   return (value:list)
+
+instance B.Binary Player where
+    put c = do B.put $ c ^. num
+               B.put $ c ^. free
+               B.put $ c ^. remain
+               B.put $ c ^. aggr
+               B.put $ c ^. shieldActive
+               B.put $ c ^. shieldStrength
+    get = do num <- B.get
+             free <- B.get
+             remain <- B.get
+             aggr <- B.get
+             shieldActive <- B.get
+             shieldStrength <- B.get
+             return Player{ _num = num
+                          , _free = free
+                          , _remain = remain
+                          , _aggr = aggr
+                          , _shieldActive = shieldActive
+                          , _shieldStrength = shieldStrength
+                          }

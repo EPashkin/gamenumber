@@ -21,6 +21,8 @@ executable gamenumber
                        array,
                        containers,
                        mtl,
+                       bytestring,
+                       binary,
                        lens,
                        gloss
   hs-source-dirs:      src

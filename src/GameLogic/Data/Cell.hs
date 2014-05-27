@@ -2,6 +2,8 @@
 module GameLogic.Data.Cell where
 
 import Control.Lens
+import Data.Binary
+import Data.Int
 import Data.Monoid
 
 
@@ -33,3 +35,10 @@ isOwnedBy playerInd Cell{ _playerIndex = pi }
     = True
     | otherwise
     = False
+
+instance Binary Cell where
+    put c = do put (fromIntegral $ c ^. value :: Int8)
+               put (fromIntegral $ c ^. playerIndex :: Int8)
+    get = do v <- get :: Get Int8
+             pi <- get :: Get Int8
+             return $ mkCell (fromIntegral v) (fromIntegral pi)

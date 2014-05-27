@@ -14,7 +14,15 @@ eventHandler (EventKey key keyState mods pos) state
     | MouseButton RightButton == key
     , Down                    == keyState
     = return $ centering pos state
-    
+
+eventHandler (EventKey (SpecialKey specKey) keyState mods pos) state
+    | KeyF2 == specKey
+    , Down == keyState
+    = doSave state
+    | KeyF3 == specKey
+    , Down == keyState
+    = doLoad state
+
 eventHandler (EventMotion pos) state
     | inPlacementMode state 
     = return $ drawing pos state
