@@ -13,11 +13,6 @@ data Cell = Cell { _value :: Int
 
 makeLenses ''Cell
 
--- needed for ix on array 
-instance Monoid Cell where
-  mempty = undefined
-  mappend = undefined
-
 mkCell v plInd = Cell { _value = v, _playerIndex = plInd }
 
 isFree :: Cell -> Bool

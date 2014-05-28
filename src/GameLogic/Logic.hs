@@ -64,4 +64,4 @@ doCellAction' pos playerInd game
     = increaseCell pos playerInd game
     | otherwise
     = game
-    where cell = game ^. cellOfGame pos
+    where Just cell = game ^? cellOfGame pos

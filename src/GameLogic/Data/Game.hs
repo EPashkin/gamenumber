@@ -33,7 +33,7 @@ mkGameDef world players gen
     } where pos = findPlayerPos activePlayerIndex world
 
 cellOfGame :: WorldPos -> Traversal' Game Cell 
-cellOfGame pos = world . cellOfWorld pos
+cellOfGame pos = world . ix pos
 
 doSaveGame :: FilePath -> Game-> IO ()
 doSaveGame = encodeFile

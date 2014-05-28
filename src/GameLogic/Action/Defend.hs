@@ -17,12 +17,11 @@ increaseCell pos playerInd game
 
 increaseCellWithMax :: WorldPos -> Int -> Int -> Game -> Game
 increaseCellWithMax pos playerInd maxVal game
-    = case mcell' of
-           Just cell' -> increasePlayerNum 1 playerInd game'
-                         where game' = game & cellOfGame pos .~ cell'
-           Nothing    -> game
-    where mcell' = p $ game ^. cellOfGame pos
-          p = increaseCellWithMax' playerInd maxVal
+    = case mcell of
+           Just cell -> increasePlayerNum 1 playerInd game'
+                        where game' = game & cellOfGame pos .~ cell
+           Nothing   -> game
+    where mcell = game ^? cellOfGame pos >>= increaseCellWithMax' playerInd maxVal
 
 increaseCellWithMax' :: Int -> Int -> Cell -> Maybe Cell
 increaseCellWithMax' playerInd maxVal cell
@@ -37,4 +36,4 @@ increaseCellWithMax' playerInd maxVal cell
 
 increasePlayerNum :: Int -> Int -> Game -> Game
 increasePlayerNum inc playerInd
-    = players . player playerInd . num %~ (+inc)
+    = players . ix playerInd . num %~ (+inc)

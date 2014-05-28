@@ -39,7 +39,7 @@ placeWorldPlayers world numPlayers gen =
         positions = [calcStartPos world numPlayers pl | pl <- players]
         (positions', gen') = shuffle gen positions
         playersPosition = zip positions' players
-        p w (pos, pl) = w & cellOfWorld pos .~ mkCell 1 pl
+        p w (pos, pl) = w & ix pos .~ mkCell 1 pl
         world' = foldl p world playersPosition
     in (world', gen')
 

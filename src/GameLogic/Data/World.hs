@@ -24,9 +24,6 @@ mkEmptyWorld :: Int -> World
 mkEmptyWorld size = array (startWorldPos, (size, size))
     [(pos, mkCell 0 0) | x <- [1..size], y <- [1..size], let pos = (x,y)]
 
-cellOfWorld :: WorldPos -> Traversal' World Cell
-cellOfWorld = ix
-
 getWorldSize :: World -> Int
 getWorldSize = fst . snd . bounds 
 
@@ -49,7 +46,8 @@ getNearestOwnedCells playerInd world
 
 getNearestCells :: World -> WorldPos -> [(WorldPos, Cell)]
 getNearestCells world = fmap p . getNearestWorldPoses world
-    where p pos' = (pos', world ^. cellOfWorld pos')
+    where p pos' = (pos', cell)
+            where Just cell = world ^? ix pos'
 
 getNearestWorldPoses :: World -> WorldPos -> [WorldPos]
 getNearestWorldPoses world pos

@@ -24,9 +24,6 @@ makeLenses ''Player
 
 type Players = Array Int Player
 
-player :: Int -> Traversal' Players Player
-player = ix
-
 mkPlayer aggr = Player {_num = 1
                   , _free = 0
                   , _remain = 0
@@ -43,7 +40,7 @@ mkPlayers num gen = (players, gen)
           (lRandoms, gen') = runState (getNRndAggros (num - 1)) gen
           list = zip lPlayerNums lRandoms
 
--- apply function to all cells
+-- apply function to all players
 mapP :: ((Int, Player) -> a) -> Players -> [a]
 mapP func = fmap func . assocs
 

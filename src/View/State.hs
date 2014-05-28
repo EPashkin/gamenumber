@@ -31,7 +31,7 @@ runStartupTest = do
        xList = playersStartPosXList defWorldSize defNumPlayers
    traceIO . show $ positions
    traceIO . show $ xList
-   traceIO . show $ g1 ^. cellOfGame (2,2) 
+   traceIO . show $ g1 ^? cellOfGame (2,2)
    traceIO . show $ getNearestPoses (2,3)
    traceIO . show $ g1 ^. GameLogic.Data.Facade.players
 
