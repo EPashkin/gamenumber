@@ -3,6 +3,7 @@ module GameLogic.Action.Defend
     ) where
 
 import Control.Lens
+import Data.Maybe
 import GameLogic.Util
 import GameLogic.Data.Cell
 import GameLogic.Data.World
@@ -12,16 +13,14 @@ import GameLogic.Data.Players
 
 increaseCell :: WorldPos -> Int -> Game -> Game
 increaseCell pos playerInd game
-    = increaseCellWithMax pos playerInd maxVal game
+    = fromMaybe game $ increaseCellWithMax pos playerInd maxVal game
     where maxVal = min 9 $ calcSumOwnedNearest game playerInd pos
 
-increaseCellWithMax :: WorldPos -> Int -> Int -> Game -> Game
+increaseCellWithMax :: WorldPos -> Int -> Int -> Game -> Maybe Game
 increaseCellWithMax pos playerInd maxVal game
-    = case mcell of
-           Just cell -> increasePlayerNum 1 playerInd game'
-                        where game' = game & cellOfGame pos .~ cell
-           Nothing   -> game
-    where mcell = game ^? cellOfGame pos >>= increaseCellWithMax' playerInd maxVal
+    = game ^? cellOfGame pos >>= increaseCellWithMax' playerInd maxVal
+      >>= (\cell -> Just $ game & cellOfGame pos .~ cell)
+      >>= Just . increasePlayerNum 1 playerInd
 
 increaseCellWithMax' :: Int -> Int -> Cell -> Maybe Cell
 increaseCellWithMax' playerInd maxVal cell
