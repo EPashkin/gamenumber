@@ -21,7 +21,8 @@ drawGame game = do
 
    let centerPos' = game ^. centerPos
    let firstPlayerColor = playerColor activePlayerIndex
-   let selected = drawSelectedCellBox (game ^. selectedPos) firstPlayerColor
+   let Just pos = game ^? players . ix activePlayerIndex . selectedPos
+   let selected = drawSelectedCellBox pos firstPlayerColor
 
    let (shiftX, shiftY) = windowPosOfWorldPos game startWorldPos
    let worldPicture = Translate shiftX shiftY . Pictures $ selected : cells

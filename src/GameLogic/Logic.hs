@@ -19,7 +19,7 @@ doSelectCellAction pos game
     | not $ isPosInGame game pos
     = game 
     | otherwise
-    = set selectedPos pos game
+    = game & players . ix activePlayerIndex . selectedPos .~ pos
     
 doGameStep :: Game -> Game
 doGameStep game
@@ -36,9 +36,10 @@ doGameStep' =
 doHumanGameStep :: Game -> Game
 doHumanGameStep game
     | game ^. placementMode
-     = doCellAction (view selectedPos game) game
+    = doCellAction pos game
     | otherwise
     = game
+    where Just pos = game ^? players . ix activePlayerIndex . selectedPos
 
 updatePlayersStats :: Game -> Game
 updatePlayersStats game =

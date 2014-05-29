@@ -27,7 +27,7 @@ mkStartGame seed = mkStartGameGen gen
 mkStartGameGen :: StdGen -> Game
 mkStartGameGen gen = mkGameDef world players gen''
     where (world, gen') = mkStartWorld defWorldSize defNumPlayers gen
-          (players, gen'') = mkPlayers defNumPlayers gen'
+          (players, gen'') = mkPlayers defNumPlayers world gen'
 
 {-# ANN mkStartWorld "HLint: ignore Eta reduce" #-}
 mkStartWorld :: RandomGen g => Int ->Int -> g -> (World, g)

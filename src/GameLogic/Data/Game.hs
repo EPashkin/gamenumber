@@ -14,7 +14,6 @@ import GameLogic.Data.Players
 data Game = Game { _world :: World
                  , _players :: Players
                  , _centerPos :: WorldPos -- position in center of screen
-                 , _selectedPos :: WorldPos -- current action position for active player
                  , _placementMode :: Bool
                  , _paused :: Bool
                  , _rndGen :: StdGen }
@@ -29,10 +28,9 @@ mkGameDef world players gen
     , _players = players
     , _rndGen = gen
     , _centerPos = pos
-    , _selectedPos = pos
     , _placementMode = False
     , _paused = True
-    } where pos = findPlayerPos activePlayerIndex world
+    } where Just pos = players ^? ix activePlayerIndex . selectedPos
 
 cellOfGame :: WorldPos -> Traversal' Game Cell 
 cellOfGame pos = world . ix pos
@@ -47,18 +45,15 @@ doLoadGame filePath game = decodeFile filePath
 instance Binary Game where
     put g = do put $ g ^. rndGen
                put $ g ^. centerPos
-               put $ g ^. selectedPos
                put $ g ^. players
                put $ g ^. world
     get = do gen <- get
              cp <- get
-             sp <- get
              ps <- get
              world <- get
              return Game{ _world = world
                         , _players = ps
                         , _centerPos = cp
-                        , _selectedPos = sp
                         , _rndGen = gen
                         , _placementMode = False
                         , _paused = True
