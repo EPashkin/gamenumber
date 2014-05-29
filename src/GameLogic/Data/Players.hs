@@ -34,7 +34,7 @@ mkPlayer aggr = Player {_num = 1
 
 mkPlayers :: RandomGen g => Int -> g -> (Players, g)
 mkPlayers num gen = (players, gen) 
-    where players = array (1, num) $ (activePlayerIndex, mkPlayer 0) 
+    where players = array (1, num) $ (activePlayerIndex, (mkPlayer 0) {_free = 0}) 
               : [(i, mkPlayer rnd) | (i, rnd) <- list]
           lPlayerNums = [2..num]
           (lRandoms, gen') = runState (getNRndAggros (num - 1)) gen

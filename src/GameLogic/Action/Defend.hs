@@ -18,21 +18,35 @@ increaseCell pos playerInd game
 
 increaseCellWithMax :: WorldPos -> Int -> Int -> Game -> Maybe Game
 increaseCellWithMax pos playerInd maxVal game
-    = game ^? cellOfGame pos >>= increaseCellWithMax' playerInd maxVal
-      >>= (\cell -> Just $ game & cellOfGame pos .~ cell)
+      = updateGameCellWithCost pos playerInd game (increaseCellWithMax' maxVal)
+      >>= decreaseGamePlayerFree playerInd
       >>= Just . increasePlayerNum 1 playerInd
 
-increaseCellWithMax' :: Int -> Int -> Cell -> Maybe Cell
-increaseCellWithMax' playerInd maxVal cell
+increaseCellWithMax' :: Int -> Int -> Cell -> Maybe (Int, Cell)
+increaseCellWithMax' maxVal playerInd cell
        | cell ^. playerIndex == playerInd
        && cell ^. value < maxVal
-       = Just $ cell & value %~ (+1)
+       = Just . (,) 1 $ cell & value %~ (+1)
        | isFree cell
        && maxVal >= 1
-       = Just $ mkCell 1 playerInd
+       = Just . (,) 1 $ mkCell 1 playerInd
        | otherwise
        = Nothing
+
+updateGameCellWithCost :: WorldPos-> Int -> Game -> (Int -> Cell -> Maybe (Int, Cell))
+      -> Maybe (Int, Game) 
+updateGameCellWithCost pos playerInd game action
+    = game ^? cellOfGame pos >>= action playerInd
+      >>= (\(val, cell) -> Just . (,) val $ game & cellOfGame pos .~ cell)
 
 increasePlayerNum :: Int -> Int -> Game -> Game
 increasePlayerNum inc playerInd
     = players . ix playerInd . num %~ (+inc)
+
+decreaseGamePlayerFree :: Int -> (Int, Game) -> Maybe Game
+decreaseGamePlayerFree playerInd (inc, game)
+    | inc <= curFree
+    = Just $ game & (players . ix playerInd . free) %~ (\v -> v - inc)
+    | otherwise
+    = Nothing
+    where Just curFree = game & preview (players . ix playerInd . free)
