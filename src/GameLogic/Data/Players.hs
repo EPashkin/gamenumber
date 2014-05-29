@@ -4,7 +4,7 @@ module GameLogic.Data.Players where
 
 import System.Random
 import Control.Monad.State
-import Data.Array
+import Data.Array as Arr
 import qualified Data.Binary as B
 import Control.Lens
 import GameLogic.Data.Settings
@@ -51,6 +51,9 @@ mkPlayers num world gen = (players, gen)
 -- apply function to all players
 mapP :: ((Int, Player) -> a) -> Players -> [a]
 mapP func = fmap func . assocs
+
+mapPIndices :: (Int -> a) -> Players -> [a]
+mapPIndices func = fmap func . Arr.indices
 
 getRndAggro :: RandomGen g => State g Int
 getRndAggro = do

@@ -19,13 +19,12 @@ drawGame game = do
    let cells = mapW drawCell $ game ^. world
    let halfScale = drawScale / 2
 
-   let centerPos' = game ^. centerPos
-   let firstPlayerColor = playerColor activePlayerIndex
-   let Just pos = game ^? players . ix activePlayerIndex . selectedPos
-   let selected = drawSelectedCellBox pos firstPlayerColor
+   let selecteds = if True --TODO: game field :: showEnemySelected
+                   then reverse $ drawSelecteds game
+                   else [drawSelected game activePlayerIndex]
 
    let (shiftX, shiftY) = windowPosOfWorldPos game startWorldPos
-   let worldPicture = Translate shiftX shiftY . Pictures $ selected : cells
+   let worldPicture = Translate shiftX shiftY . Pictures $ cells ++ selecteds
 
    return $ Pictures [worldPicture]
 
@@ -43,6 +42,16 @@ drawCell (pos, cell)
                 . Text . show $ cell ^. value
       in translateCell pos . Color color . Pictures $ rect : [ txt ]
 
+drawSelecteds :: Game -> [Picture]
+drawSelecteds game = mapPIndices (drawSelected game) $ game ^. players
+
+drawSelected :: Game -> Int -> Picture
+drawSelected game playerIndex =
+   let color = playerColor playerIndex
+       Just pos = game ^? players . ix playerIndex . selectedPos
+   in drawSelectedCellBox pos color
+
+drawSelectedCellBox :: WorldPos -> Color -> Picture
 drawSelectedCellBox pos color =
     translateCell pos . Color color $ Pictures [
         line [(-radius, 0), (delta-radius, 0)],
