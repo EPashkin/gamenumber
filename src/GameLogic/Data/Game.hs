@@ -16,6 +16,7 @@ data Game = Game { _world :: World
                  , _centerPos :: WorldPos -- position in center of screen
                  , _selectedPos :: WorldPos -- current action position for active player
                  , _placementMode :: Bool
+                 , _paused :: Bool
                  , _rndGen :: StdGen }
   deriving (Show)
   
@@ -30,6 +31,7 @@ mkGameDef world players gen
     , _centerPos = pos
     , _selectedPos = pos
     , _placementMode = False
+    , _paused = True
     } where pos = findPlayerPos activePlayerIndex world
 
 cellOfGame :: WorldPos -> Traversal' Game Cell 
@@ -59,6 +61,7 @@ instance Binary Game where
                         , _selectedPos = sp
                         , _rndGen = gen
                         , _placementMode = False
+                        , _paused = True
                         }
 
 instance Binary StdGen where

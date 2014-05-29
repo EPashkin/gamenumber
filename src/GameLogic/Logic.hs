@@ -22,13 +22,20 @@ doSelectCellAction pos game
     = set selectedPos pos game
     
 doGameStep :: Game -> Game
-doGameStep =
+doGameStep game
+    | game ^. paused
+    = game
+    | otherwise
+    = doGameStep' game
+    
+doGameStep' :: Game -> Game
+doGameStep' =
     updatePlayersStats
     >>> doHumanGameStep
 
 doHumanGameStep :: Game -> Game
 doHumanGameStep game
-    | view placementMode game
+    | game ^. placementMode
      = doCellAction (view selectedPos game) game
     | otherwise
     = game
@@ -54,13 +61,13 @@ toRange (minval, maxval) = max minval . min maxval
 doCellAction :: WorldPos -> Game -> Game
 doCellAction pos game
     | not $ isPosInGame game pos
-    = game 
+    = game
     | otherwise
     = doCellAction' pos activePlayerIndex game -- $ set selectedPos pos game
     
 doCellAction' :: WorldPos -> Int -> Game -> Game
 doCellAction' pos playerInd game
-    | cell ^. playerIndex == playerInd || isFree cell 
+    | cell ^. playerIndex == playerInd || isFree cell
     = increaseCell pos playerInd game
     | otherwise
     = game

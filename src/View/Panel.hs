@@ -23,7 +23,8 @@ drawPanel state =
         rect = Color panelBkColor $ rectangleSolid panelWidth height
         playerPicts = mapP drawPlayer $ state ^. game . players
         playersPict = Translate 0 (halfHeight - 30) $ Pictures playerPicts
-    in Translate shiftX 0 $ Pictures [rect, playersPict]
+        pausedPict  = Translate 0 (20 - halfHeight) $ drawPaused state
+    in Translate shiftX 0 $ Pictures [rect, playersPict, pausedPict]
 
 drawPlayer :: (Int, Player) -> Picture
 drawPlayer (index, player)
@@ -68,3 +69,10 @@ aggrText player
     | otherwise 
     = ""
     where aggro = player ^. aggr
+
+drawPaused :: State -> Picture
+drawPaused state
+    | state ^. game . paused
+    = Color black $ drawInfoText "PAUSED"
+    | otherwise
+    = Blank

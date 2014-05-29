@@ -15,13 +15,16 @@ eventHandler (EventKey key keyState mods pos) state
     , Down                    == keyState
     = return $ centering pos state
 
-eventHandler (EventKey (SpecialKey specKey) keyState mods pos) state
-    | KeyF2 == specKey
+eventHandler (EventKey key keyState mods pos) state
+    | SpecialKey KeyF2 == key
     , Down == keyState
     = doSave state
-    | KeyF3 == specKey
+    | SpecialKey KeyF3 == key
     , Down == keyState
     = doLoad state
+    | Char 'p' == key
+    , Down == keyState
+    = return $ doChangePaused state
 
 eventHandler (EventMotion pos) state
     | inPlacementMode state 

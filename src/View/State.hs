@@ -71,6 +71,9 @@ doLoad state = do
     g' <- doLoadGame "gamenumber.gn" g
     return $ set game g' state
 
+doChangePaused :: State -> State
+doChangePaused = game . paused %~ not
+
 doWithWindowPosOnGame :: (WorldPos -> Game -> Game) -> (Float, Float) -> Game-> Game
 doWithWindowPosOnGame action pos game = action pos' game
     where pos' = worldPosOfWindowPos game pos
