@@ -38,7 +38,7 @@ drawPlayerInfoParts player = fmap p playerInfoParts
 playerInfoParts :: [(Float, Player -> String)]
 playerInfoParts = [(-0.50, show.view num)
                   ,(-0.23, show.view free)
-                  ,(-0.01, show.view remain)
+                  ,(-0.01, remainText)
                   ,( 0.22, shieldText)
                   ,( 0.40, aggrText)
                   ]
@@ -46,6 +46,9 @@ playerInfoParts = [(-0.50, show.view num)
 drawInfoText :: String -> Picture
 drawInfoText = Translate 0 (-playerInfoHeight/2)
                . Scale panelTextScale panelTextScale . Text
+
+remainText :: Player -> String
+remainText player = show $ view remain player `div` remainDivMult
 
 shieldText :: Player -> String
 shieldText player
