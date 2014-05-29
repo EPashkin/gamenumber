@@ -26,7 +26,7 @@ increaseCellWithMax' :: Int -> Int -> Cell -> Maybe (Int, Cell)
 increaseCellWithMax' maxVal playerInd cell
        | cell ^. playerIndex == playerInd
        && cell ^. value < maxVal
-       = Just . (,) 1 $ cell & value %~ (+1)
+       = Just . (,) 1 $ cell & value +~ 1
        | isFree cell
        && maxVal >= 1
        = Just . (,) 1 $ mkCell 1 playerInd
@@ -46,7 +46,7 @@ increasePlayerNum inc playerInd
 decreaseGamePlayerFree :: Int -> (Int, Game) -> Maybe Game
 decreaseGamePlayerFree playerInd (inc, game)
     | inc <= curFree
-    = Just $ game & (players . ix playerInd . free) %~ (\v -> v - inc)
+    = Just $ game & (players . ix playerInd . free) -~ inc
     | otherwise
     = Nothing
     where Just curFree = game & preview (players . ix playerInd . free)
