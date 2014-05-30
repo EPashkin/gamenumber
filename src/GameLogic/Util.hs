@@ -1,5 +1,6 @@
 module GameLogic.Util where
 
+import Data.List
 import Control.Lens
 import GameLogic.Data.Cell
 import GameLogic.Data.World
@@ -28,3 +29,32 @@ calcSumOwnedNearest :: Game -> Int -> WorldPos -> Int
 calcSumOwnedNearest game playerInd
     = foldl p 0 . getNearestOwnedCells playerInd (view world game)
     where p acc val = (+) acc $ (view value . snd) val
+
+calcSumAllNearest :: Game -> WorldPos -> [Cell]
+calcSumAllNearest game
+    = foldl p [] . getNearestCells (view world game)
+    where p acc = updateCellList acc . snd
+
+updateCellList :: [Cell] -> Cell -> [Cell]
+updateCellList cells cell
+    | isFree cell
+    = cells
+    | null cells
+    = [cell]
+    | otherwise
+    = same' : others
+    where plInd = cell ^. playerIndex
+          (same, others) = partition (isOwnedBy plInd) cells
+          same' = case same of
+                  [] -> cell
+                  [cell'] -> cell' & value %~ (+ (cell ^. value))
+
+calcSumNearestForPlayer :: Game -> Int -> WorldPos -> (Cell, [Cell])
+calcSumNearestForPlayer game playerInd pos
+    = (same', sortBy p others)
+    where cells = calcSumAllNearest game pos
+          (same, others) = partition (isOwnedBy playerInd) cells
+          same' = case same of
+                  [] -> mkCell 0 playerInd
+                  [cell] -> cell
+          p c1 c2 = compare (c2 ^. value) (c1 ^.value)
