@@ -23,17 +23,8 @@ newState = do
     return $ State game (100, 100)
 
 runStartupTest = do
-   g1 <- newGame
-   traceIO $ show g1
-   let players = [1..defNumPlayers]
-       w2 = g1 ^. world
-       positions = [calcStartPos w2 (length players) pl | pl <- players]
-       xList = playersStartPosXList defWorldSize defNumPlayers
-   traceIO . show $ positions
-   traceIO . show $ xList
-   traceIO . show $ g1 ^? cellOfGame (2,2)
-   traceIO . show $ getNearestPoses (2,3)
-   traceIO . show $ g1 ^. GameLogic.Data.Facade.players
+    traceIO "Testing"
+    traceIO . show $ getNearestPoses (2,3)
 
 
 runGameStep :: Float -> State -> IO State
