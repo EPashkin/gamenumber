@@ -12,7 +12,8 @@ import GameLogic.Action.Defend
 
 setCenterPosLimited :: WorldPos -> Game -> Game
 setCenterPosLimited pos game = 
-    game & centerPos .~ limitPosToWorld pos game
+    game & centerPos .~ pos' & doSelectCellAction pos'
+    where pos' = limitPosToWorld pos game
     
 doSelectCellAction :: WorldPos -> Game -> Game
 doSelectCellAction pos game
