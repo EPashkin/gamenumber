@@ -1,5 +1,6 @@
 module GameLogic.Logic where
 
+import Debug.Trace
 import Control.Lens
 import Control.Category ( (>>>) )
 import GameLogic.Data.Settings
@@ -8,13 +9,17 @@ import GameLogic.Data.World
 import GameLogic.Data.Game
 import GameLogic.Data.Players
 import GameLogic.Util
+import GameLogic.AI
 import GameLogic.Action.Defend
 
 setCenterPosLimited :: WorldPos -> Game -> Game
 setCenterPosLimited pos game = 
-    game & centerPos .~ pos' & doSelectCellAction pos'
+    game & centerPos .~ pos' & traceTest game pos' doSelectCellAction pos'
     where pos' = limitPosToWorld pos game
-    
+
+traceTest game pos =
+    traceShow (calcPossibleAction game 2 pos)
+
 doSelectCellAction :: WorldPos -> Game -> Game
 doSelectCellAction pos game
     | not $ isPosInGame game pos
