@@ -18,7 +18,7 @@ isNoAction _ = False
 calcPossibleAction :: Game -> Int -> WorldPos -> PossibleAction
 calcPossibleAction game playerInd pos
     = calcPossibleAction' pos cell strengths
-    where strengths = calcSumNearestForPlayer game playerInd pos
+    where strengths = calcStrengthsForPlayer game playerInd pos
           Just cell = game ^? cellOfGame pos
 
 calcPossibleAction' :: WorldPos -> Cell -> (Cell, [Cell]) -> PossibleAction

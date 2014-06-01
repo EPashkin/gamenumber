@@ -49,12 +49,12 @@ updateCellList cells cell
                   [] -> cell
                   [cell'] -> cell' & value %~ (+ (cell ^. value))
 
-calcSumNearestForPlayer :: Game -> Int -> WorldPos -> (Cell, [Cell])
-calcSumNearestForPlayer game playerInd pos
+calcStrengthsForPlayer :: Game -> Int -> WorldPos -> (Cell, [Cell])
+calcStrengthsForPlayer game playerInd pos
     = (same', sortBy p others)
     where cells = calcSumAllNearest game pos
           (same, others) = partition (isOwnedBy playerInd) cells
           same' = case same of
                   [] -> mkCell 0 playerInd
                   [cell] -> cell
-          p c1 c2 = compare (c2 ^. value) (c1 ^.value)
+          p c1 c2 = compare (c2 ^. value) (c1 ^. value)
