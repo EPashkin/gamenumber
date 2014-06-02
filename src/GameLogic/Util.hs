@@ -1,6 +1,7 @@
 module GameLogic.Util where
 
 import Data.List
+import Data.Function (on)
 import Control.Lens
 import GameLogic.Data.Cell
 import GameLogic.Data.World
@@ -57,4 +58,4 @@ calcStrengthsForPlayer game playerInd pos
           same' = case same of
                   [] -> mkCell 0 playerInd
                   [cell] -> cell
-          p c1 c2 = compare (c2 ^. value) (c1 ^. value)
+          p = flip compare `on` view value
