@@ -59,3 +59,6 @@ calcStrengthsForPlayer game playerInd pos
                   [] -> mkCell 0 playerInd
                   [cell] -> cell
           p = flip compare `on` view value
+
+toRange :: (Int, Int) -> Int -> Int
+toRange (minval, maxval) = max minval . min maxval

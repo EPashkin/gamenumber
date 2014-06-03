@@ -19,6 +19,7 @@ setCenterPosLimited pos game =
 
 traceTest game pos =
     traceShow (calcPossibleAction game 2 pos)
+    $ traceShow (calcPossibleActions game 2)
 
 doSelectCellAction :: WorldPos -> Game -> Game
 doSelectCellAction pos game
@@ -61,9 +62,6 @@ updatePlayerStats remainDiv pl =
         free2 = (+) free1 $ view free pl
         free3 = toRange (-100, 9999) free2
     in pl & set remain remain' . set free free3
-
-toRange :: (Int, Int) -> Int -> Int
-toRange (minval, maxval) = max minval . min maxval
 
 doCellAction :: WorldPos -> Game -> Game
 doCellAction pos game
