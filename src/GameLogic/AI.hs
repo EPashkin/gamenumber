@@ -78,7 +78,7 @@ calcPossibleAction' pos cell (same, others)
     | sameStrength == 0
     = NoAction pos cell
     | sameStrength >= otherStrength
-    && (isFree cell || isOwnedBy samePlayerIndex cell)
+    && (isFree cell || (isOwnedBy samePlayerIndex cell && (cell ^. value < 9)))
     = Increase pos cell
     | otherwise
     = Unknown pos cell
