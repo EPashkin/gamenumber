@@ -14,6 +14,7 @@ import GameLogic.Util
 import GameLogic.Action.Defend
 
 data PossibleAction = NoAction WorldPos Cell
+                    | FreeCapture WorldPos Cell
                     | Increase WorldPos Cell
                     | Unknown  WorldPos Cell
                     deriving (Show)
@@ -49,6 +50,8 @@ doAIActions actions playerInd game
           action = actions !! ind
 
 doAIAction :: PossibleAction -> Int -> Game -> Game
+doAIAction (FreeCapture pos _) playerIndex
+    = increaseCell pos playerIndex . setSelectedPos pos playerIndex
 doAIAction (Increase pos _) playerIndex
     = increaseCell pos playerIndex . setSelectedPos pos playerIndex
 
@@ -82,7 +85,11 @@ calcPossibleAction' pos cell (same, others)
     | sameStrength == 0
     = NoAction pos cell
     | sameStrength >= otherStrength
-    && (isFree cell || (isOwnedBy samePlayerIndex cell && (cell ^. value < 9)))
+    && isFree cell
+    = FreeCapture pos cell
+    | sameStrength >= otherStrength
+    && isOwnedBy samePlayerIndex cell
+    && cell ^. value < min 9 sameStrength
     = Increase pos cell
     | otherwise
     = Unknown pos cell
