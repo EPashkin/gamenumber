@@ -51,8 +51,11 @@ doAIActions actions playerInd game
 
 doAIAction :: PossibleAction -> Int -> Game -> Game
 doAIAction (FreeCapture pos _) playerIndex
-    = increaseCell pos playerIndex . setSelectedPos pos playerIndex
+    = increaseCellAction pos playerIndex
 doAIAction (Increase pos _) playerIndex
+    = increaseCellAction pos playerIndex
+
+increaseCellAction pos playerIndex
     = increaseCell pos playerIndex . setSelectedPos pos playerIndex
 
 calcPossibleActions :: Game -> Int -> [PossibleAction]
