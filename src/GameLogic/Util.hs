@@ -6,8 +6,16 @@ import Control.Lens
 import GameLogic.Data.Cell
 import GameLogic.Data.World
 import GameLogic.Data.Game
+import GameLogic.Data.Players
 
 
+setSelectedPos :: WorldPos -> Int -> Game -> Game
+setSelectedPos pos playerInd game
+    | not $ isPosInGame game pos
+    = game 
+    | otherwise
+    = game & players . ix playerInd . selectedPos .~ pos
+    
 isPosInGame :: Game -> WorldPos -> Bool
 isPosInGame = isPosInWorld . view world
 

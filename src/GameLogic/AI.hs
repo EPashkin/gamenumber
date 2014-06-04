@@ -1,11 +1,13 @@
 module GameLogic.AI where
 
+import System.Random
 import Control.Lens
 import GameLogic.Data.Cell
 import GameLogic.Data.World
 import GameLogic.Data.Game
 import GameLogic.Data.Players
 import GameLogic.Util
+import GameLogic.Action.Defend
 
 data PossibleAction = NoAction WorldPos Cell
                     | Increase WorldPos Cell
@@ -16,6 +18,35 @@ isNoAction :: PossibleAction -> Bool
 isNoAction (NoAction _ _) = True
 isNoAction (Unknown _ _) = True
 isNoAction _ = False
+
+doAIsGameStep :: Game -> Game
+doAIsGameStep game = foldl p game plInds
+   where pls = game ^. players
+         --TODO: use all player indexes
+         plInds =  take 1 $ fmap fst $ filter f $ mapP id pls
+         f (ind, pl) = 0 < pl ^. aggr
+         p g plInd = doAIGameStep plInd g
+
+doAIGameStep :: Int -> Game -> Game
+doAIGameStep playerInd game
+    | free' < 1
+    = game
+    | otherwise
+    = doAIActions actions playerInd game
+    where Just pl = game ^? players . ix playerInd
+          free' = pl ^. free
+          actions = calcPossibleActions game playerInd
+
+doAIActions :: [PossibleAction] -> Int -> Game -> Game
+doAIActions [] _ game = game
+doAIActions actions playerInd game
+    = doAIAction action playerInd $ game & rndGen .~ gen'
+    where (ind, gen') = randomR (0, length actions - 1) $ game ^. rndGen
+          action = actions !! ind
+
+doAIAction :: PossibleAction -> Int -> Game -> Game
+doAIAction (Increase pos _) playerIndex
+    = increaseCell pos playerIndex . setSelectedPos pos playerIndex
 
 calcPossibleActions :: Game -> Int -> [PossibleAction]
 calcPossibleActions game playerInd

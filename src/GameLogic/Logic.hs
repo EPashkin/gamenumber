@@ -12,6 +12,7 @@ import GameLogic.Util
 import GameLogic.AI
 import GameLogic.Action.Defend
 
+
 setCenterPosLimited :: WorldPos -> Game -> Game
 setCenterPosLimited pos game = 
     game & centerPos .~ pos' & traceTest game pos' doSelectCellAction pos'
@@ -26,7 +27,7 @@ doSelectCellAction pos game
     | not $ isPosInGame game pos
     = game 
     | otherwise
-    = game & players . ix activePlayerIndex . selectedPos .~ pos
+    = setSelectedPos pos activePlayerIndex game
     
 doGameStep :: Game -> Game
 doGameStep game
@@ -39,6 +40,7 @@ doGameStep' :: Game -> Game
 doGameStep' =
     updatePlayersStats
     >>> doHumanGameStep
+    >>> doAIsGameStep
 
 doHumanGameStep :: Game -> Game
 doHumanGameStep game
