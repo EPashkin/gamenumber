@@ -1,4 +1,8 @@
-module GameLogic.AI where
+module GameLogic.AI
+    ( doAIsGameStep
+    , calcPossibleActions --TODO: temp
+    , calcPossibleAction  --TODO: temp
+    ) where
 
 import System.Random
 import Control.Lens
