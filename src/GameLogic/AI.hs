@@ -5,6 +5,7 @@ module GameLogic.AI
     ) where
 
 import System.Random
+import Data.List (find)
 import Control.Lens
 import GameLogic.Data.Cell
 import GameLogic.Data.World
@@ -23,6 +24,10 @@ isNoAction :: PossibleAction -> Bool
 isNoAction (NoAction _ _) = True
 isNoAction (Unknown _ _) = True
 isNoAction _ = False
+
+actionWeight :: PossibleAction -> Int
+actionWeight (FreeCapture _ _) = 100
+actionWeight (Increase _ _) = 10
 
 doAIsGameStep :: Game -> Game
 doAIsGameStep game = foldl p game plInds
@@ -46,8 +51,12 @@ doAIActions :: [PossibleAction] -> Int -> Game -> Game
 doAIActions [] _ game = game
 doAIActions actions playerInd game
     = doAIAction action playerInd $ game & rndGen .~ gen'
-    where (ind, gen') = randomR (0, length actions - 1) $ game ^. rndGen
-          action = actions !! ind
+    where (sumWeight, weightedActionsTmp) = foldl wf (0,[]) actions
+          wf (w, acc) act = (weight, (weight, act):acc)
+               where weight = w + actionWeight act
+          weightedActions = reverse weightedActionsTmp
+          (weight, gen') = randomR (0, sumWeight - 1) $ game ^. rndGen
+          Just (_, action) = find (\(w, _) -> w > weight) weightedActions
 
 doAIAction :: PossibleAction -> Int -> Game -> Game
 doAIAction (FreeCapture pos _) playerIndex
