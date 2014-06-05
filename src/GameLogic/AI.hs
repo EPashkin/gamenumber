@@ -14,20 +14,26 @@ import GameLogic.Data.Players
 import GameLogic.Util
 import GameLogic.Action.Defend
 
+--TODO: remove poses in defence
+--TODO: change to enum and tupple
 data PossibleAction = NoAction WorldPos Cell
                     | FreeCapture WorldPos Cell
                     | Increase WorldPos Cell
+                    | NeedDefend WorldPos Cell [WorldPos]
+                    | ParanoidNeedDefend WorldPos Cell [WorldPos]
                     | Unknown  WorldPos Cell
                     deriving (Show)
 
 isNoAction :: PossibleAction -> Bool
-isNoAction (NoAction _ _) = True
-isNoAction (Unknown _ _) = True
+isNoAction NoAction{} = True
+isNoAction Unknown{} = True
 isNoAction _ = False
 
 actionWeight :: PossibleAction -> Int
-actionWeight (FreeCapture _ _) = 100
-actionWeight (Increase _ _) = 10
+actionWeight FreeCapture{} = 100
+actionWeight Increase{} = 10
+actionWeight NeedDefend{} = 1000
+actionWeight ParanoidNeedDefend{} = 50
 
 doAIsGameStep :: Game -> Game
 doAIsGameStep game = foldl p game plInds
@@ -63,9 +69,19 @@ doAIAction (FreeCapture pos _) playerIndex
     = increaseCellAction pos playerIndex
 doAIAction (Increase pos _) playerIndex
     = increaseCellAction pos playerIndex
+doAIAction (NeedDefend pos _ poses) playerIndex
+    = defenceCellAction poses playerIndex
+doAIAction (ParanoidNeedDefend pos _ poses) playerIndex
+    = defenceCellAction poses playerIndex
 
 increaseCellAction pos playerIndex
     = increaseCell pos playerIndex . setSelectedPos pos playerIndex
+
+defenceCellAction :: [WorldPos] -> Int -> Game -> Game
+defenceCellAction poses playerIndex game
+    = increaseCellAction pos playerIndex $ game & rndGen .~ gen'
+    where (ind, gen') = randomR (0, length poses - 1) $ game ^. rndGen
+          pos = poses !! ind
 
 calcPossibleActions :: Game -> Int -> [PossibleAction]
 calcPossibleActions game playerInd
@@ -88,27 +104,62 @@ aggroRect game playerInd = ((minX, minY), (maxX, maxY))
 
 calcPossibleAction :: Game -> Int -> WorldPos -> PossibleAction
 calcPossibleAction game playerInd pos
-    = calcPossibleAction' pos cell strengths
+    = calcPossibleAction' pos cell strengths defencePositions
     where strengths = calcStrengthsForPlayer game playerInd pos
           Just cell = game ^? cellOfGame pos
+          defencePositions = getDefencePositions game playerInd pos
 
-calcPossibleAction' :: WorldPos -> Cell -> (Cell, [Cell]) -> PossibleAction
-calcPossibleAction' pos cell (same, others)
+calcPossibleAction' :: WorldPos -> Cell -> (Cell, [Cell]) -> [WorldPos] -> PossibleAction
+calcPossibleAction' pos cell (same, others) defencePositions
     | sameStrength == 0
     = NoAction pos cell
-    | sameStrength >= otherStrength
+    | deltaStrength >= 0
     && isFree cell
     = FreeCapture pos cell
-    | sameStrength >= otherStrength
-    && isOwnedBy samePlayerIndex cell
+    | isOwnedBy samePlayerIndex cell
+    && deltaStrength == -1
+    && not (null defencePositions)
+    = NeedDefend pos cell defencePositions
+    | isOwnedBy samePlayerIndex cell
+    && deltaStrength == 0
+    && not (null defencePositions)
+    = ParanoidNeedDefend pos cell defencePositions
+    | isOwnedBy samePlayerIndex cell
+    && deltaStrength >= 0
     && cell ^. value < min 9 sameStrength
     = Increase pos cell
     | otherwise
     = Unknown pos cell
     where sameStrength = same ^. value
           samePlayerIndex = same ^. playerIndex
-          otherStrengthInfo = getOthersStrength others
-          otherStrength = otherStrengthInfo ^. value
+          deltaStrength = getDeltaOtherStrength sameStrength others 
+
+getDefencePositions :: Game -> Int-> WorldPos -> [WorldPos]
+getDefencePositions game playerInd pos
+    = filter (canBeSafeIncreased game playerInd) worldPoses
+    where w = game ^. world
+          worldPoses = filter (isPosInWorld w) $ getNearestWorldPoses w pos
+
+canBeSafeIncreased :: Game -> Int -> WorldPos -> Bool
+canBeSafeIncreased game playerInd pos
+    | isFree cell
+    && deltaStrength > 0
+    = True
+    | not (isOwnedBy playerInd cell)
+    = False
+    | deltaStrength > 0
+    && cell ^. value < min 9 sameStrength
+    = True
+    | otherwise
+    = False
+    where Just cell = game ^? cellOfGame pos
+          (same, others) = calcStrengthsForPlayer game playerInd pos
+          sameStrength = same ^. value
+          deltaStrength = getDeltaOtherStrength sameStrength others 
+
+getDeltaOtherStrength :: Int -> [Cell] -> Int
+getDeltaOtherStrength sameStrength cells
+    = sameStrength - getOthersStrength cells ^. value
 
 getOthersStrength :: [Cell] -> Cell
 getOthersStrength [] = mkCell 0 0
