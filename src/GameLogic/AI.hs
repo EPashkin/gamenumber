@@ -136,9 +136,8 @@ calcPossibleAction' pos cell (same, others) defencePositions
 
 getDefencePositions :: Game -> Int-> WorldPos -> [WorldPos]
 getDefencePositions game playerInd pos
-    = filter (canBeSafeIncreased game playerInd) worldPoses
+    = filter (canBeSafeIncreased game playerInd) $ getNearestWorldPoses w pos
     where w = game ^. world
-          worldPoses = filter (isPosInWorld w) $ getNearestWorldPoses w pos
 
 canBeSafeIncreased :: Game -> Int -> WorldPos -> Bool
 canBeSafeIncreased game playerInd pos
