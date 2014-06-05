@@ -156,11 +156,3 @@ canBeSafeIncreased game playerInd pos
           (same, others) = calcStrengthsForPlayer game playerInd pos
           sameStrength = same ^. value
           deltaStrength = getDeltaOtherStrength sameStrength others 
-
-getDeltaOtherStrength :: Int -> [Cell] -> Int
-getDeltaOtherStrength sameStrength cells
-    = sameStrength - getOthersStrength cells ^. value
-
-getOthersStrength :: [Cell] -> Cell
-getOthersStrength [] = mkCell 0 0
-getOthersStrength (c:cs) = c

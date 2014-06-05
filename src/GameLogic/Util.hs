@@ -68,5 +68,13 @@ calcStrengthsForPlayer game playerInd pos
                   [cell] -> cell
           p = flip compare `on` view value
 
+getDeltaOtherStrength :: Int -> [Cell] -> Int
+getDeltaOtherStrength sameStrength cells
+    = sameStrength - getOthersStrength cells ^. value
+
+getOthersStrength :: [Cell] -> Cell
+getOthersStrength [] = mkCell 0 0
+getOthersStrength (c:cs) = c
+
 toRange :: (Int, Int) -> Int -> Int
 toRange (minval, maxval) = max minval . min maxval
