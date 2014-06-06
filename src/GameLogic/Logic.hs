@@ -1,4 +1,8 @@
-module GameLogic.Logic where
+module GameLogic.Logic
+    ( setCenterPosLimited
+    , doSelectCellAction
+    , doGameStep
+    ) where
 
 import Debug.Trace
 import Control.Lens

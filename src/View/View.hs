@@ -1,4 +1,6 @@
-module View.View where
+module View.View
+    ( drawState
+    ) where
 
 import Control.Lens
 import View.State

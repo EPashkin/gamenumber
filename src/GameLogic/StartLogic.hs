@@ -1,4 +1,6 @@
-module GameLogic.StartLogic where
+module GameLogic.StartLogic
+    ( newGame
+    ) where
 
 import System.Random
 import Control.Lens
