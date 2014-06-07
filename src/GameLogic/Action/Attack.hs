@@ -21,9 +21,8 @@ maybeAttackCell pos playerInd game
     = conquerCell pos playerInd game
     | otherwise
     = Nothing
-    where (same, others) = calcStrengthsForPlayer game playerInd pos
-          sameStrength = same ^. value
-          deltaStrength = getDeltaOtherStrength sameStrength others
+    where (_, _ , _, deltaStrength)
+              = calcStrengthsForPlayerEx game playerInd pos
 
 conquerCell :: WorldPos -> Int -> Game -> Maybe Game
 conquerCell pos playerInd game

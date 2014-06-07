@@ -110,12 +110,12 @@ aggroRect game playerInd = ((minX, minY), (maxX, maxY))
 calcPossibleAction :: Game -> Int -> WorldPos -> PossibleAction
 calcPossibleAction game playerInd pos
     = calcPossibleAction' pos cell strengths defencePositions
-    where strengths = calcStrengthsForPlayer game playerInd pos
+    where strengths = calcStrengthsForPlayerEx game playerInd pos
           Just cell = game ^? cellOfGame pos
           defencePositions = getDefencePositions game playerInd pos
 
-calcPossibleAction' :: WorldPos -> Cell -> (Cell, [Cell]) -> [WorldPos] -> PossibleAction
-calcPossibleAction' pos cell (same, others) defencePositions
+calcPossibleAction' :: WorldPos -> Cell -> StrengthsEx -> [WorldPos] -> PossibleAction
+calcPossibleAction' pos cell (same, _, sameStrength, deltaStrength) defencePositions
     | sameStrength == 0
     = NoAction pos cell
     | deltaStrength >= 0
@@ -138,9 +138,7 @@ calcPossibleAction' pos cell (same, others) defencePositions
     = Conquer pos cell
     | otherwise
     = Unknown pos cell
-    where sameStrength = same ^. value
-          samePlayerIndex = same ^. playerIndex
-          deltaStrength = getDeltaOtherStrength sameStrength others 
+    where samePlayerIndex = same ^. playerIndex
 
 getDefencePositions :: Game -> Int-> WorldPos -> [WorldPos]
 getDefencePositions game playerInd pos
@@ -160,6 +158,5 @@ canBeSafeIncreased game playerInd pos
     | otherwise
     = False
     where Just cell = game ^? cellOfGame pos
-          (same, others) = calcStrengthsForPlayer game playerInd pos
-          sameStrength = same ^. value
-          deltaStrength = getDeltaOtherStrength sameStrength others 
+          (_, _, sameStrength, deltaStrength)
+              = calcStrengthsForPlayerEx game playerInd pos

@@ -58,6 +58,15 @@ updateCellList cells cell
                   [] -> cell
                   [cell'] -> cell' & value %~ (+ (cell ^. value))
 
+type StrengthsEx = (Cell, [Cell], Int, Int)
+
+calcStrengthsForPlayerEx :: Game -> Int -> WorldPos -> StrengthsEx
+calcStrengthsForPlayerEx game playerInd pos
+    = (same, others, sameStrength, deltaStrength)
+    where (same, others) = calcStrengthsForPlayer game playerInd pos
+          sameStrength = same ^. value
+          deltaStrength = getDeltaOtherStrength sameStrength others
+
 calcStrengthsForPlayer :: Game -> Int -> WorldPos -> (Cell, [Cell])
 calcStrengthsForPlayer game playerInd pos
     = (same', sortBy p others)
