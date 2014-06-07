@@ -15,6 +15,7 @@ import GameLogic.Data.Players
 import GameLogic.Util
 import GameLogic.AI
 import GameLogic.Action.Defend
+import GameLogic.Action.Attack
 
 
 setCenterPosLimited :: WorldPos -> Game -> Game
@@ -81,5 +82,5 @@ doCellAction' pos playerInd game
     | cell ^. playerIndex == playerInd || isFree cell
     = increaseCell pos playerInd game
     | otherwise
-    = game
+    = attackCell pos playerInd game
     where Just cell = game ^? cellOfGame pos
