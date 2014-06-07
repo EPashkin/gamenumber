@@ -13,17 +13,17 @@ import GameLogic.Action.ModifyPlayer
 
 attackCell :: WorldPos -> Int -> Game -> Game
 attackCell pos playerInd game
-    = fromMaybe game $ attackCellWithStrength pos playerInd deltaStrength game
-    where (same, others) = calcStrengthsForPlayer game playerInd pos
-          sameStrength = same ^. value
-          deltaStrength = getDeltaOtherStrength sameStrength others
+    = fromMaybe game $ maybeAttackCell pos playerInd game
 
-attackCellWithStrength :: WorldPos -> Int -> Int -> Game -> Maybe Game
-attackCellWithStrength pos playerInd deltaStrength game
+maybeAttackCell :: WorldPos -> Int -> Game -> Maybe Game
+maybeAttackCell pos playerInd game
     | deltaStrength > 0
     = conquerCell pos playerInd game
     | otherwise
-    = Just game
+    = Nothing
+    where (same, others) = calcStrengthsForPlayer game playerInd pos
+          sameStrength = same ^. value
+          deltaStrength = getDeltaOtherStrength sameStrength others
 
 conquerCell :: WorldPos -> Int -> Game -> Maybe Game
 conquerCell pos playerInd game
