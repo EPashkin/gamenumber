@@ -12,6 +12,7 @@ import GameLogic.Data.World
 import GameLogic.Data.Game
 import GameLogic.Data.Players
 import GameLogic.Util
+import GameLogic.Action.Attack
 import GameLogic.Action.Defend
 
 --TODO: remove poses in defence
@@ -21,6 +22,7 @@ data PossibleAction = NoAction WorldPos Cell
                     | Increase WorldPos Cell
                     | NeedDefend WorldPos Cell [WorldPos]
                     | ParanoidNeedDefend WorldPos Cell [WorldPos]
+                    | Conquer WorldPos Cell
                     | Unknown  WorldPos Cell
                     deriving (Show)
 
@@ -34,6 +36,7 @@ actionWeight FreeCapture{} = 100
 actionWeight Increase{} = 10
 actionWeight NeedDefend{} = 1000
 actionWeight ParanoidNeedDefend{} = 50
+actionWeight Conquer{} = 800
 
 doAIsGameStep :: Game -> Game
 doAIsGameStep game = foldl p game plInds
@@ -73,6 +76,8 @@ doAIAction (NeedDefend pos _ poses) playerIndex
     = defenceCellAction poses playerIndex
 doAIAction (ParanoidNeedDefend pos _ poses) playerIndex
     = defenceCellAction poses playerIndex
+doAIAction (Conquer pos _) playerIndex
+    = attackCell pos playerIndex
 
 increaseCellAction pos playerIndex
     = increaseCell pos playerIndex . setSelectedPos pos playerIndex
@@ -128,6 +133,9 @@ calcPossibleAction' pos cell (same, others) defencePositions
     && deltaStrength >= 0
     && cell ^. value < min 9 sameStrength
     = Increase pos cell
+    | not (isOwnedBy samePlayerIndex cell)
+    && deltaStrength > 0
+    = Conquer pos cell
     | otherwise
     = Unknown pos cell
     where sameStrength = same ^. value
