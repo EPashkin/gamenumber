@@ -23,8 +23,9 @@ setCenterPosLimited pos game =
     game & centerPos .~ pos' & traceTest game pos' doSelectCellAction pos'
     where pos' = limitPosToWorld pos game
 
+traceTest :: Game -> WorldPos -> a -> a
 traceTest game pos =
-    traceShow (calcPossibleAction game 2 pos)
+    traceShow (calcPossibleAction game 2 10 pos)
     $ traceShow (calcPossibleActions game 2)
 
 doSelectCellAction :: WorldPos -> Game -> Game
@@ -75,7 +76,7 @@ doCellAction pos game
     | not $ isPosInGame game pos
     = game
     | otherwise
-    = doCellAction' pos activePlayerIndex game -- $ set selectedPos pos game
+    = doCellAction' pos activePlayerIndex game
     
 doCellAction' :: WorldPos -> Int -> Game -> Game
 doCellAction' pos playerInd game
