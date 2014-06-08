@@ -20,7 +20,7 @@ maybeAttackCell pos playerInd game
     | deltaStrength > 0
     = conquerCell pos playerInd game
     | otherwise
-    = Nothing
+    = decreaseCell pos playerInd game
     where (_, _ , _, deltaStrength)
               = calcStrengthsForPlayerEx game playerInd pos
 
@@ -33,3 +33,18 @@ conquerCell pos playerInd game
     where Just oldCell = game ^? cellOfGame pos
           oldPl = oldCell ^. playerIndex
           oldVal = oldCell ^. value
+
+decreaseCell :: WorldPos -> Int -> Game -> Maybe Game
+decreaseCell pos playerInd game
+    = Just (2, game & cellOfGame pos %~ decreaseCell')
+    >>= decreaseGamePlayerFree playerInd
+    >>= Just . increasePlayerNum (-1) oldPl
+    where Just oldPl = game ^? (cellOfGame pos . playerIndex)
+
+decreaseCell' :: Cell -> Cell
+decreaseCell' cell
+    | val > 1
+    = cell & value -~ 1
+    | otherwise
+    = mkCell 0 0
+    where val = cell ^. value
