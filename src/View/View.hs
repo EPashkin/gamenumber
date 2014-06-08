@@ -48,10 +48,16 @@ drawSelecteds :: Game -> [Picture]
 drawSelecteds game = mapPIndices (drawSelected game) $ game ^. players
 
 drawSelected :: Game -> Int -> Picture
-drawSelected game playerIndex =
-   let color = playerColor playerIndex
-       Just pos = game ^? players . ix playerIndex . selectedPos
-   in drawSelectedCellBox pos color
+drawSelected game playerIndex
+   | num' > 0
+   || playerIndex == activePlayerIndex
+   = drawSelectedCellBox pos color
+   | otherwise
+   = Blank
+   where color = playerColor playerIndex
+         Just pl = game ^? players . ix playerIndex
+         pos = pl ^. selectedPos
+         num' = pl ^. num
 
 drawSelectedCellBox :: WorldPos -> Color -> Picture
 drawSelectedCellBox pos color =
