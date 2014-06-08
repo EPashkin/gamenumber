@@ -141,7 +141,7 @@ calcPossibleAction game playerInd free pos
 
 calcPossibleAction' :: WorldPos -> Cell -> StrengthsEx -> Int
     -> [WorldPos] -> [WorldPos] -> PossibleAction
-calcPossibleAction' pos cell (same, _, sameStrength, deltaStrength) free
+calcPossibleAction' pos cell (same, others, sameStrength, deltaStrength) free
   defencePositions reduceDefencePositions
     | sameStrength == 0
     = NoAction pos cell
@@ -168,7 +168,7 @@ calcPossibleAction' pos cell (same, _, sameStrength, deltaStrength) free
     = NoAction pos cell
     -- for enemy cell
     | not (isOwnedBy samePlayerIndex cell)
-    && deltaStrength > 0
+    && (deltaStrength > 0 || (deltaStrength == 0 && sameStrength > ownerStrength))
     = Conquer pos cell
     | not (isOwnedBy samePlayerIndex cell)
     && free >= 2
@@ -181,6 +181,7 @@ calcPossibleAction' pos cell (same, _, sameStrength, deltaStrength) free
     | otherwise
     = Unknown pos cell
     where samePlayerIndex = same ^. playerIndex
+          ownerStrength = getOtherStrength (cell ^. playerIndex) others
 
 getDefencePositions :: Game -> Int-> WorldPos -> [WorldPos]
 getDefencePositions game playerInd pos

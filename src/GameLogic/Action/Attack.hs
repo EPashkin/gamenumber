@@ -17,12 +17,14 @@ attackCell pos playerInd game
 
 maybeAttackCell :: WorldPos -> Int -> Game -> Maybe Game
 maybeAttackCell pos playerInd game
-    | deltaStrength > 0
+    | deltaStrength > 0 || (deltaStrength == 0 && sameStrength > ownerStrength)
     = conquerCell pos playerInd game
     | otherwise
     = decreaseCell pos playerInd game
-    where (_, _ , _, deltaStrength)
+    where (_, others, sameStrength, deltaStrength)
               = calcStrengthsForPlayerEx game playerInd pos
+          Just ownerInd = game ^? cellOfGame pos . playerIndex
+          ownerStrength = getOtherStrength ownerInd others
 
 conquerCell :: WorldPos -> Int -> Game -> Maybe Game
 conquerCell pos playerInd game

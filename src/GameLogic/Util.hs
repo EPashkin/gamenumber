@@ -85,5 +85,13 @@ getOthersStrength :: [Cell] -> Cell
 getOthersStrength [] = mkCell 0 0
 getOthersStrength (c:cs) = c
 
+getOtherStrength :: Int -> [Cell] -> Int
+getOtherStrength _ [] = 0
+getOtherStrength playerInd (c:cs)
+    | isOwnedBy playerInd c
+    = c ^. value
+    | otherwise
+    = getOtherStrength playerInd cs
+
 toRange :: (Int, Int) -> Int -> Int
 toRange (minval, maxval) = max minval . min maxval
