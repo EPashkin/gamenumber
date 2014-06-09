@@ -2,12 +2,17 @@ module GameLogic.Util where
 
 import Data.List
 import Data.Function (on)
+import Control.Monad
 import Control.Lens
 import GameLogic.Data.Cell
 import GameLogic.Data.World
 import GameLogic.Data.Game
 import GameLogic.Data.Players
 
+
+infixl 1 >>==
+(>>==) :: Monad m => m a -> (a -> b) -> m b
+(>>==) ma f = liftM f ma 
 
 setSelectedPos :: WorldPos -> Int -> Game -> Game
 setSelectedPos pos playerInd game

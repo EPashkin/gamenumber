@@ -30,8 +30,8 @@ conquerCell :: WorldPos -> Int -> Game -> Maybe Game
 conquerCell pos playerInd game
     = Just (1, game & cellOfGame pos .~ mkCell 1 playerInd)
     >>= decreaseGamePlayerFree playerInd
-    >>= Just . increasePlayerNum 1 playerInd
-    >>= Just . increasePlayerNum (-oldVal) oldPl
+    >>== increasePlayerNum 1 playerInd
+    >>== increasePlayerNum (-oldVal) oldPl
     where Just oldCell = game ^? cellOfGame pos
           oldPl = oldCell ^. playerIndex
           oldVal = oldCell ^. value
@@ -40,7 +40,7 @@ decreaseCell :: WorldPos -> Int -> Game -> Maybe Game
 decreaseCell pos playerInd game
     = Just (2, game & cellOfGame pos %~ decreaseCell')
     >>= decreaseGamePlayerFree playerInd
-    >>= Just . increasePlayerNum (-1) oldPl
+    >>== increasePlayerNum (-1) oldPl
     where Just oldPl = game ^? (cellOfGame pos . playerIndex)
 
 decreaseCell' :: Cell -> Cell
