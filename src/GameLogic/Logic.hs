@@ -6,7 +6,7 @@ module GameLogic.Logic
 
 import Debug.Trace
 import Control.Lens
-import Control.Category ( (>>>) )
+import Control.Category ((>>>))
 import GameLogic.Data.Settings
 import GameLogic.Data.Cell
 import GameLogic.Data.World
@@ -14,6 +14,7 @@ import GameLogic.Data.Game
 import GameLogic.Data.Players
 import GameLogic.Util
 import GameLogic.AI
+import GameLogic.AI.PossibleAction
 import GameLogic.Action.Defend
 import GameLogic.Action.Attack
 
