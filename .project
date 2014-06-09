@@ -34,4 +34,15 @@
 	<natures>
 		<nature>net.sf.eclipsefp.haskell.core.project.HaskellNature</nature>
 	</natures>
+	<filteredResources>
+		<filter>
+			<id>1402328578296</id>
+			<name>dist</name>
+			<type>30</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-name-matches-false-false-*</arguments>
+			</matcher>
+		</filter>
+	</filteredResources>
 </projectDescription>
