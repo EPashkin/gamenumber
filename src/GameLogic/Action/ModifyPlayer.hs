@@ -7,12 +7,12 @@ import GameLogic.Data.Players
 
 increasePlayerNum :: Int -> Int -> Game -> Game
 increasePlayerNum inc playerInd
-    = players . ix playerInd . num %~ (+inc)
+    = players . ix playerInd . num +~ inc
 
 decreaseGamePlayerFree :: Int -> (Int, Game) -> Maybe Game
-decreaseGamePlayerFree playerInd (inc, game)
-    | inc <= curFree
-    = Just $ game & (players . ix playerInd . free) -~ inc
+decreaseGamePlayerFree playerInd (cost, game)
+    | cost <= curFree
+    = Just $ game & players . ix playerInd . free -~ cost
     | otherwise
     = Nothing
-    where Just curFree = game & preview (players . ix playerInd . free)
+    where Just curFree = game ^? players . ix playerInd . free
