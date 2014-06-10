@@ -8,6 +8,7 @@ import GameLogic.Util
 import GameLogic.Data.Cell
 import GameLogic.Data.World
 import GameLogic.Data.Game
+import GameLogic.Data.Players
 import GameLogic.Action.ModifyPlayer
 
 
@@ -38,10 +39,18 @@ conquerCell pos playerInd game
 
 decreaseCell :: WorldPos -> Int -> Game -> Maybe Game
 decreaseCell pos playerInd game
-    = Just (2, game & cellOfGame pos %~ decreaseCell')
+    = decreaseCellOrShield pos playerInd game
     >>= decreaseGamePlayerFree playerInd
-    >>== increasePlayerNum (-1) oldPl
-    where Just oldPl = game ^? (cellOfGame pos . playerIndex)
+
+decreaseCellOrShield :: WorldPos -> Int -> Game -> Maybe (Int, Game)
+decreaseCellOrShield pos playerInd game
+    | oldPl ^. shieldActive
+    = Just (2, game & players . ix oldPlInd . free -~ 1)
+    | otherwise
+    = Just (2, game & (cellOfGame pos %~ decreaseCell')
+      . increasePlayerNum (-1) oldPlInd)
+    where Just oldPlInd = game ^? cellOfGame pos . playerIndex
+          Just oldPl = game ^? players . ix oldPlInd
 
 decreaseCell' :: Cell -> Cell
 decreaseCell' cell
