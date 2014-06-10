@@ -13,6 +13,7 @@ import GameLogic.Util
 import GameLogic.AI.PossibleAction
 import GameLogic.Action.Attack
 import GameLogic.Action.Defend
+import GameLogic.Action.Shield
 
 
 doAIsGameStep :: Game -> Game
@@ -59,6 +60,10 @@ doAIAction (ReduceDefence pos _ poses) playerIndex
     = reduceDefenceCellAction poses playerIndex
 doAIAction (Attack pos _) playerIndex
     = attackCellAction pos playerIndex
+doAIAction (ShieldCharge _) playerIndex
+    = shieldAction playerIndex
+doAIAction ShieldActivate playerIndex
+    = shieldAction playerIndex
 
 increaseCellAction pos playerIndex
     = increaseCell pos playerIndex . setSelectedPos pos playerIndex

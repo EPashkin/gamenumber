@@ -6,6 +6,7 @@ module GameLogic.AI.PossibleAction
     ) where
 
 import Control.Lens
+import GameLogic.Data.Settings
 import GameLogic.Data.Cell
 import GameLogic.Data.World
 import GameLogic.Data.Game
@@ -23,6 +24,8 @@ data PossibleAction = NoAction WorldPos Cell
                     | Conquer WorldPos Cell
                     | ReduceDefence WorldPos Cell [WorldPos]
                     | Attack WorldPos Cell
+                    | ShieldCharge Player
+                    | ShieldActivate
                     | Unknown  WorldPos Cell
                     deriving (Show)
 
@@ -39,11 +42,12 @@ actionWeight ParanoidNeedDefend{} = 50
 actionWeight Conquer{} = 800
 actionWeight ReduceDefence{} = 5
 actionWeight Attack{} = 1
-
+actionWeight (ShieldCharge pl) = 100 + 2 * pl ^. shieldStrength
+actionWeight ShieldActivate = 10000
 
 calcPossibleActions :: Game -> Int -> [PossibleAction]
 calcPossibleActions game playerInd
-    = filter (not.isNoAction) actions
+    = filter (not.isNoAction) actions ++ calcPossibleShieldAction game playerInd
     where ((minX, minY), (maxX, maxY)) = aggroRect game playerInd
           poses = [(x,y) | x <- [minX..maxX], y <- [minY..maxY]]
           actions = fmap (calcPossibleAction game playerInd free') poses
@@ -141,3 +145,17 @@ canBeSafeIncreased game playerInd pos
     where Just cell = game ^? cellOfGame pos
           (_, _, sameStrength, deltaStrength)
               = calcStrengthsForPlayerEx game playerInd pos
+
+calcPossibleShieldAction :: Game -> Int -> [PossibleAction]
+calcPossibleShieldAction game playerInd
+    | pl ^. shieldActive
+    = []
+    | shieldStr >= shieldActivationStrength
+    = return ShieldActivate
+    | worldArea * 9 < shieldAINumMultiplier * (pl ^. num)
+    = return $ ShieldCharge pl
+    | otherwise
+    = []
+    where Just pl = game ^? players . ix playerInd
+          shieldStr = pl ^. shieldStrength
+          worldArea = getWorldSize (game ^. world) ^ 2
