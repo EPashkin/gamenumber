@@ -46,7 +46,7 @@ calcPossibleActions game playerInd
     = filter (not.isNoAction) actions
     where ((minX, minY), (maxX, maxY)) = aggroRect game playerInd
           poses = [(x,y) | x <- [minX..maxX], y <- [minY..maxY]]
-          actions = map (calcPossibleAction game playerInd free') poses
+          actions = fmap (calcPossibleAction game playerInd free') poses
           Just free' = game ^? players . ix playerInd . free
 
 aggroRect :: Game -> Int -> (WorldPos, WorldPos)
