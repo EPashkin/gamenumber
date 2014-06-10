@@ -7,6 +7,7 @@ import Middleware.Gloss.Facade (Picture)
 import GameLogic.Data.Facade
 import GameLogic.Logic
 import GameLogic.StartLogic
+import GameLogic.Action.ModifyPlayer
 import View.Convert
 
 data State = State { _game :: Game
@@ -61,6 +62,12 @@ doLoad state = do
     let g = state ^. game
     g' <- doLoadGame "gamenumber.gn" g
     return $ set game g' state
+
+doHelpPlayer :: State -> State
+doHelpPlayer state
+    = state & game .~ g'
+    where g = state ^. game
+          Just g' = decreaseGamePlayerFree activePlayerIndex (-10, g)
 
 doChangePaused :: State -> State
 doChangePaused = game . paused %~ not

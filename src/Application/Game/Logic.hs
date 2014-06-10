@@ -16,6 +16,9 @@ eventHandler (EventKey key keyState mods pos) state
     = return $ centering pos state
 
 eventHandler (EventKey key keyState mods pos) state
+    | SpecialKey KeyF1 == key
+    , Down == keyState
+    = return $ doHelpPlayer state
     | SpecialKey KeyF2 == key
     , Down == keyState
     = doSave state
