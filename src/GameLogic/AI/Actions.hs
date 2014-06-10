@@ -1,4 +1,4 @@
-module GameLogic.AI
+module GameLogic.AI.Actions
     ( doAIsGameStep
     ) where
 

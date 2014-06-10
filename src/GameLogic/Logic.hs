@@ -13,7 +13,7 @@ import GameLogic.Data.World
 import GameLogic.Data.Game
 import GameLogic.Data.Players
 import GameLogic.Util
-import GameLogic.AI
+import GameLogic.AI.Actions
 import GameLogic.AI.PossibleAction
 import GameLogic.Action.Defend
 import GameLogic.Action.Attack
