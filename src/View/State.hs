@@ -8,6 +8,7 @@ import GameLogic.Data.Facade
 import GameLogic.Logic
 import GameLogic.StartLogic
 import GameLogic.Action.ModifyPlayer
+import GameLogic.Action.Shield
 import View.Convert
 
 data State = State { _game :: Game
@@ -71,6 +72,9 @@ doHelpPlayer state
 
 doChangePaused :: State -> State
 doChangePaused = game . paused %~ not
+
+doShieldAction :: State -> State
+doShieldAction state = state & game %~ shieldAction activePlayerIndex
 
 doWithWindowPosOnGame :: (WorldPos -> Game -> Game) -> (Float, Float) -> Game-> Game
 doWithWindowPosOnGame action pos game = action pos' game

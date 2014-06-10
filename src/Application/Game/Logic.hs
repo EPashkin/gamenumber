@@ -28,6 +28,9 @@ eventHandler (EventKey key keyState mods pos) state
     | Char 'p' == key
     , Down == keyState
     = return $ doChangePaused state
+    | Char 's' == key
+    , Down == keyState
+    = return $ doShieldAction state
 
 eventHandler (EventMotion pos) state
     | inPlacementMode state 
