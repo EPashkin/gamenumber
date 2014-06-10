@@ -10,6 +10,7 @@ import GameLogic.Data.World
 import GameLogic.Data.Game
 import GameLogic.Data.Players
 import GameLogic.Action.ModifyPlayer
+import GameLogic.Action.Shield
 
 
 attackCell :: WorldPos -> Int -> Game -> Game
@@ -44,7 +45,7 @@ decreaseCell pos playerInd game
 
 decreaseCellOrShield :: WorldPos -> Int -> Game -> Maybe (Int, Game)
 decreaseCellOrShield pos playerInd game
-    | oldPl ^. shieldActive
+    | isShieldWorking oldPl
     = Just (2, game & players . ix oldPlInd . free -~ 1)
     | otherwise
     = Just (2, game & (cellOfGame pos %~ decreaseCell')

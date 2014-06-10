@@ -11,3 +11,4 @@ aiAggroMin = defWorldSize `div` 10 + 1 :: Int
 remainDivMin = 4 :: Int    -- for slower start
 remainDivMult = 20 :: Int   -- ~1 FREE per 2 sec for max valued player (see ticksPerSecond)
 shieldActivationStrength = 128 :: Int
+shieldStopWorkingFree = -10 :: Int -- shield does not protect if 'free' is too low

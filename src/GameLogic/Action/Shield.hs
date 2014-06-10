@@ -1,5 +1,6 @@
 module GameLogic.Action.Shield
     ( shieldAction
+    , isShieldWorking
     ) where
 
 import Control.Lens
@@ -30,3 +31,8 @@ playerShieldAction player
     = Just (0, player & shieldActive .~ True)
     | otherwise
     = Just (1, player & shieldStrength +~ 1)
+
+isShieldWorking :: Player -> Bool
+isShieldWorking player
+    = player ^. shieldActive
+    && player ^. free > shieldStopWorkingFree
