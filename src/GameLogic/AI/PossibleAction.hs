@@ -12,6 +12,7 @@ import GameLogic.Data.World
 import GameLogic.Data.Game
 import GameLogic.Data.Players
 import GameLogic.Util
+import GameLogic.Action.Shield
 
 
 --TODO: remove poses in defence
@@ -22,7 +23,7 @@ data PossibleAction = NoAction WorldPos Cell
                     | NeedDefend WorldPos Cell [WorldPos]
                     | ParanoidNeedDefend WorldPos Cell [WorldPos]
                     | Conquer WorldPos Cell
-                    | ReduceDefence WorldPos Cell [WorldPos]
+                    | ReduceDefence WorldPos Cell Bool [WorldPos]
                     | Attack WorldPos Cell
                     | ShieldCharge Player
                     | ShieldActivate
@@ -40,6 +41,7 @@ actionWeight Increase{} = 20
 actionWeight NeedDefend{} = 1000
 actionWeight ParanoidNeedDefend{} = 50
 actionWeight Conquer{} = 800
+actionWeight (ReduceDefence _ _ True _) = 1
 actionWeight ReduceDefence{} = 5
 actionWeight Attack{} = 1
 actionWeight (ShieldCharge pl) = 100 + 2 * pl ^. shieldStrength
@@ -53,6 +55,7 @@ calcPossibleActions game playerInd
           actions = fmap (calcPossibleAction game playerInd free') poses
           Just free' = game ^? players . ix playerInd . free
 
+--TODO: increase rect to all world if too many free
 aggroRect :: Game -> Int -> (WorldPos, WorldPos)
 aggroRect game playerInd = ((minX, minY), (maxX, maxY))
     where Just pl = game ^? players. ix playerInd
@@ -67,16 +70,18 @@ aggroRect game playerInd = ((minX, minY), (maxX, maxY))
 
 calcPossibleAction :: Game -> Int -> Int -> WorldPos -> PossibleAction
 calcPossibleAction game playerInd free pos
-    = calcPossibleAction' pos cell strengths free defencePositions reduceDefencePositions
+    = calcPossibleAction' pos cell strengths free
+        ownerPl defencePositions reduceDefencePositions
     where strengths = calcStrengthsForPlayerEx game playerInd pos
           Just cell = game ^? cellOfGame pos
           defencePositions = getDefencePositions game playerInd pos
           reduceDefencePositions = getReduceDefencePositions game pos
+          Just ownerPl = game ^? players . ix (cell ^. playerIndex)
 
-calcPossibleAction' :: WorldPos -> Cell -> StrengthsEx -> Int
+calcPossibleAction' :: WorldPos -> Cell -> StrengthsEx -> Int -> Player
     -> [WorldPos] -> [WorldPos] -> PossibleAction
 calcPossibleAction' pos cell (same, others, sameStrength, deltaStrength) free
-  defencePositions reduceDefencePositions
+  ownerPl defencePositions reduceDefencePositions
     | sameStrength == 0
     = NoAction pos cell
     -- for unowned cell
@@ -108,7 +113,7 @@ calcPossibleAction' pos cell (same, others, sameStrength, deltaStrength) free
     && free >= 2
     && deltaStrength == 0
     && not (null reduceDefencePositions)
-    = ReduceDefence pos cell reduceDefencePositions
+    = ReduceDefence pos cell (isShieldWorking ownerPl) reduceDefencePositions
     | not (isOwnedBy samePlayerIndex cell)
     && free >= 2
     = Attack pos cell
