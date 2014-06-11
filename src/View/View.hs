@@ -7,18 +7,20 @@ import View.State
 import View.Panel
 import View.Convert
 import GameLogic.Data.Facade
+import GameLogic.Util
 import Middleware.Gloss.Facade
 
 drawState :: State -> IO Picture
 drawState state = do 
-  world <- state & drawGame . view game
+  let visibleR = visibleRange state
+  world <- drawGame visibleR $ state ^. game
   let world' = Translate worldShiftX 0 world
   let panel = drawPanel state 
   return . Pictures $ world' : [panel]
 
-drawGame :: Game -> IO Picture
-drawGame game = do
-   let cells = mapW drawCell $ game ^. world
+drawGame :: (WorldPos, WorldPos) -> Game -> IO Picture
+drawGame visibleR game = do
+   let cells = mapWR drawCell visibleR $ game ^. world
    let halfScale = drawScale / 2
 
    let selecteds = if True --TODO: game field :: showEnemySelected
@@ -70,9 +72,25 @@ drawSelectedCellBox pos color =
         radius = diametr / 2
         delta = radius / 4
 
-    
 translateCell :: WorldPos -> Picture -> Picture
 translateCell (x,y) pict =
    let xx = (fromIntegral x - 0.5) * drawScale
        yy = (fromIntegral y - 0.5) * drawScale
    in Translate xx yy pict
+
+visibleRange :: State -> (WorldPos, WorldPos)
+visibleRange state = ((minX, minY), (maxX, maxY))
+    where game' = state ^. game
+          Just pl = game' ^? players. ix activePlayerIndex
+          (cX, cY) = game' ^. centerPos
+          wSize = state ^. windowSize
+          width = fromIntegral (fst wSize) - panelWidth
+          height = fromIntegral (snd wSize)
+          dX = floor $ (width / 2 / drawScale) + 0.5
+          dY = floor $ (height / 2 / drawScale) + 0.5
+          size = getWorldSize $ game' ^. world
+          rng = (1, size)
+          minX = toRange rng $ cX - dX
+          maxX = toRange rng $ cX + dX
+          minY = toRange rng $ cY - dY
+          maxY = toRange rng $ cY + dY

@@ -31,6 +31,9 @@ getWorldSize = fst . snd . bounds
 mapW :: ((WorldPos, Cell) -> a) -> World -> [a]
 mapW func world = fmap func (assocs world)
 
+mapWR :: ((WorldPos, Cell) -> a) -> (WorldPos, WorldPos) -> World -> [a]
+mapWR func range world = fmap func $ filter (inRange range . fst) $ assocs world
+
 -- find first pos owned by playerIndex
 -- can generate error is no pos
 findPlayerPos :: Int -> World -> WorldPos
