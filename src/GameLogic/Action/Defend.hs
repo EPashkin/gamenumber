@@ -5,6 +5,7 @@ module GameLogic.Action.Defend
 import Control.Lens
 import Data.Maybe
 import GameLogic.Util
+import GameLogic.Data.Settings
 import GameLogic.Data.Cell
 import GameLogic.Data.World
 import GameLogic.Data.Game
@@ -14,7 +15,7 @@ import GameLogic.Action.ModifyPlayer
 increaseCell :: WorldPos -> Int -> Game -> Game
 increaseCell pos playerInd game
     = fromMaybe game $ increaseCellWithMax pos playerInd maxVal game
-    where maxVal = min 9 $ calcSumOwnedNearest game playerInd pos
+    where maxVal = min maxCellValue $ calcSumOwnedNearest game playerInd pos
 
 increaseCellWithMax :: WorldPos -> Int -> Int -> Game -> Maybe Game
 increaseCellWithMax pos playerInd maxVal game

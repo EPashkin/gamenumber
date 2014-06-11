@@ -2,6 +2,7 @@ module GameLogic.Data.Settings where
 
 
 --TODO: to config
+maxCellValue = 9 :: Int
 defWorldSize = 64 :: Int
 defNumPlayers = 16 :: Int
 defSeed = 0 :: Int -- set not 0 for debug purposes

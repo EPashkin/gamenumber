@@ -101,7 +101,7 @@ calcPossibleAction' pos cell (same, others, sameStrength, deltaStrength) free
     = ParanoidNeedDefend pos cell defencePositions
     | isOwnedBy samePlayerIndex cell
     && deltaStrength >= 0
-    && cell ^. value < min 9 sameStrength
+    && cell ^. value < min maxCellValue sameStrength
     = Increase pos cell
     | isOwnedBy samePlayerIndex cell
     = NoAction pos cell
@@ -143,7 +143,7 @@ canBeSafeIncreased game playerInd pos
     | not (isOwnedBy playerInd cell)
     = False
     | deltaStrength >= 0
-    && cell ^. value < min 9 sameStrength
+    && cell ^. value < min maxCellValue sameStrength
     = True
     | otherwise
     = False
@@ -157,7 +157,7 @@ calcPossibleShieldAction game playerInd
     = []
     | shieldStr >= shieldActivationStrength
     = return ShieldActivate
-    | worldArea * 9 < shieldAINumMultiplier * (pl ^. num)
+    | worldArea * maxCellValue < shieldAINumMultiplier * (pl ^. num)
     = return $ ShieldCharge pl
     | otherwise
     = []
