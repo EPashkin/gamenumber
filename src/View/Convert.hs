@@ -10,6 +10,7 @@ panelTextScale = 1 / 8 :: Float
 panelWidth = 200 :: Float
 playerInfoWidth = panelWidth*0.9
 playerInfoHeight = 20 :: Float
+mapSize = 64 :: Float
 
 windowPosOfWorldPos :: Game -> WorldPos -> (Float, Float)
 windowPosOfWorldPos game pos =

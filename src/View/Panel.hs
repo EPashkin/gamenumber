@@ -8,7 +8,6 @@ import View.Convert
 import GameLogic.Data.Facade
 import Middleware.Gloss.Facade
 
---TODO: Show minimap
 --TODO: Pause checkbox
 --TODO: Collapsible panel
 drawPanel :: State -> Picture
@@ -24,7 +23,10 @@ drawPanel state =
         playerPicts = mapP drawPlayer $ state ^. game . players
         playersPict = Translate 0 (halfHeight - 30) $ Pictures playerPicts
         pausedPict  = Translate 0 (20 - halfHeight) $ drawPaused state
-    in Translate shiftX 0 $ Pictures [rect, positionPic, playersPict, pausedPict]
+        miniMapPict = Translate (-panelWidth/2.2) (35 - halfHeight)
+                      $ drawMiniMap $ state ^. game
+    in Translate shiftX 0 $ Pictures [rect, positionPic, playersPict, miniMapPict
+                                     , pausedPict]
 
 drawPosition :: State -> Picture
 drawPosition state
@@ -82,3 +84,22 @@ drawPaused state
     = Color black $ drawInfoText "PAUSED"
     | otherwise
     = Blank
+
+drawMiniMap :: Game -> Picture
+drawMiniMap game = Pictures cells
+    where cells = mapW (drawMiniMapCell mapCellScale) w
+          w = game ^. world
+          mapCellScale = mapSize / fromIntegral (getWorldSize w)
+
+drawMiniMapCell :: Float -> (WorldPos, Cell) -> Picture
+drawMiniMapCell mapCellScale (pos, cell)
+   | isFree cell
+      = translateCell pos $ Color emptyCellColor rect
+   | otherwise
+      = translateCell pos $ Color color rect
+    where translateCell (x,y) pict =
+             let xx = (fromIntegral x - 0.5) * mapCellScale
+                 yy = (fromIntegral y - 0.5) * mapCellScale
+             in Translate xx yy pict
+          rect = rectangleSolid mapCellScale mapCellScale
+          color = playerColor $ cell ^. playerIndex
