@@ -44,8 +44,8 @@ drawPlayerInfoParts player = fmap p playerInfoParts
 
 playerInfoParts :: [(Float, Player -> String)]
 playerInfoParts = [(-0.50, show.view num)
-                  ,(-0.23, show.view free)
-                  ,(-0.01, remainText)
+                  ,(-0.22, show.view free)
+                  --,(-0.01, remainText)
                   ,( 0.22, shieldText)
                   ,( 0.40, aggrText)
                   ]
