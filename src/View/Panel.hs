@@ -8,10 +8,9 @@ import View.Convert
 import GameLogic.Data.Facade
 import Middleware.Gloss.Facade
 
---TODO: Show position
 --TODO: Show minimap
---TODO: Pause checbox
---TODO: Colapsible panel
+--TODO: Pause checkbox
+--TODO: Collapsible panel
 drawPanel :: State -> Picture
 drawPanel state =
     let size = state ^. windowSize
@@ -21,10 +20,17 @@ drawPanel state =
         halfHeight = height / 2
         shiftX = halfWidth - (panelWidth/2)
         rect = Color panelBkColor $ rectangleSolid panelWidth height
+        positionPic = Translate (-panelWidth/2.2) (halfHeight - 20) $ drawPosition state
         playerPicts = mapP drawPlayer $ state ^. game . players
         playersPict = Translate 0 (halfHeight - 30) $ Pictures playerPicts
         pausedPict  = Translate 0 (20 - halfHeight) $ drawPaused state
-    in Translate shiftX 0 $ Pictures [rect, playersPict, pausedPict]
+    in Translate shiftX 0 $ Pictures [rect, positionPic, playersPict, pausedPict]
+
+drawPosition :: State -> Picture
+drawPosition state
+    = Color black $ Scale panelTextScale panelTextScale $ Text str
+    where str = "Position: " ++ show x ++ "x" ++ show y
+          Just (x,y) = state ^? game . players . ix activePlayerIndex . selectedPos
 
 drawPlayer :: (Int, Player) -> Picture
 drawPlayer (index, player)
