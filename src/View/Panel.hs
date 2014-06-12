@@ -2,11 +2,19 @@ module View.Panel
     ( drawPanel
     ) where
 
+import Debug.Trace
+import Numeric
+import Data.Word
+import Data.Bits
+import Data.Monoid
+import qualified Data.ByteString as BS
+import qualified Data.ByteString.Lazy as BSL
+import Data.ByteString.Lazy.Builder
 import Control.Lens
 import View.State
 import View.Convert
 import GameLogic.Data.Facade
-import Middleware.Gloss.Facade
+import Middleware.Gloss.Facade hiding (shift)
 
 --TODO: Pause checkbox
 --TODO: Collapsible panel
@@ -86,7 +94,34 @@ drawPaused state
     = Blank
 
 drawMiniMap :: Game -> Picture
-drawMiniMap game = Pictures cells
+drawMiniMap game = Translate shift shift $ bitmapOfByteString wSize wSize bs False
+    where cells = Prelude.foldl (\acc w -> acc `mappend` word32BE w) (mempty::Builder) words
+          words = mapW getMiniMapCellWord w
+          --words = fmap getMiniMapCellWord replicate (wSize*wSize) ((1,1), mkCell 1 1)
+          bs = toStrict $ toLazyByteString cells
+          w = game ^. world
+          wSize = getWorldSize w
+          shift =  fromIntegral wSize / 2
+
+toStrict :: BSL.ByteString -> BS.ByteString
+toStrict = BS.concat . BSL.toChunks
+
+getMiniMapCellWord :: (WorldPos, Cell) -> Word32
+getMiniMapCellWord (_, cell)
+{-    | isFree cell
+    = shift 255 24
+    | otherwise -}
+    = shift a 24 .|. shift b 16 .|. shift g 8 .|. shift r 0
+    where color = playerColor $ cell ^. playerIndex
+          (r',g',b',a') = rgbaOfColor color
+          r = floor $ r' * 255
+          g = floor $ g' * 255
+          b = floor $ b' * 255
+          a = floor $ a' * 255
+
+
+drawMiniMapOld :: Game -> Picture
+drawMiniMapOld game = Pictures cells
     where cells = mapW (drawMiniMapCell mapCellScale) w
           --swap for testing drawing speed degradation
           --cells = fmap (drawMiniMapCell mapCellScale) [((x,y), mkCell 1 1) | x<-[1..wSize], y<-[1..wSize]]

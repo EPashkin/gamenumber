@@ -16,6 +16,7 @@ playerColor playerInd =
 
 playerColor' (-1) = (0, 0,42)        -- possible background color
 
+playerColor' 0 = ( 0, 0, 0)
 playerColor' 1 = ( 0,42, 0)
 playerColor' 2 = (39,17,25)
 playerColor' 3 = (60,24,27)
