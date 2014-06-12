@@ -2,8 +2,10 @@
 {-# LANGUAGE Rank2Types #-}
 module GameLogic.Data.Game where
 
+import Debug.Trace
 import System.Random
 import Control.Lens
+import Control.Exception
 import Data.Binary
 import GameLogic.Data.Settings
 import GameLogic.Data.Cell
@@ -36,11 +38,14 @@ cellOfGame :: WorldPos -> Traversal' Game Cell
 cellOfGame pos = world . ix pos
 
 doSaveGame :: FilePath -> Game-> IO ()
-doSaveGame = encodeFile
+doSaveGame filePath game = handle handler $ encodeFile filePath game
+    where handler :: IOException -> IO ()
+          handler ex = traceShow ex $ return ()
 
---TODO: error prone version doLoadGame
 doLoadGame :: FilePath -> Game -> IO Game
-doLoadGame filePath game = decodeFile filePath
+doLoadGame filePath game = handle handler $ decodeFile filePath
+    where handler :: IOException -> IO Game
+          handler ex = traceShow ex $ return game
 
 instance Binary Game where
     put g = do put $ g ^. rndGen
