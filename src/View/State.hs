@@ -20,14 +20,13 @@ makeLenses ''State
 
 newState :: IO State
 newState = do
-    runStartupTest
+    --runStartupTest
     game <- newGame
     return $ State game (100, 100)
 
 runStartupTest = do
     traceIO "Testing"
     traceIO . show $ getNearestPoses (2,3)
-
 
 runGameStep :: Float -> State -> IO State
 runGameStep _ = return . over game doGameStep
