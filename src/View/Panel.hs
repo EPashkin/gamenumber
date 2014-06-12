@@ -88,8 +88,11 @@ drawPaused state
 drawMiniMap :: Game -> Picture
 drawMiniMap game = Pictures cells
     where cells = mapW (drawMiniMapCell mapCellScale) w
+          --swap for testing drawing speed degradation
+          --cells = fmap (drawMiniMapCell mapCellScale) [((x,y), mkCell 1 1) | x<-[1..wSize], y<-[1..wSize]]
           w = game ^. world
-          mapCellScale = mapSize / fromIntegral (getWorldSize w)
+          wSize = getWorldSize w
+          mapCellScale = mapSize / fromIntegral wSize
 
 drawMiniMapCell :: Float -> (WorldPos, Cell) -> Picture
 drawMiniMapCell mapCellScale (pos, cell)
