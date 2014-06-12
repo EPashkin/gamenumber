@@ -12,12 +12,12 @@ import GameLogic.Data.Game
 import GameLogic.Action.ModifyPlayer
 
 
-increaseCell :: WorldPos -> Int -> Game -> Game
+increaseCell :: WorldPos -> Int -> GameData -> GameData
 increaseCell pos playerInd game
     = fromMaybe game $ increaseCellWithMax pos playerInd maxVal game
     where maxVal = min maxCellValue $ calcSumOwnedNearest game playerInd pos
 
-increaseCellWithMax :: WorldPos -> Int -> Int -> Game -> Maybe Game
+increaseCellWithMax :: WorldPos -> Int -> Int -> GameData -> Maybe GameData
 increaseCellWithMax pos playerInd maxVal game
       = updateGameCellWithCost pos playerInd game (increaseCellWithMax' maxVal)
       >>= decreaseGamePlayerFree playerInd
@@ -34,8 +34,8 @@ increaseCellWithMax' maxVal playerInd cell
        | otherwise
        = Nothing
 
-updateGameCellWithCost :: WorldPos-> Int -> Game -> (Int -> Cell -> Maybe (Int, Cell))
-      -> Maybe (Int, Game) 
+updateGameCellWithCost :: WorldPos-> Int -> GameData -> (Int -> Cell -> Maybe (Int, Cell))
+      -> Maybe (Int, GameData)
 updateGameCellWithCost pos playerInd game action
     = game ^? cellOfGame pos >>= action playerInd
       >>= (\(val, cell) -> Just . (,) val $ game & cellOfGame pos .~ cell)

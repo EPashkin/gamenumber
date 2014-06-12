@@ -5,11 +5,11 @@ import GameLogic.Data.Game
 import GameLogic.Data.Players
 
 
-increasePlayerNum :: Int -> Int -> Game -> Game
+increasePlayerNum :: Int -> Int -> GameData -> GameData
 increasePlayerNum inc playerInd
     = players . ix playerInd . num +~ inc
 
-decreaseGamePlayerFree :: Int -> (Int, Game) -> Maybe Game
+decreaseGamePlayerFree :: Int -> (Int, GameData) -> Maybe GameData
 decreaseGamePlayerFree playerInd (cost, game)
     | cost <= curFree
     = Just $ game & players . ix playerInd . free -~ cost

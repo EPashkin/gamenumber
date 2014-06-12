@@ -13,17 +13,17 @@ infixl 1 >>==
 (>>==) :: Functor m => m a -> (a -> b) -> m b
 (>>==) ma f = fmap f ma 
 
-setSelectedPos :: WorldPos -> Int -> Game -> Game
+setSelectedPos :: WorldPos -> Int -> GameData -> GameData
 setSelectedPos pos playerInd game
     | not $ isPosInGame game pos
     = game 
     | otherwise
     = game & players . ix playerInd . selectedPos .~ pos
     
-isPosInGame :: Game -> WorldPos -> Bool
+isPosInGame :: GameData -> WorldPos -> Bool
 isPosInGame = isPosInWorld . view world
 
-limitPosToWorld :: WorldPos -> Game -> WorldPos
+limitPosToWorld :: WorldPos -> GameData -> WorldPos
 limitPosToWorld pos = limitPosToWorld' pos . getWorldSize . view world
 
 limitPosToWorld' (x, y) max
@@ -38,12 +38,12 @@ limitPosToWorld' (x, y) max
     | otherwise
     = (x,y)
 
-calcSumOwnedNearest :: Game -> Int -> WorldPos -> Int
+calcSumOwnedNearest :: GameData -> Int -> WorldPos -> Int
 calcSumOwnedNearest game playerInd
     = foldl p 0 . getNearestOwnedCells playerInd (view world game)
     where p acc val = (+) acc $ (view value . snd) val
 
-calcSumAllNearest :: Game -> WorldPos -> [Cell]
+calcSumAllNearest :: GameData -> WorldPos -> [Cell]
 calcSumAllNearest game
     = foldl p [] . getNearestCells (view world game)
     where p acc = updateCellList acc . snd
@@ -64,14 +64,14 @@ updateCellList cells cell
 
 type StrengthsEx = (Cell, [Cell], Int, Int)
 
-calcStrengthsForPlayerEx :: Game -> Int -> WorldPos -> StrengthsEx
+calcStrengthsForPlayerEx :: GameData -> Int -> WorldPos -> StrengthsEx
 calcStrengthsForPlayerEx game playerInd pos
     = (same, others, sameStrength, deltaStrength)
     where (same, others) = calcStrengthsForPlayer game playerInd pos
           sameStrength = same ^. value
           deltaStrength = getDeltaOtherStrength sameStrength others
 
-calcStrengthsForPlayer :: Game -> Int -> WorldPos -> (Cell, [Cell])
+calcStrengthsForPlayer :: GameData -> Int -> WorldPos -> (Cell, [Cell])
 calcStrengthsForPlayer game playerInd pos
     = (same', sortBy p others)
     where cells = calcSumAllNearest game pos

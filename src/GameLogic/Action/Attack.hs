@@ -13,11 +13,11 @@ import GameLogic.Action.ModifyPlayer
 import GameLogic.Action.Shield
 
 
-attackCell :: WorldPos -> Int -> Game -> Game
+attackCell :: WorldPos -> Int -> GameData -> GameData
 attackCell pos playerInd game
     = fromMaybe game $ maybeAttackCell pos playerInd game
 
-maybeAttackCell :: WorldPos -> Int -> Game -> Maybe Game
+maybeAttackCell :: WorldPos -> Int -> GameData -> Maybe GameData
 maybeAttackCell pos playerInd game
     | deltaStrength > 0 || (deltaStrength == 0 && sameStrength > ownerStrength)
     = conquerCell pos playerInd game
@@ -28,7 +28,7 @@ maybeAttackCell pos playerInd game
           Just ownerInd = game ^? cellOfGame pos . playerIndex
           ownerStrength = getOtherStrength ownerInd others
 
-conquerCell :: WorldPos -> Int -> Game -> Maybe Game
+conquerCell :: WorldPos -> Int -> GameData -> Maybe GameData
 conquerCell pos playerInd game
     = Just (1, game & cellOfGame pos .~ mkCell 1 playerInd)
     >>= decreaseGamePlayerFree playerInd
@@ -38,12 +38,12 @@ conquerCell pos playerInd game
           oldPl = oldCell ^. playerIndex
           oldVal = oldCell ^. value
 
-decreaseCell :: WorldPos -> Int -> Game -> Maybe Game
+decreaseCell :: WorldPos -> Int -> GameData -> Maybe GameData
 decreaseCell pos playerInd game
     = decreaseCellOrShield pos playerInd game
     >>= decreaseGamePlayerFree playerInd
 
-decreaseCellOrShield :: WorldPos -> Int -> Game -> Maybe (Int, Game)
+decreaseCellOrShield :: WorldPos -> Int -> GameData -> Maybe (Int, GameData)
 decreaseCellOrShield pos playerInd game
     | isShieldWorking oldPl
     = Just (2, game & players . ix oldPlInd . free -~ 1)

@@ -18,7 +18,7 @@ drawState state = do
   let panel = drawPanel state 
   return . Pictures $ world' : [panel]
 
-drawGame :: (WorldPos, WorldPos) -> Game -> IO Picture
+drawGame :: (WorldPos, WorldPos) -> GameData -> IO Picture
 drawGame visibleR game = do
    let cells = mapWR drawCell visibleR $ game ^. world
    let halfScale = drawScale / 2
@@ -46,10 +46,10 @@ drawCell (pos, cell)
                 . Text . show $ cell ^. value
       in translateCell pos . Color color . Pictures $ rect : [ txt ]
 
-drawSelecteds :: Game -> [Picture]
+drawSelecteds :: GameData -> [Picture]
 drawSelecteds game = mapPIndices (drawSelected game) $ game ^. players
 
-drawSelected :: Game -> Int -> Picture
+drawSelected :: GameData -> Int -> Picture
 drawSelected game playerIndex
    | num' > 0
    || playerIndex == activePlayerIndex

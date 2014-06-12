@@ -19,37 +19,37 @@ import GameLogic.Action.Defend
 import GameLogic.Action.Attack
 
 
-setCenterPosLimited :: WorldPos -> Game -> Game
+setCenterPosLimited :: WorldPos -> GameData -> GameData
 setCenterPosLimited pos game = 
     game & centerPos .~ pos' & {- traceTest game pos' -} doSelectCellAction pos'
     where pos' = limitPosToWorld pos game
 
-traceTest :: Game -> WorldPos -> a -> a
+traceTest :: GameData -> WorldPos -> a -> a
 traceTest game pos =
     traceShow (calcPossibleAction game 2 10 pos)
     $ traceShow (calcPossibleActions game 2)
 
-doSelectCellAction :: WorldPos -> Game -> Game
+doSelectCellAction :: WorldPos -> GameData -> GameData
 doSelectCellAction pos game
     | not $ isPosInGame game pos
     = game 
     | otherwise
     = setSelectedPos pos activePlayerIndex game
     
-doGameStep :: Game -> Game
+doGameStep :: GameData -> GameData
 doGameStep game
     | game ^. paused
     = game
     | otherwise
     = doGameStep' game
     
-doGameStep' :: Game -> Game
+doGameStep' :: GameData -> GameData
 doGameStep' =
     updatePlayersStats
     >>> doHumanGameStep
     >>> doAIsGameStep
 
-doHumanGameStep :: Game -> Game
+doHumanGameStep :: GameData -> GameData
 doHumanGameStep game
     | game ^. placementMode
     = doCellAction pos game
@@ -57,7 +57,7 @@ doHumanGameStep game
     = game
     where Just pos = game ^? players . ix activePlayerIndex . selectedPos
 
-updatePlayersStats :: Game -> Game
+updatePlayersStats :: GameData -> GameData
 updatePlayersStats game =
     let maxnum = maximum $ remainDivMin : game ^.. players . each . num
         remainDiv = maxnum * remainDivMult
@@ -72,14 +72,14 @@ updatePlayerStats remainDiv pl =
         free3 = toRange (-100, 9999) free2
     in pl & set remain remain' . set free free3
 
-doCellAction :: WorldPos -> Game -> Game
+doCellAction :: WorldPos -> GameData -> GameData
 doCellAction pos game
     | not $ isPosInGame game pos
     = game
     | otherwise
     = doCellAction' pos activePlayerIndex game
     
-doCellAction' :: WorldPos -> Int -> Game -> Game
+doCellAction' :: WorldPos -> Int -> GameData -> GameData
 doCellAction' pos playerInd game
     | cell ^. playerIndex == playerInd || isFree cell
     = increaseCell pos playerInd game

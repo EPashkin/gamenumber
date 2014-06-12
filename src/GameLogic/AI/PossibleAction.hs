@@ -47,7 +47,7 @@ actionWeight Attack{} = 1
 actionWeight (ShieldCharge pl) = 100 + 2 * pl ^. shieldStrength
 actionWeight ShieldActivate = 10000
 
-calcPossibleActions :: Game -> Int -> [PossibleAction]
+calcPossibleActions :: GameData -> Int -> [PossibleAction]
 calcPossibleActions game playerInd
     = filter (not.isNoAction) actions ++ calcPossibleShieldAction game playerInd
     where ((minX, minY), (maxX, maxY)) = aggroRect game playerInd
@@ -56,7 +56,7 @@ calcPossibleActions game playerInd
           Just free' = game ^? players . ix playerInd . free
 
 --TODO: increase rect to all world if too many free
-aggroRect :: Game -> Int -> (WorldPos, WorldPos)
+aggroRect :: GameData -> Int -> (WorldPos, WorldPos)
 aggroRect game playerInd = ((minX, minY), (maxX, maxY))
     where Just pl = game ^? players. ix playerInd
           (spX, spY) = pl ^. selectedPos
@@ -68,7 +68,7 @@ aggroRect game playerInd = ((minX, minY), (maxX, maxY))
           minY = toRange rng $ spY - aggro
           maxY = toRange rng $ spY + aggro
 
-calcPossibleAction :: Game -> Int -> Int -> WorldPos -> PossibleAction
+calcPossibleAction :: GameData -> Int -> Int -> WorldPos -> PossibleAction
 calcPossibleAction game playerInd free pos
     = calcPossibleAction' pos cell strengths free
         ownerPl defencePositions reduceDefencePositions
@@ -122,12 +122,12 @@ calcPossibleAction' pos cell (same, others, sameStrength, deltaStrength) free
     where samePlayerIndex = same ^. playerIndex
           ownerStrength = getOtherStrength (cell ^. playerIndex) others
 
-getDefencePositions :: Game -> Int-> WorldPos -> [WorldPos]
+getDefencePositions :: GameData -> Int-> WorldPos -> [WorldPos]
 getDefencePositions game playerInd pos
     = filter (canBeSafeIncreased game playerInd) $ getNearestWorldPoses w pos
     where w = game ^. world
 
-getReduceDefencePositions :: Game -> WorldPos -> [WorldPos]
+getReduceDefencePositions :: GameData -> WorldPos -> [WorldPos]
 getReduceDefencePositions game pos
     = filter p $ getNearestWorldPoses w pos
     where w = game ^. world
@@ -135,7 +135,7 @@ getReduceDefencePositions game pos
           p pos = isOwnedBy playerInd cell
                   where Just cell = w ^? ix pos
 
-canBeSafeIncreased :: Game -> Int -> WorldPos -> Bool
+canBeSafeIncreased :: GameData -> Int -> WorldPos -> Bool
 canBeSafeIncreased game playerInd pos
     | isFree cell
     && deltaStrength >= 0
@@ -151,7 +151,7 @@ canBeSafeIncreased game playerInd pos
           (_, _, sameStrength, deltaStrength)
               = calcStrengthsForPlayerEx game playerInd pos
 
-calcPossibleShieldAction :: Game -> Int -> [PossibleAction]
+calcPossibleShieldAction :: GameData -> Int -> [PossibleAction]
 calcPossibleShieldAction game playerInd
     | pl ^. shieldActive
     = []

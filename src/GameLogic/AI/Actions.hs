@@ -16,7 +16,7 @@ import GameLogic.Action.Defend
 import GameLogic.Action.Shield
 
 
-doAIsGameStep :: Game -> Game
+doAIsGameStep :: GameData -> GameData
 doAIsGameStep game = foldl p game plInds
    where pls = game ^. players
          --TODO: use all player indexes
@@ -24,7 +24,7 @@ doAIsGameStep game = foldl p game plInds
          f (ind, pl) = 0 < pl ^. aggr
          p g plInd = doAIGameStep plInd g
 
-doAIGameStep :: Int -> Game -> Game
+doAIGameStep :: Int -> GameData -> GameData
 doAIGameStep playerInd game
     | free' < 1
     = game
@@ -34,7 +34,7 @@ doAIGameStep playerInd game
           free' = pl ^. free
           actions = calcPossibleActions game playerInd
 
-doAIActions :: [PossibleAction] -> Int -> Game -> Game
+doAIActions :: [PossibleAction] -> Int -> GameData -> GameData
 doAIActions [] _ game = game
 doAIActions actions playerInd game
     = doAIAction action playerInd $ game & rndGen .~ gen'
@@ -45,7 +45,7 @@ doAIActions actions playerInd game
           (weight, gen') = randomR (0, sumWeight - 1) $ game ^. rndGen
           Just (_, action) = find (\(w, _) -> w > weight) weightedActions
 
-doAIAction :: PossibleAction -> Int -> Game -> Game
+doAIAction :: PossibleAction -> Int -> GameData -> GameData
 doAIAction (FreeCapture pos _) playerIndex
     = increaseCellAction pos playerIndex
 doAIAction (Increase pos _) playerIndex
@@ -68,7 +68,7 @@ doAIAction ShieldActivate playerIndex
 increaseCellAction pos playerIndex
     = increaseCell pos playerIndex . setSelectedPos pos playerIndex
 
-defendCellAction :: [WorldPos] -> Int -> Game -> Game
+defendCellAction :: [WorldPos] -> Int -> GameData -> GameData
 defendCellAction poses playerIndex game
     = increaseCellAction pos playerIndex $ game & rndGen .~ gen'
     where (ind, gen') = randomR (0, length poses - 1) $ game ^. rndGen
@@ -80,7 +80,7 @@ reduceDefenceCellAction poses playerIndex game
     | otherwise 
     = reduceDefenceCellAction' poses playerIndex game
 
-reduceDefenceCellAction' :: [WorldPos] -> Int -> Game -> Game
+reduceDefenceCellAction' :: [WorldPos] -> Int -> GameData -> GameData
 reduceDefenceCellAction' poses playerIndex game
     = attackCellAction pos playerIndex $ game & rndGen .~ gen'
     where (ind, gen') = randomR (0, length poses - 1) $ game ^. rndGen

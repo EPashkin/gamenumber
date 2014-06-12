@@ -11,7 +11,7 @@ import GameLogic.Action.ModifyPlayer
 import GameLogic.Action.Shield
 import View.Convert
 
-data State = State { _game :: Game
+data State = State { _game :: GameData
                    , _windowSize :: (Int, Int) -- current window size
                    }
   deriving (Show)
@@ -75,14 +75,15 @@ doChangePaused = game . paused %~ not
 doShieldAction :: State -> State
 doShieldAction state = state & game %~ shieldAction activePlayerIndex
 
-doWithWindowPosOnGame :: (WorldPos -> Game -> Game) -> (Float, Float) -> Game-> Game
+doWithWindowPosOnGame :: (WorldPos -> GameData -> GameData) -> (Float, Float)
+  -> GameData -> GameData
 doWithWindowPosOnGame action pos game = action pos' game
     where pos' = worldPosOfWindowPos game pos
 
-doWithWindowPosInField :: (WorldPos -> Game -> Game) -> (Float, Float) -> State -> State
+doWithWindowPosInField :: (WorldPos -> GameData -> GameData) -> (Float, Float) -> State -> State
 doWithWindowPosInField action pos = game %~ doWithWindowPosOnGame action pos
 
-doWithWindowPos :: (WorldPos -> Game-> Game) -> (Float, Float) -> State -> State
+doWithWindowPos :: (WorldPos -> GameData -> GameData) -> (Float, Float) -> State -> State
 doWithWindowPos action pos@(x, y) state
     | inPanel pos state
     = state

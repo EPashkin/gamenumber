@@ -13,7 +13,7 @@ import GameLogic.Data.World
 import GameLogic.Data.Players
 
 
-data Game = Game { _world :: World
+data GameData = GameData { _world :: World
                  , _players :: Players
                  , _centerPos :: WorldPos -- position in center of screen
                  , _placementMode :: Bool
@@ -21,11 +21,11 @@ data Game = Game { _world :: World
                  , _rndGen :: StdGen }
   deriving (Show)
   
-makeLenses ''Game
+makeLenses ''GameData
 
-mkGameDef :: World -> Players -> StdGen -> Game
+mkGameDef :: World -> Players -> StdGen -> GameData
 mkGameDef world players gen
-    = Game { 
+    = GameData {
     _world = world
     , _players = players
     , _rndGen = gen
@@ -34,20 +34,20 @@ mkGameDef world players gen
     , _paused = True
     } where Just pos = players ^? ix activePlayerIndex . selectedPos
 
-cellOfGame :: WorldPos -> Traversal' Game Cell 
+cellOfGame :: WorldPos -> Traversal' GameData Cell 
 cellOfGame pos = world . ix pos
 
-doSaveGame :: FilePath -> Game-> IO ()
+doSaveGame :: FilePath -> GameData -> IO ()
 doSaveGame filePath game = handle handler $ encodeFile filePath game
     where handler :: IOException -> IO ()
           handler ex = traceShow ex $ return ()
 
-doLoadGame :: FilePath -> Game -> IO Game
+doLoadGame :: FilePath -> GameData -> IO GameData
 doLoadGame filePath game = handle handler $ decodeFile filePath
-    where handler :: IOException -> IO Game
+    where handler :: IOException -> IO GameData
           handler ex = traceShow ex $ return game
 
-instance Binary Game where
+instance Binary GameData where
     put g = do put $ g ^. rndGen
                put $ g ^. centerPos
                put $ g ^. players
@@ -56,7 +56,7 @@ instance Binary Game where
              cp <- get
              ps <- get
              world <- get
-             return Game{ _world = world
+             return GameData{ _world = world
                         , _players = ps
                         , _centerPos = cp
                         , _rndGen = gen

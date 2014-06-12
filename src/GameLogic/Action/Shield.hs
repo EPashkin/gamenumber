@@ -11,12 +11,12 @@ import GameLogic.Data.Players
 import GameLogic.Action.ModifyPlayer
 
 
-shieldAction :: Int -> Game -> Game
+shieldAction :: Int -> GameData -> GameData
 shieldAction playerInd game
     = fromMaybe game $ maybeShieldAction playerInd game
     >>= decreaseGamePlayerFree playerInd
 
-maybeShieldAction :: Int -> Game -> Maybe (Int, Game)
+maybeShieldAction :: Int -> GameData -> Maybe (Int, GameData)
 maybeShieldAction playerIndex game
     = playerShieldAction pl
     >>= (\(cost, pl') -> Just (cost, game & players . ix playerIndex .~ pl') )

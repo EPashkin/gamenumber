@@ -12,21 +12,21 @@ import GameLogic.Data.Game
 import Util.Shuffle
 
 
-newGame::IO Game
+newGame::IO GameData
 newGame = newGame' defSeed
 
-newGame':: Int -> IO Game
+newGame':: Int -> IO GameData
 newGame' seed
     | 0 == seed
     = fmap mkStartGameGen newStdGen
     | otherwise
     = return $ mkStartGame seed
 
-mkStartGame :: Int -> Game
+mkStartGame :: Int -> GameData
 mkStartGame seed = mkStartGameGen gen
     where gen = mkStdGen seed
 
-mkStartGameGen :: StdGen -> Game
+mkStartGameGen :: StdGen -> GameData
 mkStartGameGen gen = mkGameDef world players gen''
     where (world, gen') = mkStartWorld defWorldSize defNumPlayers gen
           (players, gen'') = mkPlayers defNumPlayers world gen'

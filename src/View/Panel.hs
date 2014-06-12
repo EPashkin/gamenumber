@@ -85,7 +85,7 @@ drawPaused state
     | otherwise
     = Blank
 
-drawMiniMap :: Game -> Picture
+drawMiniMap :: GameData -> Picture
 drawMiniMap game = Pictures cells
     where cells = mapW (drawMiniMapCell mapCellScale) w
           --swap for testing drawing speed degradation
