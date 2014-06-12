@@ -46,4 +46,4 @@ Shield protects players cell from attacks for cost of free points.
 
 Shield must be charged up to 128 and then activated.
 
-Activated shield can be disabled to accumulate points and then turned back on without spending points.
+Activated shield can be disabled to accumulate free points and then turned back on without spending free points.
