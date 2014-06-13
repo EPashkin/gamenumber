@@ -20,11 +20,9 @@ drawState state = do
     let cnt = view counter state
     translate (V2 240 300) . color green . text fnt 15 $ show cnt
     translate (V2 240 480) . rotateD (fromIntegral cnt) . color red $ text fnt 70 "Test"
-    fps <- getFPS
-    translate (V2 240 240) . color (playerColor 2) . text fnt 15 $ show fps
 
     let visibleR = visibleRange state
-    translate worldShift $ drawGame fnt visibleR $ state ^. game
+    translate worldShift . drawGame fnt visibleR $ state ^. game
     translate (V2 shiftX 0) $ drawPanel state
 --    let panel = drawPanel state 
 --  return . Pictures $ world' : [panel]
@@ -49,15 +47,15 @@ drawGame fnt visibleR game = do
 drawCell :: Font -> (WorldPos, Cell) -> Frame()
 drawCell fnt (pos, cell)
    | isFree cell
-      = translateCell pos $ color emptyCellColor $ rectangleWire 30 30
+      = translateCell pos . color emptyCellColor $ rectangleWire 30 30
    | otherwise
       = let rect = rectangleWire 30 30
             clr = playerColor $ cell ^. playerIndex
             shiftX = - drawScale / 3.2
             shiftY = drawScale / 2.8
             txt = translate (V2 shiftX shiftY) 
-                   $ text fnt cellFontSize $ show $ cell ^. value
-      in translateCell pos $ color clr $ rect >> txt
+                   . text fnt cellFontSize . show $ cell ^. value
+      in translateCell pos . color clr $ rect >> txt
 
 {-
 drawSelecteds :: GameData -> [Picture]

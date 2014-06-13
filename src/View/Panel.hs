@@ -13,53 +13,41 @@ import Middleware.FreeGame.Facade
 drawPanel :: StateData -> Frame ()
 drawPanel state = do 
     let (width, height) = state ^. windowSize
+        fnt = state ^. font
+        g = state ^. game
     color panelBkColor $ rectangleSolid panelWidth height
-    translate (V2 10 (height - 10 - mapSize)) $ drawMiniMap $ state ^. game
+    translate (V2 10 20) $ drawPosition state
+    fps <- getFPS
+    let fpsText = "FPS:" ++ show fps
+    translate (V2 (panelWidth - 60) 20) . color black $ text fnt 15 fpsText
+    translate (V2 0 30) . sequence_ . mapP (drawPlayer fnt) $ g ^. players
+    translate (V2 10 (height - 10 - mapSize)) $ drawMiniMap g
     translate (V2 (panelWidth/2) (height - 10)) $ drawPaused state
-{-
-drawPanel state = 
-    let size = state ^. windowSize
-        width = fromIntegral $ fst size
-        height = fromIntegral $ snd size
-        halfWidth = width / 2
-        halfHeight = height / 2
-        rect = Color panelBkColor $ rectangleSolid panelWidth height
-        positionPic = Translate (-panelWidth/2.2) (halfHeight - 20) $ drawPosition state
-        playerPicts = mapP drawPlayer $ state ^. game . players
-        playersPict = Translate 0 (halfHeight - 30) $ Pictures playerPicts
-        pausedPict  = Translate 0 (20 - halfHeight) $ drawPaused state
-        miniMapPict = Translate (-panelWidth/2.2) (35 - halfHeight)
-                      $ drawMiniMap $ state ^. game
-    in Translate shiftX 0 $ Pictures [rect, positionPic, playersPict, miniMapPict
-                                     , pausedPict]
 
-drawPosition :: StateData -> Picture
+drawPosition :: StateData -> Frame ()
 drawPosition state
-    = Color black $ Scale panelTextScale panelTextScale $ Text str
+    = color black $ text (state ^. font) panelFontSize str
     where str = "Position: " ++ show x ++ "x" ++ show y
           Just (x,y) = state ^? game . players . ix activePlayerIndex . selectedPos
 
-drawPlayer :: (Int, Player) -> Picture
-drawPlayer (index, player)
-    = Translate 0 shiftY . Color color . Pictures $ drawPlayerInfoParts player
-    where color = playerColor index
-          shiftY = (0.5 - fromIntegral index) * playerInfoHeight
+drawPlayer :: Font -> (Int, Player) -> Frame ()
+drawPlayer font (index, player)
+    = translate (V2 (panelWidth/2) shiftY) . color clr . drawPlayerInfoParts font $ player
+    where clr = playerColor index
+          shiftY = fromIntegral index * playerInfoHeight
 
-drawPlayerInfoParts :: Player -> [Picture]
-drawPlayerInfoParts player = fmap p playerInfoParts
-    where p (shift, p) = Translate (playerInfoWidth*shift) 0 . drawInfoText $ p player
+drawPlayerInfoParts :: Font -> Player -> Frame ()
+drawPlayerInfoParts fnt player = mapM_ p playerInfoParts
+    where p (shift, p) = translate (V2 (playerInfoWidth*shift) 0)
+                             . text fnt panelFontSize $ p player
 
-playerInfoParts :: [(Float, Player -> String)]
+playerInfoParts :: [(Double, Player -> String)]
 playerInfoParts = [(-0.50, show.view num)
                   ,(-0.22, show.view free)
                   --,(-0.01, remainText)
                   ,( 0.22, shieldText)
                   ,( 0.40, aggrText)
                   ]
-
-drawInfoText :: String -> Picture
-drawInfoText = Translate 0 (-playerInfoHeight/2)
-               . Scale panelTextScale panelTextScale . Text
 
 remainText :: Player -> String
 remainText player = show $ view remain player `div` remainDivMult
@@ -82,11 +70,11 @@ aggrText player
     | otherwise 
     = ""
     where aggro = player ^. aggr
--}
+
 drawPaused :: StateData -> Frame ()
 drawPaused state
     = when (state ^. game . paused)
-           $ color black $ text (state ^. font) panelFontSize "PAUSED"
+           . color black $ text (state ^. font) panelFontSize "PAUSED"
 
 drawMiniMap :: GameData -> Frame ()
 drawMiniMap game = sequence_ cells
