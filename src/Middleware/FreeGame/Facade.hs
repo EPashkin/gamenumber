@@ -3,6 +3,7 @@ module Middleware.FreeGame.Facade (module G
     , panelBkColor
     , playerColor
     , rectangleWire
+    , rectangleSolid
     ) where
 
 import FreeGame as G
@@ -46,3 +47,6 @@ rectangleWire w h
                      ]
     where w2 = w/2
           h2 = h/2
+
+rectangleSolid :: Double -> Double -> Frame ()
+rectangleSolid w h = polygon [ V2 0 0, V2 w 0, V2 w h, V2 0 h]

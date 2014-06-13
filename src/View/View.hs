@@ -15,6 +15,7 @@ drawState state = do
     let fnt = view font state
     let (w,h) = state ^. windowSize
     let worldShift = V2 (w/2 + worldShiftX) (h/2)
+        shiftX = w - panelWidth
 
     let cnt = view counter state
     translate (V2 240 300) . color green . text fnt 15 $ show cnt
@@ -24,6 +25,7 @@ drawState state = do
 
     let visibleR = visibleRange state
     translate worldShift $ drawGame fnt visibleR $ state ^. game
+    translate (V2 shiftX 0) $ drawPanel state
 --    let panel = drawPanel state 
 --  return . Pictures $ world' : [panel]
 

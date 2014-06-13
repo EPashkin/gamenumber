@@ -11,8 +11,11 @@ import Middleware.FreeGame.Facade
 --TODO: Pause checkbox
 --TODO: Collapsible panel
 drawPanel :: StateData -> Frame ()
-drawPanel state = return () 
-
+drawPanel state = do 
+    let (width, height) = state ^. windowSize
+    color panelBkColor $ rectangleSolid panelWidth height
+    translate (V2 10 (height - 10 - mapSize)) $ drawMiniMap $ state ^. game
+    translate (V2 (panelWidth/2) (height - 10)) $ drawPaused state
 {-
 drawPanel state = 
     let size = state ^. windowSize
@@ -20,7 +23,6 @@ drawPanel state =
         height = fromIntegral $ snd size
         halfWidth = width / 2
         halfHeight = height / 2
-        shiftX = halfWidth - (panelWidth/2)
         rect = Color panelBkColor $ rectangleSolid panelWidth height
         positionPic = Translate (-panelWidth/2.2) (halfHeight - 20) $ drawPosition state
         playerPicts = mapP drawPlayer $ state ^. game . players
@@ -80,16 +82,14 @@ aggrText player
     | otherwise 
     = ""
     where aggro = player ^. aggr
-
-drawPaused :: StateData -> Picture
+-}
+drawPaused :: StateData -> Frame ()
 drawPaused state
-    | state ^. game . paused
-    = Color black $ drawInfoText "PAUSED"
-    | otherwise
-    = Blank
+    = when (state ^. game . paused)
+           $ color black $ text (state ^. font) panelFontSize "PAUSED"
 
-drawMiniMap :: GameData -> Picture
-drawMiniMap game = Pictures cells
+drawMiniMap :: GameData -> Frame ()
+drawMiniMap game = sequence_ cells
     where cells = mapW (drawMiniMapCell mapCellScale) w
           --swap for testing drawing speed degradation
           --cells = fmap (drawMiniMapCell mapCellScale) [((x,y), mkCell 1 1) | x<-[1..wSize], y<-[1..wSize]]
@@ -97,16 +97,15 @@ drawMiniMap game = Pictures cells
           wSize = getWorldSize w
           mapCellScale = mapSize / fromIntegral wSize
 
-drawMiniMapCell :: Float -> (WorldPos, Cell) -> Picture
+drawMiniMapCell :: Double -> (WorldPos, Cell) -> Frame ()
 drawMiniMapCell mapCellScale (pos, cell)
    | isFree cell
-      = translateCell pos $ Color emptyCellColor rect
+      = translateCell pos $ color emptyCellColor rect
    | otherwise
-      = translateCell pos $ Color color rect
+      = translateCell pos $ color clr rect
     where translateCell (x,y) pict =
-             let xx = (fromIntegral x - 0.5) * mapCellScale
-                 yy = (fromIntegral y - 0.5) * mapCellScale
-             in Translate xx yy pict
+             let xx = (fromIntegral x - 1) * mapCellScale
+                 yy = (fromIntegral y - 1) * mapCellScale
+             in translate (V2 xx yy) pict
           rect = rectangleSolid mapCellScale mapCellScale
-          color = playerColor $ cell ^. playerIndex
--}
+          clr = playerColor $ cell ^. playerIndex
