@@ -3,7 +3,7 @@ module Application.Game.Logic where
 import Middleware.Gloss.Facade
 import View.State
 
-eventHandler :: Event -> State -> IO State
+eventHandler :: Event -> StateData -> IO StateData
 eventHandler (EventKey key keyState mods pos) state
     | MouseButton LeftButton == key
     , Down                   == keyState
