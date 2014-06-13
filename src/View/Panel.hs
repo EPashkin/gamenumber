@@ -6,12 +6,15 @@ import Control.Lens
 import View.State
 import View.Convert
 import GameLogic.Data.Facade
-import Middleware.Gloss.Facade
+import Middleware.FreeGame.Facade
 
 --TODO: Pause checkbox
 --TODO: Collapsible panel
-drawPanel :: StateData -> Picture
-drawPanel state =
+drawPanel :: StateData -> Frame ()
+drawPanel state = return () 
+
+{-
+drawPanel state = 
     let size = state ^. windowSize
         width = fromIntegral $ fst size
         height = fromIntegral $ snd size
@@ -106,3 +109,4 @@ drawMiniMapCell mapCellScale (pos, cell)
              in Translate xx yy pict
           rect = rectangleSolid mapCellScale mapCellScale
           color = playerColor $ cell ^. playerIndex
+-}

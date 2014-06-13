@@ -8,9 +8,19 @@ import View.Panel
 import View.Convert
 import GameLogic.Data.Facade
 import GameLogic.Util
-import Middleware.Gloss.Facade
+import Middleware.FreeGame.Facade
 
-drawState :: StateData -> IO Picture
+drawState :: StateData -> Frame ()
+drawState state = do
+    let fnt = view font state
+    let cnt = view counter state
+    translate (V2 240 300) . color green . text fnt 15 $ show cnt
+    translate (V2 240 480) . rotateD (fromIntegral cnt) . color red $ text fnt 70 "Test"
+    fps <- getFPS
+    translate (V2 240 240) . color red . text fnt 15 $ show fps
+    
+    return ()
+{-
 drawState state = do 
   let visibleR = visibleRange state
   world <- drawGame visibleR $ state ^. game
@@ -94,3 +104,4 @@ visibleRange state = ((minX, minY), (maxX, maxY))
           maxX = toRange rng $ cX + dX
           minY = toRange rng $ cY - dY
           maxY = toRange rng $ cY + dY
+-}

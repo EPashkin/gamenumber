@@ -3,7 +3,7 @@ module View.State where
 
 import Debug.Trace
 import Control.Lens
-import Middleware.Gloss.Facade (Picture)
+import Middleware.FreeGame.Facade
 import GameLogic.Data.Facade
 import GameLogic.Logic
 import GameLogic.StartLogic
@@ -11,18 +11,24 @@ import GameLogic.Action.ModifyPlayer
 import GameLogic.Action.Shield
 import View.Convert
 
+
+instance (Show Font) where
+  show _ = "Font"
+
 data StateData = StateData { _game :: GameData
                    , _windowSize :: (Int, Int) -- current window size
+                   , _counter :: Int
+                   , _font :: Font
                    }
   deriving (Show)
-  
+
 makeLenses ''StateData
 
-newState :: IO StateData
-newState = do
+newState :: Font -> IO StateData
+newState font = do
     --runStartupTest
     game <- newGame
-    return $ StateData game (100, 100)
+    return $ StateData game (100, 100) 2 font
 
 runStartupTest = do
     traceIO "Testing"

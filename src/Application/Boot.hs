@@ -3,7 +3,9 @@ module Application.Boot where
 import Debug.Trace (trace)
 import View.State (newState)
 import Application.Game.Engine (runEngine)
+import Middleware.FreeGame.Facade (loadFont)
 
 boot = do
-  state <- newState
+  font <- loadFont "./Data/VL-PGothic-Regular.ttf"
+  state <- newState font
   trace "Starting" $ runEngine state

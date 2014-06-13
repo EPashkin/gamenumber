@@ -1,9 +1,10 @@
 module Application.Game.Logic where
 
-import Middleware.Gloss.Facade
+import Middleware.FreeGame.Facade
 import View.State
 
-eventHandler :: Event -> StateData -> IO StateData
+{-
+eventHandler :: Event -> StateData -> IO State
 eventHandler (EventKey key keyState mods pos) state
     | MouseButton LeftButton == key
     , Down                   == keyState
@@ -43,3 +44,4 @@ eventHandler (EventResize size) state
 
 eventHandler _ state
     = return state
+-}

@@ -1,17 +1,17 @@
-module Middleware.Gloss.Facade (module G
+module Middleware.FreeGame.Facade (module G
     , emptyCellColor
     , panelBkColor
     , playerColor) where
 
-import Graphics.Gloss.Interface.IO.Game as G
+import FreeGame as G
 
-emptyCellColor = makeColor8 100 100 100 255
+emptyCellColor = Color 100 100 100 255
 
-panelBkColor = makeColor8 212 208 200 255
+panelBkColor = Color 212 208 200 255
 
 playerColor playerInd = 
     let (r, g, b) = playerColor' playerInd
-    in makeColor8 (r*4) (g*4) (b*4) 255
+    in Color (r*4) (g*4) (b*4) 255
 
 
 playerColor' (-1) = (0, 0,42)        -- possible background color
