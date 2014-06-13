@@ -24,7 +24,7 @@ subLoop drawState state = do
     let state' = state & counter +~ 1
 
     Box _ (V2 w h) <- getBoundingBox
-    let state'' = state'& windowSize .~ (floor w, floor h)
+    let state'' = state'& windowSize .~ (w, h)
 
     lift $ drawState state''
 

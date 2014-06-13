@@ -16,7 +16,7 @@ instance (Show Font) where
   show _ = "Font"
 
 data StateData = StateData { _game :: GameData
-                   , _windowSize :: (Int, Int) -- current window size
+                   , _windowSize :: (Coord, Coord) -- current window size
                    , _counter :: Int
                    , _font :: Font
                    }
@@ -37,7 +37,7 @@ runStartupTest = do
 runGameStep :: Float -> StateData -> IO StateData
 runGameStep _ = return . over game doGameStep
 
-startPlacement :: (Float, Float) -> StateData -> StateData
+startPlacement :: (Coord, Coord) -> StateData -> StateData
 startPlacement pos = set placementModeOfGame True . doWithWindowPos doSelectCellAction pos
 
 stopPlacement :: StateData -> StateData
@@ -49,14 +49,14 @@ inPlacementMode = view placementModeOfGame
 placementModeOfGame :: Lens' StateData Bool
 placementModeOfGame = game . placementMode
 
-centering :: (Float, Float) -> StateData -> StateData
+centering :: (Coord, Coord) -> StateData -> StateData
 centering = doWithWindowPos setCenterPosLimited
 
-drawing :: (Float, Float) -> StateData -> StateData
+drawing :: (Coord, Coord) -> StateData -> StateData
 drawing = doWithWindowPos doSelectCellAction
 
-updateWindowSize :: (Int, Int) -> StateData -> StateData
-updateWindowSize = set windowSize
+--updateWindowSize :: (Int, Int) -> StateData -> StateData
+--updateWindowSize = set windowSize
 
 doSave :: StateData -> IO StateData
 doSave state = do 
@@ -81,15 +81,15 @@ doChangePaused = game . paused %~ not
 doShieldAction :: StateData -> StateData
 doShieldAction state = state & game %~ shieldAction activePlayerIndex
 
-doWithWindowPosOnGame :: (WorldPos -> GameData -> GameData) -> (Float, Float)
+doWithWindowPosOnGame :: (WorldPos -> GameData -> GameData) -> (Coord, Coord)
   -> GameData -> GameData
 doWithWindowPosOnGame action pos game = action pos' game
     where pos' = worldPosOfWindowPos game pos
 
-doWithWindowPosInField :: (WorldPos -> GameData -> GameData) -> (Float, Float) -> StateData -> StateData
+doWithWindowPosInField :: (WorldPos -> GameData -> GameData) -> (Coord, Coord) -> StateData -> StateData
 doWithWindowPosInField action pos = game %~ doWithWindowPosOnGame action pos
 
-doWithWindowPos :: (WorldPos -> GameData -> GameData) -> (Float, Float) -> StateData -> StateData
+doWithWindowPos :: (WorldPos -> GameData -> GameData) -> (Coord, Coord) -> StateData -> StateData
 doWithWindowPos action pos@(x, y) state
     | inPanel pos state
     = state
@@ -97,12 +97,12 @@ doWithWindowPos action pos@(x, y) state
     = doWithWindowPosInField action pos' state
     where pos' = (x - worldShiftX, y)
 
-inPanel :: (Float, Float) -> StateData -> Bool
+inPanel :: (Coord, Coord) -> StateData -> Bool
 inPanel (x, y) state = x >= panelLeftX state
 
-panelLeftX :: StateData -> Float
+panelLeftX :: StateData -> Coord
 panelLeftX state = width/2 - panelWidth
     where size = state ^. windowSize
-          width = fromIntegral $ fst size
+          width = fst size
 
-worldShiftX = - panelWidth / 2 :: Float
+worldShiftX = - panelWidth / 2 :: Coord

@@ -1,7 +1,9 @@
 module Middleware.FreeGame.Facade (module G
     , emptyCellColor
     , panelBkColor
-    , playerColor) where
+    , playerColor
+    , rectangleWire
+    ) where
 
 import FreeGame as G
 
@@ -33,3 +35,14 @@ playerColor' 13 = (21,12,22)
 playerColor' 14 = (27,35,58)
 playerColor' 15 = (40,30, 1)
 playerColor' 16 = (10,52,51)
+
+--TODO: replace with positive rectangle
+rectangleWire :: Double -> Double -> Frame ()
+rectangleWire w h
+    = polygonOutline [ V2 (-w2) (-h2)
+                     , V2 w2 (-h2)
+                     , V2 w2 h2
+                     , V2 (-w2) h2
+                     ]
+    where w2 = w/2
+          h2 = h/2
