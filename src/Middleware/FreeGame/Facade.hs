@@ -5,14 +5,15 @@ module Middleware.FreeGame.Facade (module G
 
 import FreeGame as G
 
-emptyCellColor = Color 100 100 100 255
+emptyCellColor = clr 100 100 100 255
 
-panelBkColor = Color 212 208 200 255
+panelBkColor = clr 212 208 200 255
 
 playerColor playerInd = 
     let (r, g, b) = playerColor' playerInd
-    in Color (r*4) (g*4) (b*4) 255
+    in clr (r*4) (g*4) (b*4) 255
 
+clr r g b a = Color (r/255) (g/255) (b/255) (a/255) 
 
 playerColor' (-1) = (0, 0,42)        -- possible background color
 
