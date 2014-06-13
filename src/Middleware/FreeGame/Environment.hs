@@ -29,4 +29,4 @@ subLoop drawState state = do
     lift $ drawState state''
 
     key <- keyPress KeyEscape
-    unless key tick >> subLoop drawState state''
+    unless key $ tick >> subLoop drawState state''
