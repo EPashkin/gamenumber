@@ -1,5 +1,6 @@
 module Application.Game.Logic where
 
+import qualified Data.Boolean as B
 import Middleware.FreeGame.Facade
 import Middleware.FreeGame.GameState
 import Control.Monad.State.Lazy
@@ -15,8 +16,10 @@ eventHandler = do
     whenGameState (keyDown KeyF1) $ overGameState doHelpPlayer
     whenGameState (keyDown KeyF2) $ overIOGameState doSave
     whenGameState (keyDown KeyF3) $ overIOGameState doLoad
-    whenGameState (keyDown KeyPadAdd) $ overGameState increaseSpeed
-    whenGameState (keyDown KeyPadSubtract) $ overGameState decreaseSpeed
+    whenGameState (keyDown KeyPadAdd B.|| keyDown KeyEqual)
+        $ overGameState increaseSpeed
+    whenGameState (keyDown KeyPadSubtract B.|| keyDown KeyMinus)
+        $ overGameState decreaseSpeed
 
 updateWindowSize' :: GameState
 updateWindowSize' = do

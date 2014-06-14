@@ -22,6 +22,7 @@ executable gamenumber
                        containers,
                        mtl,
                        bytestring,
+                       AC-Boolean,
                        binary,
                        lens,
                        transformers,
