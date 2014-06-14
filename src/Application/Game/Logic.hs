@@ -13,6 +13,10 @@ eventHandler = do
     overGameState incCounter
     onKeyA
     onKeyB
+    
+    whenGameState (keyDown KeyP) $ overGameState doChangePaused
+    whenGameState (keyDown KeyF2) $ overIOGameState doSave
+    whenGameState (keyDown KeyF3) $ overIOGameState doLoad
 
 updateWindowSize :: GameState
 updateWindowSize = do

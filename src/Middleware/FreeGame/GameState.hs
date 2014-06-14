@@ -16,5 +16,8 @@ runGameState = evalStateT
 overGameState :: (StateData -> StateData) -> GameState
 overGameState f = modify f >> get 
 
+overIOGameState :: (StateData -> IO StateData) -> GameState
+overIOGameState f = get >>= (liftIO . f) >>= put >> get
+
 whenGameState :: GameStateA Bool -> GameState -> GameState
 whenGameState mp m = mp >>= bool get m
