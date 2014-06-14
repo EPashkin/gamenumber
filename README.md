@@ -12,6 +12,8 @@ Controls
 | F3 | load game
 | p | pause \ unpause
 | s | shield action
+| + | increase game speed
+| - | decrease game speed
 
 Termins
 ----
