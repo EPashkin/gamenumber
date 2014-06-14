@@ -1,6 +1,7 @@
 module Middleware.FreeGame.Environment where
 
 import FreeGame
+import Data.Monoid
 import Control.Monad.State.Lazy
 import Control.Lens
 import View.State
@@ -22,9 +23,7 @@ subLoop :: (StateData -> Frame()) -> StateData -> Game ()
 subLoop drawState state = do
     state' <- state & runGameState (updateWindowSize>>processEvents)
     lift $ drawState state'
-
-    key <- keyPress KeyEscape
-    unless key $ tick >> subLoop drawState state'
+    unlessM (keyPress KeyEscape) $ tick >> subLoop drawState state'
 
 type GameStateA a = StateT StateData Game a
 
@@ -34,10 +33,7 @@ runGameState :: GameState -> StateData-> Game StateData
 runGameState = evalStateT
 
 overGameState :: (StateData -> StateData) -> GameState
-overGameState f = do
-    state <- get
-    put $ f state
-    get
+overGameState f = modify f >> get 
 
 whenGameState :: GameStateA Bool -> GameState -> GameState
 whenGameState mp m = mp >>= bool get m
