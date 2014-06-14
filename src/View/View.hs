@@ -24,27 +24,18 @@ drawState state = do
     let visibleR = visibleRange state
     translate worldShift . drawGame fnt visibleR $ state ^. game
     translate (V2 shiftX 0) $ drawPanel state
---    let panel = drawPanel state 
---  return . Pictures $ world' : [panel]
 
 drawGame :: Font -> (WorldPos, WorldPos) -> GameData -> Frame ()
 drawGame fnt visibleR game = do
    let cells = mapWR (drawCell fnt) visibleR $ game ^. world
-   let halfScale = drawScale / 2
    let (shiftX, shiftY) = windowPosOfWorldPos game startWorldPos
    translate (V2 shiftX shiftY) $ sequence_ cells
-{-
-   let selecteds = if True --TODO: game field :: showEnemySelected
-                   then reverse $ drawSelecteds game
-                   else [drawSelected game activePlayerIndex]
 
-   let (shiftX, shiftY) = windowPosOfWorldPos game startWorldPos
-   let worldPicture = Translate shiftX shiftY . Pictures $ cells ++ selecteds
+   translate (V2 shiftX shiftY) $ if True --TODO: game field :: showEnemySelected
+   then drawSelecteds game
+   else drawSelected game activePlayerIndex
 
-   return $ Pictures [worldPicture]
--}
-
-drawCell :: Font -> (WorldPos, Cell) -> Frame()
+drawCell :: Font -> (WorldPos, Cell) -> Frame ()
 drawCell fnt (pos, cell)
    | isFree cell
       = translateCell pos . color emptyCellColor $ rectangleWire 30 30
@@ -57,33 +48,29 @@ drawCell fnt (pos, cell)
                    . text fnt cellFontSize . show $ cell ^. value
       in translateCell pos . color clr $ rect >> txt
 
-{-
-drawSelecteds :: GameData -> [Picture]
-drawSelecteds game = mapPIndices (drawSelected game) $ game ^. players
+drawSelecteds :: GameData -> Frame ()
+drawSelecteds game = sequence_ . mapPIndices (drawSelected game) $ game ^. players
 
-drawSelected :: GameData -> Int -> Picture
+drawSelected :: GameData -> Int -> Frame ()
 drawSelected game playerIndex
-   | num' > 0
-   || playerIndex == activePlayerIndex
-   = drawSelectedCellBox pos color
-   | otherwise
-   = Blank
+   = when (num' > 0 || playerIndex == activePlayerIndex)
+       $ drawSelectedCellBox pos color
    where color = playerColor playerIndex
          Just pl = game ^? players . ix playerIndex
          pos = pl ^. selectedPos
          num' = pl ^. num
 
-drawSelectedCellBox :: WorldPos -> Color -> Picture
-drawSelectedCellBox pos color =
-    translateCell pos . Color color $ Pictures [
-        line [(-radius, 0), (delta-radius, 0)],
-        line [(radius, 0), (radius-delta, 0)],
+drawSelectedCellBox :: WorldPos -> Color -> Frame ()
+drawSelectedCellBox pos clr =
+    translateCell pos . color clr $ do
+        line [V2 (-radius) 0, V2 (delta - radius) 0]
+        line [V2 radius 0, V2 (radius - delta) 0]
         rectangleWire diametr diametr
-    ] where
+    where
         diametr = 26
         radius = diametr / 2
         delta = radius / 4
--}
+
 translateCell :: WorldPos -> Frame () -> Frame ()
 translateCell (x,y) =
    let xx = (fromIntegral x - 0.5) * drawScale
