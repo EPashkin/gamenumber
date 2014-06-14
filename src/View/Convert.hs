@@ -8,10 +8,8 @@ type Coord = Double
 
 --TODO: config
 drawScale = 8 * 4 :: Coord
-textScale = 8 / drawScale
 cellFontSize = 30 :: Double
 panelFontSize = 15 :: Double
-panelTextScale = 1 / 8 :: Coord
 panelWidth = 200 :: Coord
 playerInfoWidth = panelWidth*0.9
 playerInfoHeight = 20 :: Coord

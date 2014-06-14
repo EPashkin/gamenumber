@@ -17,10 +17,6 @@ drawState state = do
     let worldShift = V2 (w/2 + worldShiftX) (h/2)
         shiftX = w - panelWidth
 
-    let cnt = view counter state
-    translate (V2 240 300) . color green . text fnt 15 $ show cnt
-    translate (V2 240 480) . rotateD (fromIntegral cnt) . color red $ text fnt 70 "Test"
-
     let visibleR = visibleRange state
     translate worldShift . drawGame fnt visibleR $ state ^. game
     translate (V2 shiftX 0) $ drawPanel state

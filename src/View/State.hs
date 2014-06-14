@@ -17,7 +17,6 @@ instance (Show Font) where
 
 data StateData = StateData { _game :: GameData
                    , _windowSize :: (Coord, Coord) -- current window size
-                   , _counter :: Int
                    , _font :: Font
                    }
   deriving (Show)
@@ -28,7 +27,7 @@ newState :: Font -> IO StateData
 newState font = do
     --runStartupTest
     game <- newGame
-    return $ StateData game (100, 100) 2 font
+    return $ StateData game (100, 100) font
 
 runStartupTest = do
     traceIO "Testing"
