@@ -34,8 +34,8 @@ runStartupTest = do
     traceIO "Testing"
     traceIO . show $ getNearestPoses (2,3)
 
-runGameStep :: Float -> StateData -> IO StateData
-runGameStep _ = return . over game doGameStep
+runGameStep :: StateData -> StateData
+runGameStep = over game doGameStep
 
 startPlacement :: (Coord, Coord) -> StateData -> StateData
 startPlacement pos = set placementModeOfGame True . doWithWindowPos doSelectCellAction pos
