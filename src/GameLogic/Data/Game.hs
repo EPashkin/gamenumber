@@ -18,6 +18,7 @@ data GameData = GameData { _world :: World
                  , _centerPos :: WorldPos -- position in center of screen
                  , _placementMode :: Bool
                  , _paused :: Bool
+                 , _gameSpeed :: GameSpeed
                  , _rndGen :: StdGen }
   deriving (Show)
   
@@ -32,6 +33,7 @@ mkGameDef world players gen
     , _centerPos = pos
     , _placementMode = False
     , _paused = True
+    , _gameSpeed = Normal
     } where Just pos = players ^? ix activePlayerIndex . selectedPos
 
 cellOfGame :: WorldPos -> Traversal' GameData Cell 
@@ -62,6 +64,7 @@ instance Binary GameData where
                         , _rndGen = gen
                         , _placementMode = False
                         , _paused = True
+                        , _gameSpeed = Normal
                         }
 
 instance Binary StdGen where

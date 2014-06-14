@@ -80,6 +80,20 @@ doChangePaused = game . paused %~ not
 doShieldAction :: StateData -> StateData
 doShieldAction state = state & game %~ shieldAction activePlayerIndex
 
+increaseSpeed :: StateData -> StateData
+increaseSpeed state
+    | maxBound == state ^. game . gameSpeed
+    = state
+    | otherwise
+    = state & game . gameSpeed %~ succ
+
+decreaseSpeed :: StateData -> StateData
+decreaseSpeed state
+    | minBound == state ^. game . gameSpeed
+    = state
+    | otherwise
+    = state & game . gameSpeed %~ pred
+
 doWithWindowPosOnGame :: (WorldPos -> GameData -> GameData) -> (Coord, Coord)
   -> GameData -> GameData
 doWithWindowPosOnGame action pos game = action pos' game

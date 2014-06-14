@@ -15,6 +15,8 @@ eventHandler = do
     whenGameState (keyDown KeyF1) $ overGameState doHelpPlayer
     whenGameState (keyDown KeyF2) $ overIOGameState doSave
     whenGameState (keyDown KeyF3) $ overIOGameState doLoad
+    whenGameState (keyDown KeyPadAdd) $ overGameState increaseSpeed
+    whenGameState (keyDown KeyPadSubtract) $ overGameState decreaseSpeed
 
 updateWindowSize' :: GameState
 updateWindowSize' = do

@@ -60,7 +60,7 @@ doHumanGameStep game
 updatePlayersStats :: GameData -> GameData
 updatePlayersStats game =
     let maxnum = maximum $ remainDivMin : game ^.. players . each . num
-        remainDiv = maxnum * remainDivMult
+        remainDiv = maxnum * remainDivMult (game ^. gameSpeed)
     in game & players. each %~ updatePlayerStats remainDiv
 
 updatePlayerStats :: Int -> Player -> Player

@@ -23,6 +23,7 @@ drawPanel state = do
     translate (V2 0 30) . sequence_ . mapP (drawPlayer fnt) $ g ^. players
     translate (V2 10 (height - 10 - mapSize)) $ drawMiniMap g
     translate (V2 (panelWidth/2) (height - 10)) $ drawPaused state
+    translate (V2 (panelWidth/2) (height - 100)) $ drawGameSpeed state
 
 drawPosition :: StateData -> Frame ()
 drawPosition state
@@ -49,8 +50,8 @@ playerInfoParts = [(-0.50, show.view num)
                   ,( 0.40, aggrText)
                   ]
 
-remainText :: Player -> String
-remainText player = show $ view remain player `div` remainDivMult
+--remainText :: Player -> String
+--remainText player = show $ view remain player `div` remainDivMult
 
 shieldText :: Player -> String
 shieldText player
@@ -97,3 +98,32 @@ drawMiniMapCell mapCellScale (pos, cell)
              in translate (V2 xx yy) pict
           rect = rectangleSolid mapCellScale mapCellScale
           clr = playerColor $ cell ^. playerIndex
+
+drawGameSpeed :: StateData -> Frame ()
+drawGameSpeed state = do
+    let gs = state ^. game . gameSpeed
+        gaudgeLeft = panelWidth * 0.05
+        gaudgeWidth = panelWidth * 0.3
+        gaudgeStep = gaudgeWidth / fromIntegral (fromEnum (maxBound :: GameSpeed))
+        gaudgeTop = panelFontSize * 1.5 
+        gaudgeHeight = panelFontSize
+        gaudgePos sp = gaudgeLeft + gaudgeStep * fromIntegral (fromEnum sp)
+    translate (V2 0 panelFontSize) . color black
+        $ text (state ^. font) panelFontSize "Game speed"
+    translate (V2 0 (panelFontSize * 2)) . color black 
+        $ line [V2 gaudgeLeft 0, V2 (gaudgeLeft + gaudgeWidth) 0]
+    translate (V2 0 gaudgeTop) . color black $ sequence_
+        [line [V2 x 0, V2 x gaudgeHeight]
+        | sp <- enumFrom (minBound :: GameSpeed)
+        , let x = gaudgePos sp]
+    translate (V2 (gaudgePos gs) gaudgeTop) $ drawGameSpeedMarker gaudgeHeight
+
+drawGameSpeedMarker :: Coord -> Frame ()
+drawGameSpeedMarker gaudgeHeight
+    = color gray $ polygon [ V2 0 0
+                           , V2 hw hw
+                           , V2 hw gaudgeHeight
+                           , V2 (-hw) gaudgeHeight
+                           , V2 (-hw) hw
+                           ]
+    where hw = 5
