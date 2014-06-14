@@ -1,8 +1,7 @@
 module Middleware.FreeGame.Environment where
 
 import FreeGame
-import Control.Monad.Reader (unless)
-import Control.Monad.Trans.Class (lift)
+import Control.Monad.State.Lazy
 import Control.Lens
 import View.State
 
@@ -21,12 +20,52 @@ runEnvironment ticksPerSecond state drawState {-runStep-} = runGame Resizable (B
 
 subLoop :: (StateData -> Frame()) -> StateData -> Game ()
 subLoop drawState state = do
-    let state' = state & counter +~ 1
-
-    Box _ (V2 w h) <- getBoundingBox
-    let state'' = state'& windowSize .~ (w, h)
-
-    lift $ drawState state''
+    state' <- state & runGameState (updateWindowSize>>processEvents)
+    lift $ drawState state'
 
     key <- keyPress KeyEscape
-    unless key $ tick >> subLoop drawState state''
+    unless key $ tick >> subLoop drawState state'
+
+type GameStateA a = StateT StateData Game a
+
+type GameState = GameStateA StateData
+
+runGameState :: GameState -> StateData-> Game StateData
+runGameState = evalStateT
+
+overGameState :: (StateData -> StateData) -> GameState
+overGameState f = do
+    state <- get
+    put $ f state
+    get
+
+whenGameState :: GameStateA Bool -> GameState -> GameState
+whenGameState mp m = mp >>= bool get m
+
+updateWindowSize :: GameState
+updateWindowSize = do
+    Box _ (V2 w h) <- getBoundingBox
+    overGameState $ windowSize .~ (w, h)
+
+processEvents :: GameState
+processEvents = do
+    overGameState incCounter
+    onKeyA
+    onKeyB
+
+incCounter100 :: StateData -> StateData
+incCounter100 = counter +~ 100
+
+incCounter :: StateData -> StateData
+incCounter = counter +~ 1
+
+onKeyA :: GameState
+onKeyA = do
+    whenM (keyDown KeyA) $ color green $ polygon [V2 20 0, V2 100 20, V2 90 60, V2 30 70]
+    get
+
+onKeyB :: GameState
+onKeyB = do
+    whenGameState (keyDown KeyB) $ overGameState incCounter100
+    color green $ polygon [V2 100 0, V2 100 20, V2 90 60, V2 30 70]
+    get
