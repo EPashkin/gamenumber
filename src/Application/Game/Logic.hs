@@ -9,7 +9,7 @@ import View.State
 
 eventHandler :: GameState
 eventHandler = do
-    updateWindowSize
+    updateWindowSize'
     overGameState incCounter
     onKeyA
     onKeyB
@@ -21,10 +21,10 @@ eventHandler = do
     whenGameState (keyDown KeyF2) $ overIOGameState doSave
     whenGameState (keyDown KeyF3) $ overIOGameState doLoad
 
-updateWindowSize :: GameState
-updateWindowSize = do
+updateWindowSize' :: GameState
+updateWindowSize' = do
     Box _ (V2 w h) <- getBoundingBox
-    overGameState $ windowSize .~ (w, h)
+    overGameState $ updateWindowSize (w, h)
 
 incCounter100 :: StateData -> StateData
 incCounter100 = counter +~ 100

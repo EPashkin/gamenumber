@@ -55,8 +55,8 @@ centering = doWithWindowPos setCenterPosLimited
 drawing :: (Coord, Coord) -> StateData -> StateData
 drawing = doWithWindowPos doSelectCellAction
 
---updateWindowSize :: (Int, Int) -> StateData -> StateData
---updateWindowSize = set windowSize
+updateWindowSize :: (Coord, Coord) -> StateData -> StateData
+updateWindowSize = set windowSize
 
 doSave :: StateData -> IO StateData
 doSave state = do 
