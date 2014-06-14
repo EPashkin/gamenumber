@@ -17,6 +17,7 @@ import GameLogic.Action.Shield
 
 --TODO: remove poses in defence
 --TODO: change to enum and tupple
+--TODO: add BordersNeedDefend
 data PossibleAction = NoAction WorldPos Cell
                     | FreeCapture WorldPos Cell
                     | Increase WorldPos Cell
@@ -56,6 +57,7 @@ calcPossibleActions game playerInd
           Just free' = game ^? players . ix playerInd . free
 
 --TODO: increase rect to all world if too many free
+--TODO: range must be +- aggro/2
 aggroRect :: GameData -> Int -> (WorldPos, WorldPos)
 aggroRect game playerInd = ((minX, minY), (maxX, maxY))
     where Just pl = game ^? players. ix playerInd

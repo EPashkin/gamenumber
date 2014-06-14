@@ -56,6 +56,7 @@ drawSelected game playerIndex
          pos = pl ^. selectedPos
          num' = pl ^. num
 
+--TODO: better selected box
 drawSelectedCellBox :: WorldPos -> Color -> Frame ()
 drawSelectedCellBox pos clr =
     translateCell pos . color clr $ do

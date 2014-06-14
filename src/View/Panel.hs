@@ -10,6 +10,10 @@ import Middleware.FreeGame.Facade
 
 --TODO: Pause checkbox
 --TODO: Collapsible panel
+--TODO: Show owned player of selected cell
+--TODO: Hide dead player info
+--TODO: Center by minimap
+--TODO: Move game speed down
 drawPanel :: StateData -> Frame ()
 drawPanel state = do 
     let (width, height) = state ^. windowSize
