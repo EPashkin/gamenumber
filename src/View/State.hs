@@ -95,14 +95,14 @@ doWithWindowPos action pos@(x, y) state
     = state
     | otherwise
     = doWithWindowPosInField action pos' state
-    where pos' = (x - worldShiftX, y)
+    where pos' = (x - worldShiftX - w/2, y - h/2)
+          (w,h) = state ^. windowSize
 
 inPanel :: (Coord, Coord) -> StateData -> Bool
 inPanel (x, y) state = x >= panelLeftX state
 
 panelLeftX :: StateData -> Coord
-panelLeftX state = width/2 - panelWidth
-    where size = state ^. windowSize
-          width = fst size
+panelLeftX state = width - panelWidth
+    where (width, _) = state ^. windowSize
 
 worldShiftX = - panelWidth / 2 :: Coord

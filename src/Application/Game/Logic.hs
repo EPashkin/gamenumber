@@ -14,6 +14,7 @@ eventHandler = do
     onKeyA
     onKeyB
     
+    mouseEvents
     whenGameState (keyDown KeyP) $ overGameState doChangePaused
     whenGameState (keyDown KeyS) $ overGameState doShieldAction
     whenGameState (keyDown KeyF1) $ overGameState doHelpPlayer
@@ -42,6 +43,13 @@ onKeyB = do
     color green $ polygon [V2 100 0, V2 100 20, V2 90 60, V2 30 70]
     get
 
+mouseEvents :: GameState
+mouseEvents = do
+    V2 x y <- mousePosition
+    l <- mouseButtonL
+    
+    whenGameState mouseButtonR $ overGameState $ centering (x,y)
+
 {-
 eventHandler :: Event -> StateData -> IO State
 eventHandler (EventKey key keyState mods pos) state
@@ -51,9 +59,6 @@ eventHandler (EventKey key keyState mods pos) state
     | MouseButton LeftButton == key
     , Up                     == keyState
     = return $ stopPlacement state 
-    | MouseButton RightButton == key
-    , Down                    == keyState
-    = return $ centering pos state
 
 eventHandler (EventMotion pos) state
     | inPlacementMode state 
