@@ -46,23 +46,13 @@ onKeyB = do
 mouseEvents :: GameState
 mouseEvents = do
     V2 x y <- mousePosition
+    let pos = (x, y)
     l <- mouseButtonL
+    state <- get 
     
-    whenGameState mouseButtonR $ overGameState $ centering (x,y)
-
-{-
-eventHandler :: Event -> StateData -> IO State
-eventHandler (EventKey key keyState mods pos) state
-    | MouseButton LeftButton == key
-    , Down                   == keyState
-    = return $ startPlacement pos state 
-    | MouseButton LeftButton == key
-    , Up                     == keyState
-    = return $ stopPlacement state 
-
-eventHandler (EventMotion pos) state
-    | inPlacementMode state 
-    = return $ drawing pos state
-    | otherwise
-    = return state
--}
+    whenGameState mouseButtonR . overGameState $ centering pos
+    case (l, inPlacementMode state) of
+        (True, False) -> overGameState $ startPlacement pos
+        (True, True)  -> overGameState $ drawing pos
+        (False, True) -> overGameState stopPlacement
+        _             -> get
