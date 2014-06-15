@@ -1,5 +1,6 @@
 module Middleware.FreeGame.Environment
     ( runEnvironment
+    , EnvironmentInfo(..)
     ) where
 
 import FreeGame
@@ -7,27 +8,33 @@ import Control.Monad.State.Lazy
 import View.State
 import Middleware.FreeGame.GameState
 
+data EnvironmentInfo = EnvironmentInfo
+     { _drawState :: StateData -> Frame()
+     , _runGameStep :: StateData -> StateData
+     , _eventHandler :: GameState
+     , _state :: StateData
+     }
 
-runEnvironment :: Int -> StateData
-    -> (StateData -> Frame()) -> (StateData -> StateData) -> GameState
-    -> IO (Maybe ())
-runEnvironment ticksPerSecond state drawState runStep eventHandler
+runEnvironment :: Int -> EnvironmentInfo -> IO (Maybe ())
+runEnvironment ticksPerSecond info
     = runGame Resizable (Box (V2 0 0) (V2 800 550)) $ do
         setTitle "GameNumber"
         clearColor black
         setFPS ticksPerSecond
-        gameLoop drawState runStep eventHandler state
+        gameLoop info
 
-gameLoop :: (StateData -> Frame()) -> (StateData -> StateData)
-    -> GameState -> StateData -> Game ()
-gameLoop drawState runStep eventHandler state = do
-    state'' <- lift $ doFrame drawState runStep eventHandler state
+gameLoop :: EnvironmentInfo -> Game ()
+gameLoop info = do
+    state'' <- lift $ doFrame info
     unlessM (keyPress KeyEscape)
-        $ tick >> gameLoop drawState runStep eventHandler state''
+        $ tick >> gameLoop info{_state = state''}
 
-doFrame :: (StateData -> Frame()) -> (StateData -> StateData)
-    -> GameState -> StateData -> Frame StateData
-doFrame drawState runStep eventHandler state = do
-    state' <- runGameState (eventHandler >> overGameState runStep) state
+doFrame :: EnvironmentInfo -> Frame StateData
+doFrame info = do
+    state' <- runGameState (eventHandler >> overGameState runGameStep) state
     drawState state'
     return state'
+    where state = _state info
+          drawState = _drawState info
+          runGameStep = _runGameStep info
+          eventHandler = _eventHandler info
