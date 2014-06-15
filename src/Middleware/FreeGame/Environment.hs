@@ -31,7 +31,7 @@ gameLoop info = do
 
 doFrame :: EnvironmentInfo -> Frame StateData
 doFrame info = do
-    state' <- runGameState (eventHandler >> overGameState runGameStep) state
+    state' <- execStateT (eventHandler >> modify runGameStep) state
     drawState state'
     return state'
     where state = _state info

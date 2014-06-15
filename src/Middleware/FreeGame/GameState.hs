@@ -8,16 +8,7 @@ import View.State
 --TODO: Include in Middleware.FreeGame.Facade
 type GameStateA a = StateT StateData Frame a
 
-type GameState = GameStateA StateData
-
-runGameState :: GameState -> StateData-> Frame StateData
-runGameState = evalStateT
-
-overGameState :: (StateData -> StateData) -> GameState
-overGameState f = modify f >> get 
+type GameState = GameStateA ()
 
 overIOGameState :: (StateData -> IO StateData) -> GameState
-overIOGameState f = get >>= (liftIO . f) >>= put >> get
-
-whenGameState :: GameStateA Bool -> GameState -> GameState
-whenGameState mp m = mp >>= bool get m
+overIOGameState f = get >>= (liftIO . f) >>= put

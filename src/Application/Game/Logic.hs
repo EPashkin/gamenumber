@@ -11,20 +11,20 @@ eventHandler :: GameState
 eventHandler = do
     updateWindowSize'
     mouseEvents
-    whenGameState (keyDown KeyP) $ overGameState doChangePaused
-    whenGameState (keyDown KeyS) $ overGameState doShieldAction
-    whenGameState (keyDown KeyF1) $ overGameState doHelpPlayer
-    whenGameState (keyDown KeyF2) $ overIOGameState doSave
-    whenGameState (keyDown KeyF3) $ overIOGameState doLoad
-    whenGameState (keyDown KeyPadAdd B.|| keyDown KeyEqual)
-        $ overGameState increaseSpeed
-    whenGameState (keyDown KeyPadSubtract B.|| keyDown KeyMinus)
-        $ overGameState decreaseSpeed
+    whenM (keyDown KeyP) $ modify doChangePaused
+    whenM (keyDown KeyS) $ modify doShieldAction
+    whenM (keyDown KeyF1) $ modify doHelpPlayer
+    whenM (keyDown KeyF2) $ overIOGameState doSave
+    whenM (keyDown KeyF3) $ overIOGameState doLoad
+    whenM (keyDown KeyPadAdd B.|| keyDown KeyEqual)
+        $ modify increaseSpeed
+    whenM (keyDown KeyPadSubtract B.|| keyDown KeyMinus)
+        $ modify decreaseSpeed
 
 updateWindowSize' :: GameState
 updateWindowSize' = do
     Box _ (V2 w h) <- getBoundingBox
-    overGameState $ updateWindowSize (w, h)
+    modify $ updateWindowSize (w, h)
 
 mouseEvents :: GameState
 mouseEvents = do
@@ -33,9 +33,9 @@ mouseEvents = do
     l <- mouseButtonL
     state <- get 
     
-    whenGameState mouseButtonR . overGameState $ centering pos
+    whenM mouseButtonR . modify $ centering pos
     case (l, inPlacementMode state) of
-        (True, False) -> overGameState $ startPlacement pos
-        (True, True)  -> overGameState $ drawing pos
-        (False, True) -> overGameState stopPlacement
-        _             -> get
+        (True, False) -> modify $ startPlacement pos
+        (True, True)  -> modify $ drawing pos
+        (False, True) -> modify stopPlacement
+        _             -> return ()
