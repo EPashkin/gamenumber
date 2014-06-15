@@ -1,4 +1,6 @@
-module Middleware.FreeGame.Environment where
+module Middleware.FreeGame.Environment
+    ( runEnvironment
+    ) where
 
 import FreeGame
 import Control.Monad.State.Lazy
@@ -14,12 +16,18 @@ runEnvironment ticksPerSecond state drawState runStep eventHandler
         setTitle "GameNumber"
         clearColor black
         setFPS ticksPerSecond
-        subLoop drawState runStep eventHandler state
+        gameLoop drawState runStep eventHandler state
 
-subLoop :: (StateData -> Frame()) -> (StateData -> StateData) -> GameState -> StateData -> Game ()
-subLoop drawState runStep eventHandler state = do
-    state'' <- lift $ do
-       state' <- runGameState (eventHandler >> overGameState runStep) state
-       drawState state'
-       return state'
-    unlessM (keyPress KeyEscape) $ tick >> subLoop drawState runStep eventHandler state''
+gameLoop :: (StateData -> Frame()) -> (StateData -> StateData)
+    -> GameState -> StateData -> Game ()
+gameLoop drawState runStep eventHandler state = do
+    state'' <- lift $ doFrame drawState runStep eventHandler state
+    unlessM (keyPress KeyEscape)
+        $ tick >> gameLoop drawState runStep eventHandler state''
+
+doFrame :: (StateData -> Frame()) -> (StateData -> StateData)
+    -> GameState -> StateData -> Frame StateData
+doFrame drawState runStep eventHandler state = do
+    state' <- runGameState (eventHandler >> overGameState runStep) state
+    drawState state'
+    return state'
