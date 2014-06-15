@@ -81,15 +81,17 @@ drawPaused state
            . color black $ text (state ^. font) panelFontSize "PAUSED"
 
 drawMiniMap :: GameData -> Frame ()
-drawMiniMap game = sequence_ cells
-    where cells = mapW (drawMiniMapCell mapCellScale) w
+drawMiniMap game = draw $ sequence_ cells
+    where cells :: (Applicative f, Monad f, Picture2D f, Local f) => [f ()]
+          cells = mapW (drawMiniMapCell mapCellScale) w 
           --swap for testing drawing speed degradation
           --cells = fmap (drawMiniMapCell mapCellScale) [((x,y), mkCell 1 1) | x<-[1..wSize], y<-[1..wSize]]
           w = game ^. world
           wSize = getWorldSize w
           mapCellScale = mapSize / fromIntegral wSize
 
-drawMiniMapCell :: Double -> (WorldPos, Cell) -> Frame ()
+drawMiniMapCell :: (Applicative f, Monad f, Picture2D f, Local f)
+   => Double -> (WorldPos, Cell) -> f ()
 drawMiniMapCell mapCellScale (pos, cell)
    | isFree cell
       = translateCell pos $ color emptyCellColor rect

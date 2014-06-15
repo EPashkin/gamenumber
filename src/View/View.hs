@@ -59,7 +59,7 @@ drawSelected game playerIndex
 --TODO: better selected box
 drawSelectedCellBox :: WorldPos -> Color -> Frame ()
 drawSelectedCellBox pos clr =
-    translateCell pos . color clr $ do
+    draw $ translateCell pos . color clr $ do
         line [V2 (-radius) 0, V2 (delta - radius) 0]
         line [V2 radius 0, V2 (radius - delta) 0]
         rectangleWire diametr diametr
@@ -68,7 +68,7 @@ drawSelectedCellBox pos clr =
         radius = diametr / 2
         delta = radius / 4
 
-translateCell :: WorldPos -> Frame () -> Frame ()
+translateCell :: Affine f => WorldPos -> f () -> f ()
 translateCell (x,y) =
    let xx = (fromIntegral x - 0.5) * drawScale
        yy = (fromIntegral y - 0.5) * drawScale
