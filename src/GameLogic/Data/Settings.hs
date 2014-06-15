@@ -9,6 +9,7 @@ defSeed = 0 :: Int -- set not 0 for debug purposes
 activePlayerIndex = 1 :: Int
 aiAggroMax = defWorldSize * 3 `div` 4 :: Int
 aiAggroMin = defWorldSize `div` 10 + 1 :: Int
+superAggroFree = 20 :: Int -- if free greater than this, aggro becomes unlimited
 remainDivMin = 4 :: Int    -- for slower start
 shieldActivationStrength = 128 :: Int
 shieldStopWorkingFree = -10 :: Int -- shield does not protect if 'free' is too low

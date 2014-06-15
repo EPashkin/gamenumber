@@ -57,9 +57,12 @@ calcPossibleActions game playerInd
           actions = fmap (calcPossibleAction game playerInd free') poses
           Just free' = game ^? players . ix playerInd . free
 
---TODO: increase rect to all world if too many free
 aggroRect :: GameData -> Int -> (WorldPos, WorldPos)
-aggroRect game playerInd = ((minX, minY), (maxX, maxY))
+aggroRect game playerInd
+    | pl ^. free > superAggroFree
+    = (startWorldPos, (size, size))
+    | otherwise
+    = ((minX, minY), (maxX, maxY))
     where Just pl = game ^? players. ix playerInd
           (spX, spY) = pl ^. selectedPos
           aggro = pl ^. aggr `div` 2
