@@ -17,12 +17,12 @@ import GameLogic.Action.Shield
 
 --TODO: remove poses in defence
 --TODO: change to enum and tupple
---TODO: add BordersNeedDefend
 data PossibleAction = NoAction WorldPos Cell
                     | FreeCapture WorldPos Cell
                     | Increase WorldPos Cell
                     | NeedDefend WorldPos Cell [WorldPos]
                     | ParanoidNeedDefend WorldPos Cell [WorldPos]
+                    | BorderNeedDefend WorldPos Cell [WorldPos]
                     | Conquer WorldPos Cell
                     | ReduceDefence WorldPos Cell Bool [WorldPos]
                     | Attack WorldPos Cell
@@ -41,6 +41,7 @@ actionWeight FreeCapture{} = 100
 actionWeight Increase{} = 20
 actionWeight NeedDefend{} = 1000
 actionWeight ParanoidNeedDefend{} = 50
+actionWeight BorderNeedDefend{} = 40
 actionWeight Conquer{} = 800
 actionWeight (ReduceDefence _ _ True _) = 1
 actionWeight ReduceDefence{} = 5
@@ -100,6 +101,11 @@ calcPossibleAction' pos cell (same, others, sameStrength, deltaStrength) free
     && deltaStrength == 0
     && not (null defencePositions)
     = ParanoidNeedDefend pos cell defencePositions
+    | isOwnedBy samePlayerIndex cell
+    && deltaStrength > 0
+    && not (null others)
+    && not (null defencePositions)
+    = BorderNeedDefend pos cell defencePositions
     | isOwnedBy samePlayerIndex cell
     && deltaStrength >= 0
     && cell ^. value < min maxCellValue sameStrength

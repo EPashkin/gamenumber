@@ -53,6 +53,8 @@ doAIAction (NeedDefend pos _ poses) playerIndex
     = defendCellAction poses playerIndex
 doAIAction (ParanoidNeedDefend pos _ poses) playerIndex
     = defendCellAction poses playerIndex
+doAIAction (BorderNeedDefend pos _ poses) playerIndex
+    = defendCellAction poses playerIndex
 doAIAction (Conquer pos _) playerIndex
     = attackCellAction pos playerIndex
 doAIAction (ReduceDefence pos _ _ poses) playerIndex
