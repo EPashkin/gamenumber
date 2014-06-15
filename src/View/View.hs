@@ -45,7 +45,7 @@ drawCell fnt (pos, cell)
       in translateCell pos . color clr $ rect >> txt
 
 drawSelecteds :: GameData -> Frame ()
-drawSelecteds game = sequence_ . mapPIndices (drawSelected game) $ game ^. players
+drawSelecteds game = sequence_ . reverse . mapPIndices (drawSelected game) $ game ^. players
 
 drawSelected :: GameData -> Int -> Frame ()
 drawSelected game playerIndex
@@ -56,10 +56,9 @@ drawSelected game playerIndex
          pos = pl ^. selectedPos
          num' = pl ^. num
 
---TODO: better selected box
 drawSelectedCellBox :: WorldPos -> Color -> Frame ()
 drawSelectedCellBox pos clr =
-    draw $ translateCell pos . color clr $ do
+    draw $ translateCell pos . thickness 3 . color clr $ do
         line [V2 (-radius) 0, V2 (delta - radius) 0]
         line [V2 radius 0, V2 (radius - delta) 0]
         rectangleWire diametr diametr
