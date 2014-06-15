@@ -18,6 +18,8 @@ runEnvironment ticksPerSecond state drawState runStep eventHandler
 
 subLoop :: (StateData -> Frame()) -> (StateData -> StateData) -> GameState -> StateData -> Game ()
 subLoop drawState runStep eventHandler state = do
-    state' <- runGameState (eventHandler >> overGameState runStep) state
-    lift $ drawState state'
-    unlessM (keyPress KeyEscape) $ tick >> subLoop drawState runStep eventHandler state'
+    state'' <- lift $ do
+       state' <- runGameState (eventHandler >> overGameState runStep) state
+       drawState state'
+       return state'
+    unlessM (keyPress KeyEscape) $ tick >> subLoop drawState runStep eventHandler state''

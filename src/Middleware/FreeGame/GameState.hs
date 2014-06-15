@@ -6,11 +6,11 @@ import View.State
 
 
 --TODO: Include in Middleware.FreeGame.Facade
-type GameStateA a = StateT StateData Game a
+type GameStateA a = StateT StateData Frame a
 
 type GameState = GameStateA StateData
 
-runGameState :: GameState -> StateData-> Game StateData
+runGameState :: GameState -> StateData-> Frame StateData
 runGameState = evalStateT
 
 overGameState :: (StateData -> StateData) -> GameState
