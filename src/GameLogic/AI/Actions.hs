@@ -20,8 +20,7 @@ doAIsGameStep :: GameData -> GameData
 doAIsGameStep game = foldl p game plInds
    where pls = game ^. players
          --TODO: use all player indexes
-         plInds =  {-take 1 $ -}fmap fst $ filter f $ mapP id pls
-         f (ind, pl) = 0 < pl ^. aggr
+         plInds =  {-take 1 $ -}fmap fst $ filter (isAI . snd) $ mapP id pls
          p g plInd = doAIGameStep plInd g
 
 doAIGameStep :: Int -> GameData -> GameData

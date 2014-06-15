@@ -70,11 +70,10 @@ shieldText player
 
 aggrText :: Player -> String
 aggrText player
-    | aggro > 0
-    = show aggro
+    | isAI player
+    = show $ player ^. aggr
     | otherwise 
     = ""
-    where aggro = player ^. aggr
 
 drawPaused :: StateData -> Frame ()
 drawPaused state

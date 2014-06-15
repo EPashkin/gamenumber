@@ -48,6 +48,9 @@ mkPlayers num world gen = (players, gen)
           (lRandoms, gen') = runState (getNRndAggros (num - 1)) gen
           list = zip lPlayerNums lRandoms
 
+isAI :: Player -> Bool
+isAI pl = 0 < pl ^. aggr
+
 -- apply function to all players
 mapP :: ((Int, Player) -> a) -> Players -> [a]
 mapP func = fmap func . assocs

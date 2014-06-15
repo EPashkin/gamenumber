@@ -57,12 +57,11 @@ calcPossibleActions game playerInd
           Just free' = game ^? players . ix playerInd . free
 
 --TODO: increase rect to all world if too many free
---TODO: range must be +- aggro/2
 aggroRect :: GameData -> Int -> (WorldPos, WorldPos)
 aggroRect game playerInd = ((minX, minY), (maxX, maxY))
     where Just pl = game ^? players. ix playerInd
           (spX, spY) = pl ^. selectedPos
-          aggro = pl ^. aggr
+          aggro = pl ^. aggr `div` 2
           size = getWorldSize $ view world game
           rng = (1, size)
           minX = toRange rng $ spX - aggro
