@@ -13,7 +13,6 @@ import Middleware.FreeGame.Facade
 --TODO: Show owned player of selected cell
 --TODO: Hide dead player info
 --TODO: Center by minimap
---TODO: Move game speed down
 drawPanel :: StateData -> Frame ()
 drawPanel state = do 
     let (width, height) = state ^. windowSize
@@ -26,8 +25,8 @@ drawPanel state = do
     translate (V2 (panelWidth - 60) 20) . color black $ text fnt 15 fpsText
     translate (V2 0 30) . sequence_ . mapP (drawPlayer fnt) $ g ^. players
     translate (V2 10 (height - 10 - mapSize)) $ drawMiniMap g
-    translate (V2 (panelWidth/2) (height - 10)) $ drawPaused state
-    translate (V2 (panelWidth/2) (height - 100)) $ drawGameSpeed state
+    translate (V2 110 (height - 10)) $ drawPaused state
+    translate (V2 95 (height - 70)) $ drawGameSpeed state
 
 drawPosition :: StateData -> Frame ()
 drawPosition state
@@ -107,7 +106,7 @@ drawMiniMapCell mapCellScale (pos, cell)
 drawGameSpeed :: StateData -> Frame ()
 drawGameSpeed state = do
     let gs = state ^. game . gameSpeed
-        gaudgeLeft = panelWidth * 0.05
+        gaudgeLeft = panelWidth * 0.065
         gaudgeWidth = panelWidth * 0.3
         gaudgeStep = gaudgeWidth / fromIntegral (fromEnum (maxBound :: GameSpeed))
         gaudgeTop = panelFontSize * 1.5 
