@@ -1,4 +1,4 @@
-GameNumber
+GameNumber [![Build Status](https://secure.travis-ci.org/EPashkin/gamenumber.png?branch=master)](http://travis-ci.org/EPashkin/gamenumber)
 ====
 GameNumber is simple game with AI players
 
