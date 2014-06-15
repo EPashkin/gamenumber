@@ -37,18 +37,11 @@ playerColor' 14 = (27,35,58)
 playerColor' 15 = (40,30, 1)
 playerColor' 16 = (10,52,51)
 
---TODO: replace with positive rectangle
-rectangleWire :: (Applicative f, Monad f, Picture2D f, Local f)
-    => Double -> Double -> f ()
-rectangleWire w h
-    = polygonOutline [ V2 (-w2) (-h2)
-                     , V2 w2 (-h2)
-                     , V2 w2 h2
-                     , V2 (-w2) h2
-                     ]
-    where w2 = w/2
-          h2 = h/2
+rectangleWire :: Picture2D f => Double -> Double -> f ()
+rectangleWire w h = polygonOutline $ rectPoints w h
 
-rectangleSolid :: (Applicative f, Monad f, Picture2D f, Local f)
-    => Double -> Double -> f ()
-rectangleSolid w h = polygon [ V2 0 0, V2 w 0, V2 w h, V2 0 h]
+rectangleSolid :: Picture2D f => Double -> Double -> f ()
+rectangleSolid w h = polygon $ rectPoints w h
+
+rectPoints :: Double -> Double -> [Vec2]
+rectPoints w h = [ V2 0 0, V2 w 0, V2 w h, V2 0 h]

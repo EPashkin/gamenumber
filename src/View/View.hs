@@ -34,15 +34,15 @@ drawGame fnt visibleR game = do
 drawCell :: Font -> (WorldPos, Cell) -> Frame ()
 drawCell fnt (pos, cell)
    | isFree cell
-      = translateCell pos . color emptyCellColor $ rectangleWire 30 30
+   = translateCell pos . color emptyCellColor $ rect
    | otherwise
-      = let rect = rectangleWire 30 30
-            clr = playerColor $ cell ^. playerIndex
-            shiftX = - drawScale / 3.2
-            shiftY = drawScale / 2.8
-            txt = translate (V2 shiftX shiftY) 
-                   . text fnt cellFontSize . show $ cell ^. value
-      in translateCell pos . color clr $ rect >> txt
+   = translateCell pos . color clr $ rect >> txt
+   where rect = rectangleWire 30 30
+         txt = translate (V2 shiftX shiftY)
+               . text fnt cellFontSize . show $ cell ^. value
+         clr = playerColor $ cell ^. playerIndex
+         shiftX = drawScale * 0.17
+         shiftY = drawScale * 0.80
 
 drawSelecteds :: GameData -> Frame ()
 drawSelecteds game = sequence_ . reverse . mapPIndices (drawSelected game) $ game ^. players
@@ -58,19 +58,21 @@ drawSelected game playerIndex
 
 drawSelectedCellBox :: WorldPos -> Color -> Frame ()
 drawSelectedCellBox pos clr =
-    draw $ translateCell pos . thickness 3 . color clr $ do
-        line [V2 (-radius) 0, V2 (delta - radius) 0]
-        line [V2 radius 0, V2 (radius - delta) 0]
+    draw $ translateCell pos . translate (V2 start start)
+        . thickness 3 . color clr $ do
+        line [V2 0 radius, V2 delta radius]
+        line [V2 diametr radius, V2 (diametr - delta) radius]
         rectangleWire diametr diametr
     where
         diametr = 26
         radius = diametr / 2
         delta = radius / 4
+        start = 2
 
 translateCell :: Affine f => WorldPos -> f () -> f ()
 translateCell (x,y) =
-   let xx = (fromIntegral x - 0.5) * drawScale
-       yy = (fromIntegral y - 0.5) * drawScale
+   let xx = (fromIntegral x - 1) * drawScale
+       yy = (fromIntegral y - 1) * drawScale
    in translate (V2 xx yy)
 
 visibleRange :: StateData -> (WorldPos, WorldPos)
