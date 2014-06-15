@@ -10,7 +10,6 @@ import Middleware.FreeGame.Facade
 
 --TODO: Pause checkbox
 --TODO: Collapsible panel
---TODO: Show owned player of selected cell
 --TODO: Hide dead player info
 --TODO: Center by minimap
 drawPanel :: StateData -> Frame ()
@@ -18,12 +17,14 @@ drawPanel state = do
     let (width, height) = state ^. windowSize
         fnt = state ^. font
         g = state ^. game
+        Just activePlayerPosition = g ^? players . ix activePlayerIndex . selectedPos 
+        Just ownerPlayerInd = g ^? world . ix activePlayerPosition . playerIndex
     color panelBkColor $ rectangleSolid panelWidth height
     translate (V2 10 20) $ drawPosition state
     fps <- getFPS
     let fpsText = "FPS:" ++ show fps
     translate (V2 (panelWidth - 60) 20) . color black $ text fnt 15 fpsText
-    translate (V2 0 30) . sequence_ . mapP (drawPlayer fnt) $ g ^. players
+    translate (V2 0 30) . sequence_ . mapP (drawPlayer fnt ownerPlayerInd) $ g ^. players
     translate (V2 10 (height - 10 - mapSize)) $ drawMiniMap g
     translate (V2 110 (height - 10)) $ drawPaused state
     translate (V2 95 (height - 70)) $ drawGameSpeed state
@@ -34,11 +35,16 @@ drawPosition state
     where str = "Position: " ++ show x ++ "x" ++ show y
           Just (x,y) = state ^? game . players . ix activePlayerIndex . selectedPos
 
-drawPlayer :: Font -> (Int, Player) -> Frame ()
-drawPlayer font (index, player)
-    = translate (V2 (panelWidth/2) shiftY) . color clr . drawPlayerInfoParts font $ player
+drawPlayer :: Font -> Int -> (Int, Player) -> Frame ()
+drawPlayer font ownerPlayerInd (index, player) = do
+    translate (V2 (panelWidth/2) shiftY) . color clr . drawPlayerInfoParts font $ player
+    when (ownerPlayerInd == index)
+          . translate (V2 0 shiftY) $ color clr drawOwnerFlag
     where clr = playerColor index
           shiftY = fromIntegral index * playerInfoHeight
+
+drawOwnerFlag :: Frame ()
+drawOwnerFlag = line [V2 0 (-5), V2 10 (-5)] >> line [V2 5 0, V2 5 (-10)]
 
 drawPlayerInfoParts :: Font -> Player -> Frame ()
 drawPlayerInfoParts fnt player = mapM_ p playerInfoParts
