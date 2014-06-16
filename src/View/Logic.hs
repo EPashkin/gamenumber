@@ -1,5 +1,4 @@
-{-# LANGUAGE TemplateHaskell #-}
-module View.State where
+module View.Logic where
 
 import Debug.Trace
 import Control.Lens
@@ -10,28 +9,8 @@ import GameLogic.StartLogic
 import GameLogic.Action.ModifyPlayer
 import GameLogic.Action.Shield
 import View.Convert
+import View.GameState
 
-
-instance (Show Font) where
-  show _ = "Font"
-
-data StateData = StateData { _game :: GameData
-                   , _windowSize :: (Coord, Coord) -- current window size
-                   , _font :: Font
-                   }
-  deriving (Show)
-
-makeLenses ''StateData
-
-newState :: Font -> IO StateData
-newState font = do
-    --runStartupTest
-    game <- newGame
-    return $ StateData game (100, 100) font
-
-runStartupTest = do
-    traceIO "Testing"
-    traceIO . show $ getNearestPoses (2,3)
 
 runGameStep :: StateData -> StateData
 runGameStep = over game doGameStep
@@ -117,5 +96,3 @@ inPanel (x, y) state = x >= panelLeftX state
 panelLeftX :: StateData -> Coord
 panelLeftX state = width - panelWidth
     where (width, _) = state ^. windowSize
-
-worldShiftX = - panelWidth / 2 :: Coord

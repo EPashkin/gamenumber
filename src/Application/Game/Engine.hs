@@ -2,7 +2,7 @@ module Application.Game.Engine where
 
 import Application.Game.Logic (eventHandler)
 import Middleware.FreeGame.Environment (runEnvironment, EnvironmentInfo(..))
-import View.State (runGameStep)
+import View.Logic (runGameStep)
 import View.View (drawState)
 
 ticksPerSecond = 10

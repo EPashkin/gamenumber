@@ -1,4 +1,5 @@
-module Middleware.FreeGame.Facade (module G
+module Middleware.FreeGame.Facade
+    ( module G
     , emptyCellColor
     , panelBkColor
     , playerColor

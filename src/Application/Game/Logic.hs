@@ -2,9 +2,8 @@ module Application.Game.Logic where
 
 import qualified Data.Boolean as B
 import Middleware.FreeGame.Facade
-import Middleware.FreeGame.GameState
-import Control.Monad.State.Lazy
-import View.State
+import View.GameState
+import View.Logic
 
 
 eventHandler :: GameState

@@ -4,9 +4,7 @@ module Middleware.FreeGame.Environment
     ) where
 
 import FreeGame
-import Control.Monad.State.Lazy
-import View.State
-import Middleware.FreeGame.GameState
+import View.GameState
 
 data EnvironmentInfo = EnvironmentInfo
      { _drawState :: StateData -> Frame()

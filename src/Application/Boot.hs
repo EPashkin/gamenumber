@@ -1,7 +1,7 @@
 module Application.Boot where
 
 import Debug.Trace (trace)
-import View.State (newState)
+import View.GameState (newState)
 import Application.Game.Engine (runEngine)
 import Middleware.FreeGame.Facade (loadFont)
 

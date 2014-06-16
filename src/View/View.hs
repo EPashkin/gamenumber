@@ -3,7 +3,7 @@ module View.View
     ) where
 
 import Control.Lens
-import View.State
+import View.GameState
 import View.Panel
 import View.Convert
 import GameLogic.Data.Facade

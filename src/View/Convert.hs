@@ -28,3 +28,5 @@ worldPosOfWindowPos game (x, y) =
        xi = floor (x / drawScale + 0.5) + fst centerPos'
        yi = floor (y / drawScale + 0.5) + snd centerPos'
    in (xi, yi)
+
+worldShiftX = - panelWidth / 2 :: Coord
