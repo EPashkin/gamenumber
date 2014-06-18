@@ -51,6 +51,9 @@ mkPlayers num world gen = (players, gen)
 isAI :: Player -> Bool
 isAI pl = 0 < pl ^. aggr
 
+isAlive :: Player -> Bool
+isAlive pl = pl ^. num > 0 || not (isAI pl)
+
 -- apply function to all players
 mapP :: ((Int, Player) -> a) -> Players -> [a]
 mapP func = fmap func . assocs

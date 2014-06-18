@@ -10,7 +10,6 @@ import Middleware.FreeGame.Facade
 
 --TODO: Pause checkbox
 --TODO: Collapsible panel
---TODO: Hide dead player info
 --TODO: Center by minimap
 drawPanel :: StateData -> Frame ()
 drawPanel state = do 
@@ -24,7 +23,7 @@ drawPanel state = do
     fps <- getFPS
     let fpsText = "FPS:" ++ show fps
     translate (V2 (panelWidth - 60) 20) . color black $ text fnt 15 fpsText
-    translate (V2 0 30) . sequence_ . mapP (drawPlayer fnt ownerPlayerInd) $ g ^. players
+    translate (V2 0 30) . drawPlayers fnt ownerPlayerInd $ g ^. players
     translate (V2 10 (height - 10 - mapSize)) $ drawMiniMap g
     translate (V2 110 (height - 10)) $ drawPaused state
     translate (V2 95 (height - 70)) $ drawGameSpeed state
@@ -35,13 +34,29 @@ drawPosition state
     where str = "Position: " ++ show x ++ "x" ++ show y
           Just (x,y) = state ^? game . players . ix activePlayerIndex . selectedPos
 
-drawPlayer :: Font -> Int -> (Int, Player) -> Frame ()
-drawPlayer font ownerPlayerInd (index, player) = do
+drawPlayers :: Font -> Int -> Players -> Frame()
+drawPlayers fnt ownerPlayerInd = mapM_ (drawPlayer fnt ownerPlayerInd)
+    . filterVisiblePlayers . mapP id
+
+filterVisiblePlayers :: [(Int, Player)] -> [(Int, Int, Player)]
+filterVisiblePlayers = reverse . filterVisiblePlayers' 1 [] 
+
+filterVisiblePlayers' :: Int -> [(Int, Int, Player)]
+    -> [(Int, Player)] -> [(Int, Int, Player)]
+filterVisiblePlayers' ind acc [] = acc
+filterVisiblePlayers' ind acc ((i, pl):xs)
+    | isAlive pl
+    = filterVisiblePlayers' (ind+1) ((ind, i, pl) : acc) xs
+    | otherwise
+    = filterVisiblePlayers' ind acc xs
+
+drawPlayer :: Font -> Int -> (Int, Int, Player) -> Frame ()
+drawPlayer font ownerPlayerInd (visIndex, index, player) = do
     translate (V2 (panelWidth/2) shiftY) . color clr . drawPlayerInfoParts font $ player
     when (ownerPlayerInd == index)
           . translate (V2 0 shiftY) $ color clr drawOwnerFlag
     where clr = playerColor index
-          shiftY = fromIntegral index * playerInfoHeight
+          shiftY = fromIntegral visIndex * playerInfoHeight
 
 drawOwnerFlag :: Frame ()
 drawOwnerFlag = line [V2 0 (-5), V2 10 (-5)] >> line [V2 5 0, V2 5 (-10)]
