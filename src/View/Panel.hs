@@ -35,28 +35,23 @@ drawPosition state
           Just (x,y) = state ^? game . players . ix activePlayerIndex . selectedPos
 
 drawPlayers :: Font -> Int -> Players -> Frame()
-drawPlayers fnt ownerPlayerInd = mapM_ (drawPlayer fnt ownerPlayerInd)
-    . filterVisiblePlayers . mapP id
+drawPlayers fnt ownerPlayerInd
+   = (`evalStateT` 1) . sequence_ . mapP (drawPlayer fnt ownerPlayerInd)
 
-filterVisiblePlayers :: [(Int, Player)] -> [(Int, Int, Player)]
-filterVisiblePlayers = reverse . filterVisiblePlayers' 1 [] 
-
-filterVisiblePlayers' :: Int -> [(Int, Int, Player)]
-    -> [(Int, Player)] -> [(Int, Int, Player)]
-filterVisiblePlayers' ind acc [] = acc
-filterVisiblePlayers' ind acc ((i, pl):xs)
-    | isAlive pl
-    = filterVisiblePlayers' (ind+1) ((ind, i, pl) : acc) xs
+drawPlayer :: Font -> Int -> (Int, Player) -> StateT Int Frame ()
+drawPlayer font ownerPlayerInd (index, player)
+    | not ( isAlive player)
+    = return ()
     | otherwise
-    = filterVisiblePlayers' ind acc xs
-
-drawPlayer :: Font -> Int -> (Int, Int, Player) -> Frame ()
-drawPlayer font ownerPlayerInd (visIndex, index, player) = do
-    translate (V2 (panelWidth/2) shiftY) . color clr . drawPlayerInfoParts font $ player
+    = do
+    ind <- get
+    let shiftY = fromIntegral ind * playerInfoHeight
+        clr = playerColor index
+    translate (V2 (panelWidth/2) shiftY) . color clr
+        . lift . drawPlayerInfoParts font $ player
     when (ownerPlayerInd == index)
-          . translate (V2 0 shiftY) $ color clr drawOwnerFlag
-    where clr = playerColor index
-          shiftY = fromIntegral visIndex * playerInfoHeight
+        . translate (V2 0 shiftY) . color clr $ lift drawOwnerFlag
+    put (ind+1)
 
 drawOwnerFlag :: Frame ()
 drawOwnerFlag = line [V2 0 (-5), V2 10 (-5)] >> line [V2 5 0, V2 5 (-10)]
