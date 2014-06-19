@@ -1,4 +1,4 @@
-module Util.Shuffle (shuffle) where
+module GameLogic.Util.Shuffle (shuffle) where
 
 import System.Random
 import Data.Map as M hiding (foldl)

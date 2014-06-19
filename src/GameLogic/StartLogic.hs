@@ -9,7 +9,7 @@ import GameLogic.Data.Cell
 import GameLogic.Data.World
 import GameLogic.Data.Players
 import GameLogic.Data.Game
-import Util.Shuffle
+import GameLogic.Util.Shuffle
 
 
 newGame::IO GameData
