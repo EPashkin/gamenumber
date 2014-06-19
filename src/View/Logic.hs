@@ -12,11 +12,17 @@ import View.Convert
 import View.GameState
 
 
+type WindowActionA a = (Coord, Coord) -> StateData -> a
+type WindowAction = WindowActionA StateData
+type WindowGameAction = (Coord, Coord) -> GameData -> GameData
+type PanelAction = Coord -> WindowGameAction
+
 runGameStep :: StateData -> StateData
 runGameStep = over game doGameStep
 
-startPlacement :: (Coord, Coord) -> StateData -> StateData
-startPlacement pos = set placementModeOfGame True . doWithWindowPos doSelectCellAction pos
+startPlacement :: WindowAction
+startPlacement pos = set placementModeOfGame True
+    . doWithWindowPos doSelectCellAction pos
 
 stopPlacement :: StateData -> StateData
 stopPlacement = set placementModeOfGame False
@@ -27,13 +33,21 @@ inPlacementMode = view placementModeOfGame
 placementModeOfGame :: Lens' StateData Bool
 placementModeOfGame = game . placementMode
 
-centering :: (Coord, Coord) -> StateData -> StateData
-centering = doWithWindowPos setCenterPosLimited
+centering :: WindowAction
+centering = doWithWindowPos2 setCenterPosLimited setCenterPosByMiniMap
 
-drawing :: (Coord, Coord) -> StateData -> StateData
+setCenterPosByMiniMap :: PanelAction
+setCenterPosByMiniMap height (x,y)
+    = setCenterPosOnMiniMap (x', y')
+    where V2 x' y' = V2 x y - shiftMiniMap height
+
+setCenterPosOnMiniMap :: WindowGameAction
+setCenterPosOnMiniMap (x,y) = setCenterPos (floor x, floor y)
+
+drawing :: WindowAction
 drawing = doWithWindowPos doSelectCellAction
 
-updateWindowSize :: (Coord, Coord) -> StateData -> StateData
+updateWindowSize :: WindowAction
 updateWindowSize = set windowSize
 
 doSave :: StateData -> IO StateData
@@ -73,24 +87,34 @@ decreaseSpeed state
     | otherwise
     = state & game . gameSpeed %~ pred
 
-doWithWindowPosOnGame :: (WorldPos -> GameData -> GameData) -> (Coord, Coord)
-  -> GameData -> GameData
+doWithWindowPosOnGame :: WorldAction -> WindowGameAction
 doWithWindowPosOnGame action pos game = action pos' game
     where pos' = worldPosOfWindowPos game pos
 
-doWithWindowPosInField :: (WorldPos -> GameData -> GameData) -> (Coord, Coord) -> StateData -> StateData
+doWithWindowPosInField :: WorldAction -> WindowAction
 doWithWindowPosInField action pos = game %~ doWithWindowPosOnGame action pos
 
-doWithWindowPos :: (WorldPos -> GameData -> GameData) -> (Coord, Coord) -> StateData -> StateData
-doWithWindowPos action pos@(x, y) state
+emptyPanelAction _ _ = id
+
+doWithWindowPosInPanel :: PanelAction -> WindowAction
+doWithWindowPosInPanel panelAction (x,y) state
+    = state & game %~ panelAction h (x', y)
+    where x' = x - panelLeftX state
+          (_,h) = state ^. windowSize
+
+doWithWindowPos :: WorldAction -> WindowAction
+doWithWindowPos = (`doWithWindowPos2` emptyPanelAction)
+
+doWithWindowPos2 :: WorldAction -> PanelAction -> WindowAction
+doWithWindowPos2 action panelAction pos@(x, y) state
     | inPanel pos state
-    = state
+    = doWithWindowPosInPanel panelAction pos state
     | otherwise
     = doWithWindowPosInField action pos' state
     where pos' = (x - worldShiftX - w/2, y - h/2)
           (w,h) = state ^. windowSize
 
-inPanel :: (Coord, Coord) -> StateData -> Bool
+inPanel :: WindowActionA Bool
 inPanel (x, y) state = x >= panelLeftX state
 
 panelLeftX :: StateData -> Coord

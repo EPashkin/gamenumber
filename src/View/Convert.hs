@@ -2,6 +2,7 @@ module View.Convert where
 
 import Control.Lens
 import GameLogic.Data.Facade
+import Middleware.FreeGame.Facade
 
 
 type Coord = Double
@@ -30,3 +31,6 @@ worldPosOfWindowPos game (x, y) =
    in (xi, yi)
 
 worldShiftX = - panelWidth / 2 :: Coord
+
+--position of minimap in panel
+shiftMiniMap height = V2 10 (height - 10 - mapSize)

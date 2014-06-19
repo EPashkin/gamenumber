@@ -10,7 +10,6 @@ import Middleware.FreeGame.Facade
 
 --TODO: Pause checkbox
 --TODO: Collapsible panel
---TODO: Center by minimap
 drawPanel :: StateData -> Frame ()
 drawPanel state = do 
     let (width, height) = state ^. windowSize
@@ -24,7 +23,7 @@ drawPanel state = do
     let fpsText = "FPS:" ++ show fps
     translate (V2 (panelWidth - 60) 20) . color black $ text fnt 15 fpsText
     translate (V2 0 30) . drawPlayers fnt ownerPlayerInd $ g ^. players
-    translate (V2 10 (height - 10 - mapSize)) $ drawMiniMap g
+    translate (shiftMiniMap height) $ drawMiniMap g
     translate (V2 110 (height - 10)) $ drawPaused state
     translate (V2 95 (height - 70)) $ drawGameSpeed state
 

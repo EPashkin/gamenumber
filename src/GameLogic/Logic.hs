@@ -1,7 +1,9 @@
 module GameLogic.Logic
     ( setCenterPosLimited
+    , setCenterPos
     , doSelectCellAction
     , doGameStep
+    , WorldAction
     ) where
 
 import Debug.Trace
@@ -19,17 +21,26 @@ import GameLogic.Action.Defend
 import GameLogic.Action.Attack
 
 
-setCenterPosLimited :: WorldPos -> GameData -> GameData
+type WorldAction = WorldPos -> GameData -> GameData
+
+setCenterPosLimited :: WorldAction
 setCenterPosLimited pos game = 
     game & centerPos .~ pos' & {- traceTest game pos' -} doSelectCellAction pos'
     where pos' = limitPosToWorld pos game
+
+setCenterPos :: WorldAction
+setCenterPos pos game
+    | not $ isPosInGame game pos
+    = game 
+    | otherwise
+    = game & centerPos .~ pos & doSelectCellAction pos
 
 traceTest :: GameData -> WorldPos -> a -> a
 traceTest game pos =
     traceShow (calcPossibleAction game 2 10 pos)
     $ traceShow (calcPossibleActions game 2)
 
-doSelectCellAction :: WorldPos -> GameData -> GameData
+doSelectCellAction :: WorldAction
 doSelectCellAction pos game
     | not $ isPosInGame game pos
     = game 
@@ -72,7 +83,7 @@ updatePlayerStats remainDiv pl =
         free3 = toRange (-100, 9999) free2
     in pl & set remain remain' . set free free3
 
-doCellAction :: WorldPos -> GameData -> GameData
+doCellAction :: WorldAction
 doCellAction pos game
     | not $ isPosInGame game pos
     = game
