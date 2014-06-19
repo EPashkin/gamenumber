@@ -52,7 +52,7 @@ drawSelected game playerIndex
    = when (num' > 0 || playerIndex == activePlayerIndex)
        $ drawSelectedCellBox pos color
    where color = playerColor playerIndex
-         Just pl = game ^? players . ix playerIndex
+         Just pl = game ^? playerOfGame playerIndex
          pos = pl ^. selectedPos
          num' = pl ^. num
 
@@ -78,7 +78,7 @@ translateCell (x,y) =
 visibleRange :: StateData -> (WorldPos, WorldPos)
 visibleRange state = ((minX, minY), (maxX, maxY))
     where game' = state ^. game
-          Just pl = game' ^? players. ix activePlayerIndex
+          Just pl = game' ^? playerOfGame activePlayerIndex
           (cX, cY) = game' ^. centerPos
           (width, height) = state ^. windowSize
           dX = floor $ ((width - panelWidth ) / 2 / drawScale) + 0.5

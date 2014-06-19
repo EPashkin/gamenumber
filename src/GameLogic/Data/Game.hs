@@ -36,8 +36,13 @@ mkGameDef world players gen
     , _gameSpeed = Normal
     } where Just pos = players ^? ix activePlayerIndex . selectedPos
 
+{-# INLINE cellOfGame #-}
 cellOfGame :: WorldPos -> Traversal' GameData Cell 
 cellOfGame pos = world . ix pos
+
+{-# INLINE playerOfGame #-}
+playerOfGame :: Int -> Traversal' GameData Player 
+playerOfGame pos = players . ix pos
 
 doSaveGame :: FilePath -> GameData -> IO ()
 doSaveGame filePath game = handle handler $ encodeFile filePath game

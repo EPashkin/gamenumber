@@ -18,7 +18,7 @@ type WindowGameAction = (Coord, Coord) -> GameData -> GameData
 type PanelAction = Coord -> WindowGameAction
 
 runGameStep :: StateData -> StateData
-runGameStep = over game doGameStep
+runGameStep = game %~ doGameStep
 
 startPlacement :: WindowAction
 startPlacement pos = set placementModeOfGame True
@@ -71,21 +71,15 @@ doChangePaused :: StateData -> StateData
 doChangePaused = game . paused %~ not
 
 doShieldAction :: StateData -> StateData
-doShieldAction state = state & game %~ shieldAction activePlayerIndex
+doShieldAction = game %~ shieldAction activePlayerIndex
 
 increaseSpeed :: StateData -> StateData
-increaseSpeed state
-    | maxBound == state ^. game . gameSpeed
-    = state
-    | otherwise
-    = state & game . gameSpeed %~ succ
+increaseSpeed = iif ((/=) maxBound . view (game . gameSpeed))
+    $ game . gameSpeed %~ succ
 
 decreaseSpeed :: StateData -> StateData
-decreaseSpeed state
-    | minBound == state ^. game . gameSpeed
-    = state
-    | otherwise
-    = state & game . gameSpeed %~ pred
+decreaseSpeed = iif ((/=) minBound . view (game . gameSpeed))
+    $ game . gameSpeed %~ pred
 
 doWithWindowPosOnGame :: WorldAction -> WindowGameAction
 doWithWindowPosOnGame action pos game = action pos' game
@@ -115,8 +109,7 @@ doWithWindowPos2 action panelAction pos@(x, y) state
           (w,h) = state ^. windowSize
 
 inPanel :: WindowActionA Bool
-inPanel (x, y) state = x >= panelLeftX state
+inPanel (x, y) = (>=) x . panelLeftX
 
 panelLeftX :: StateData -> Coord
-panelLeftX state = width - panelWidth
-    where (width, _) = state ^. windowSize
+panelLeftX = flip (-) panelWidth . fst . view windowSize

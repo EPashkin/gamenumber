@@ -13,15 +13,15 @@ infixl 1 >>==
 (>>==) :: Functor m => m a -> (a -> b) -> m b
 (>>==) ma f = fmap f ma 
 
+iif :: (a -> Bool) -> (a -> a) -> a -> a
+iif bf f val = if bf val then f val else val
+
 setSelectedPos :: WorldPos -> Int -> GameData -> GameData
-setSelectedPos pos playerInd game
-    | not $ isPosInGame game pos
-    = game 
-    | otherwise
-    = game & players . ix playerInd . selectedPos .~ pos
+setSelectedPos pos playerInd = iif (isPosInGame pos)
+    $ playerOfGame playerInd . selectedPos .~ pos
     
-isPosInGame :: GameData -> WorldPos -> Bool
-isPosInGame = isPosInWorld . view world
+isPosInGame :: WorldPos -> GameData -> Bool
+isPosInGame pos = (`isPosInWorld` pos) . view world
 
 limitPosToWorld :: WorldPos -> GameData -> WorldPos
 limitPosToWorld pos = limitPosToWorld' pos . getWorldSize . view world

@@ -15,8 +15,8 @@ drawPanel state = do
     let (width, height) = state ^. windowSize
         fnt = state ^. font
         g = state ^. game
-        Just activePlayerPosition = g ^? players . ix activePlayerIndex . selectedPos 
-        Just ownerPlayerInd = g ^? world . ix activePlayerPosition . playerIndex
+        Just activePlayerPosition = g ^? playerOfGame activePlayerIndex . selectedPos
+        Just ownerPlayerInd = g ^? cellOfGame activePlayerPosition . playerIndex
     color panelBkColor $ rectangleSolid panelWidth height
     translate (V2 10 20) $ drawPosition state
     fps <- getFPS
@@ -31,7 +31,7 @@ drawPosition :: StateData -> Frame ()
 drawPosition state
     = color black $ text (state ^. font) panelFontSize str
     where str = "Position: " ++ show x ++ "x" ++ show y
-          Just (x,y) = state ^? game . players . ix activePlayerIndex . selectedPos
+          Just (x,y) = state ^? game . playerOfGame activePlayerIndex . selectedPos
 
 drawPlayers :: Font -> Int -> Players -> Frame()
 drawPlayers fnt ownerPlayerInd

@@ -29,11 +29,8 @@ setCenterPosLimited pos game =
     where pos' = limitPosToWorld pos game
 
 setCenterPos :: WorldAction
-setCenterPos pos game
-    | not $ isPosInGame game pos
-    = game 
-    | otherwise
-    = game & centerPos .~ pos & doSelectCellAction pos
+setCenterPos pos = iif (isPosInGame pos)
+    $ set centerPos pos . doSelectCellAction pos
 
 traceTest :: GameData -> WorldPos -> a -> a
 traceTest game pos =
@@ -41,18 +38,11 @@ traceTest game pos =
     $ traceShow (calcPossibleActions game 2)
 
 doSelectCellAction :: WorldAction
-doSelectCellAction pos game
-    | not $ isPosInGame game pos
-    = game 
-    | otherwise
-    = setSelectedPos pos activePlayerIndex game
+doSelectCellAction pos = iif (isPosInGame pos)
+    $ setSelectedPos pos activePlayerIndex
     
 doGameStep :: GameData -> GameData
-doGameStep game
-    | game ^. paused
-    = game
-    | otherwise
-    = doGameStep' game
+doGameStep = iif (not . view paused) doGameStep'
     
 doGameStep' :: GameData -> GameData
 doGameStep' =
@@ -66,7 +56,7 @@ doHumanGameStep game
     = doCellAction pos game
     | otherwise
     = game
-    where Just pos = game ^? players . ix activePlayerIndex . selectedPos
+    where Just pos = game ^? playerOfGame activePlayerIndex . selectedPos
 
 updatePlayersStats :: GameData -> GameData
 updatePlayersStats game =
@@ -84,11 +74,7 @@ updatePlayerStats remainDiv pl =
     in pl & set remain remain' . set free free3
 
 doCellAction :: WorldAction
-doCellAction pos game
-    | not $ isPosInGame game pos
-    = game
-    | otherwise
-    = doCellAction' pos activePlayerIndex game
+doCellAction pos = iif (isPosInGame pos) $ doCellAction' pos activePlayerIndex
     
 doCellAction' :: WorldPos -> Int -> GameData -> GameData
 doCellAction' pos playerInd game

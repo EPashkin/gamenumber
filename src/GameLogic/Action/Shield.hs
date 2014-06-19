@@ -19,8 +19,8 @@ shieldAction playerInd game
 maybeShieldAction :: Int -> GameData -> Maybe (Int, GameData)
 maybeShieldAction playerIndex game
     = playerShieldAction pl
-    >>= (\(cost, pl') -> Just (cost, game & players . ix playerIndex .~ pl') )
-    where Just pl = game ^? players . ix playerIndex
+    >>= (\(cost, pl') -> Just (cost, game & playerOfGame playerIndex .~ pl') )
+    where Just pl = game ^? playerOfGame playerIndex
 
 
 playerShieldAction :: Player -> Maybe (Int, Player)

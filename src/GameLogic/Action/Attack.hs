@@ -46,12 +46,12 @@ decreaseCell pos playerInd game
 decreaseCellOrShield :: WorldPos -> Int -> GameData -> Maybe (Int, GameData)
 decreaseCellOrShield pos playerInd game
     | isShieldWorking oldPl
-    = Just (2, game & players . ix oldPlInd . free -~ 1)
+    = Just (2, game & playerOfGame oldPlInd . free -~ 1)
     | otherwise
     = Just (2, game & (cellOfGame pos %~ decreaseCell')
       . increasePlayerNum (-1) oldPlInd)
     where Just oldPlInd = game ^? cellOfGame pos . playerIndex
-          Just oldPl = game ^? players . ix oldPlInd
+          Just oldPl = game ^? playerOfGame oldPlInd
 
 decreaseCell' :: Cell -> Cell
 decreaseCell' cell

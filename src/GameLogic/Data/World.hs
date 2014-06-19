@@ -28,20 +28,24 @@ getWorldSize :: World -> Int
 getWorldSize = fst . snd . bounds 
 
 -- apply function to all cells
+{-# INLINE mapW #-}
 mapW :: ((WorldPos, Cell) -> a) -> World -> [a]
 mapW func world = fmap func (assocs world)
 
+{-# INLINABLE mapWR #-}
 mapWR :: ((WorldPos, Cell) -> a) -> (WorldPos, WorldPos) -> World -> [a]
-mapWR func range world = fmap func $ filter (inRange range . fst) $ assocs world
+mapWR func range world = fmap func . filter (inRange range . fst) $ assocs world
 
 -- find first pos owned by playerIndex
 -- can generate error is no pos
+{-# INLINABLE findPlayerPos #-}
 findPlayerPos :: Int -> World -> WorldPos
 findPlayerPos playerInd
     = fst . head . take 1 . filter (isOwnedBy playerInd . snd) . assocs
 
+{-# INLINE isPosInWorld #-}
 isPosInWorld :: World -> WorldPos -> Bool
-isPosInWorld world = inRange $ bounds world
+isPosInWorld = inRange . bounds
 
 getNearestOwnedCells :: Int -> World -> WorldPos -> [(WorldPos, Cell)]
 getNearestOwnedCells playerInd world
@@ -53,8 +57,7 @@ getNearestCells world = fmap p . getNearestWorldPoses world
             where Just cell = world ^? ix pos'
 
 getNearestWorldPoses :: World -> WorldPos -> [WorldPos]
-getNearestWorldPoses world pos
-    = filter (isPosInWorld world) $ getNearestPoses pos  
+getNearestWorldPoses world = filter (isPosInWorld world) . getNearestPoses  
 
 getNearestPoses :: WorldPos -> [WorldPos]
 getNearestPoses pos = fmap (\add -> pos + add) nearestCellsPosAdds    

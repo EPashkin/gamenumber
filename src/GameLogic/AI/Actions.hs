@@ -20,7 +20,7 @@ doAIsGameStep :: GameData -> GameData
 doAIsGameStep game = foldl p game plInds
    where pls = game ^. players
          --TODO: use all player indexes
-         plInds =  {-take 1 $ -}fmap fst $ filter (isAI . snd) $ mapP id pls
+         plInds =  {-take 1 $ -}fmap fst . filter (isAI . snd) $ mapP id pls
          p g plInd = doAIGameStep plInd g
 
 doAIGameStep :: Int -> GameData -> GameData
@@ -29,7 +29,7 @@ doAIGameStep playerInd game
     = game
     | otherwise
     = doAIActions actions playerInd game
-    where Just pl = game ^? players . ix playerInd
+    where Just pl = game ^? playerOfGame playerInd
           free' = pl ^. free
           actions = calcPossibleActions game playerInd
 

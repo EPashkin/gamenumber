@@ -48,16 +48,20 @@ mkPlayers num world gen = (players, gen)
           (lRandoms, gen') = runState (getNRndAggros (num - 1)) gen
           list = zip lPlayerNums lRandoms
 
+{-# INLINE isAI #-}
 isAI :: Player -> Bool
 isAI pl = 0 < pl ^. aggr
 
+{-# INLINE isAlive #-}
 isAlive :: Player -> Bool
 isAlive pl = pl ^. num > 0 || not (isAI pl)
 
 -- apply function to all players
+{-# INLINE mapP #-}
 mapP :: ((Int, Player) -> a) -> Players -> [a]
 mapP func = fmap func . assocs
 
+{-# INLINE mapPIndices #-}
 mapPIndices :: (Int -> a) -> Players -> [a]
 mapPIndices func = fmap func . Arr.indices
 
