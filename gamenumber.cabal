@@ -1,12 +1,12 @@
 name:                gamenumber
 version:             0.0.1
 synopsis:            simple game
--- description:         
+description:         GameNumber is simple game with AI players
 license:             GPL-3
 license-file:        LICENSE
 author:              Evgeny Pashkin
 maintainer:          epashkin@cognitive.ru
--- copyright:           
+copyright:           (C) 2014 Evgeny Pashkin
 category:            Game
 build-type:          Simple
 extra-source-files:  README.md
@@ -36,7 +36,7 @@ library
                        lens
   hs-source-dirs:      src_gl
   default-language:    Haskell2010
-  ghc-options:         -O2 -threaded
+  ghc-options:         -O2
   exposed-modules:     GameLogic
   other-modules:       GameLogic.Logic
                        GameLogic.StartLogic
@@ -54,3 +54,7 @@ library
                        GameLogic.Action.ModifyPlayer
                        GameLogic.Action.Shield
                        GameLogic.Util.Shuffle
+
+source-repository head
+  type: git
+  location: git://github.com/EPashkin/gamenumber.git
