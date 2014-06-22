@@ -1,7 +1,7 @@
 module View.Convert where
 
 import Control.Lens
-import GameLogic.Data.Facade
+import GameLogic
 import Middleware.FreeGame.Facade
 
 

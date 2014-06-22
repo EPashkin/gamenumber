@@ -16,8 +16,7 @@ import Debug.Trace
 import Control.Lens
 import FreeGame
 import Control.Monad.State.Lazy as ST
-import GameLogic.Data.Facade
-import GameLogic.StartLogic
+import GameLogic
 import View.Convert
 
 

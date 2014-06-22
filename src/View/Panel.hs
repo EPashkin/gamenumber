@@ -5,7 +5,7 @@ module View.Panel
 import Control.Lens
 import View.GameState
 import View.Convert
-import GameLogic.Data.Facade
+import GameLogic
 import Middleware.FreeGame.Facade
 
 --TODO: Pause checkbox

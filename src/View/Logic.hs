@@ -3,11 +3,7 @@ module View.Logic where
 import Debug.Trace
 import Control.Lens
 import Middleware.FreeGame.Facade
-import GameLogic.Data.Facade
-import GameLogic.Logic
-import GameLogic.StartLogic
-import GameLogic.Action.ModifyPlayer
-import GameLogic.Action.Shield
+import GameLogic
 import View.Convert
 import View.GameState
 
