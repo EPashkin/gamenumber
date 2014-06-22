@@ -40,11 +40,11 @@ conquerCell pos playerInd game
 
 decreaseCell :: WorldPos -> Int -> GameData -> Maybe GameData
 decreaseCell pos playerInd game
-    = decreaseCellOrShield pos playerInd game
+    = decreaseCellOrShield pos game
     >>= decreaseGamePlayerFree playerInd
 
-decreaseCellOrShield :: WorldPos -> Int -> GameData -> Maybe (Int, GameData)
-decreaseCellOrShield pos playerInd game
+decreaseCellOrShield :: WorldPos -> GameData -> Maybe (Int, GameData)
+decreaseCellOrShield pos game
     | isShieldWorking oldPl
     = Just (2, game & playerOfGame oldPlInd . free -~ 1)
     | otherwise

@@ -7,8 +7,8 @@ import Control.Lens
 import GameLogic.Data.Settings
 import GameLogic.Data.Cell
 import GameLogic.Data.World
-import GameLogic.Data.Players
-import GameLogic.Data.Game
+import GameLogic.Data.Players (mkPlayers)
+import GameLogic.Data.Game (GameData, mkGameDef)
 import GameLogic.Util.Shuffle
 
 
@@ -57,6 +57,7 @@ calcStartPos world numPlayers num =
 playersStartPosCols :: Int -> Int
 playersStartPosCols 4 = 2
 playersStartPosCols 16 = 4
+playersStartPosCols _ = error "Wrong world size in GameLogic.StartLogic.playersStartPosCols"
 
 -- return list x-coords start positions
 playersStartPosXList :: Int -> Int -> [Int]

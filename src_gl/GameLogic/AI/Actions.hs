@@ -5,7 +5,6 @@ module GameLogic.AI.Actions
 import System.Random
 import Data.List (find)
 import Control.Lens
-import GameLogic.Data.Cell
 import GameLogic.Data.World
 import GameLogic.Data.Game
 import GameLogic.Data.Players
@@ -38,54 +37,58 @@ doAIActions [] _ game = game
 doAIActions actions playerInd game
     = doAIAction action playerInd $ game & rndGen .~ gen'
     where (sumWeight, weightedActionsTmp) = foldl wf (0,[]) actions
-          wf (w, acc) act = (weight, (weight, act):acc)
-               where weight = w + actionWeight act
+          wf (w, acc) action' = (weight', (weight', action'):acc)
+               where weight' = w + actionWeight action'
           weightedActions = reverse weightedActionsTmp
           (weight, gen') = randomR (0, sumWeight - 1) $ game ^. rndGen
           Just (_, action) = find (\(w, _) -> w > weight) weightedActions
 
 doAIAction :: PossibleAction -> Int -> GameData -> GameData
-doAIAction (FreeCapture pos _) playerIndex
-    = increaseCellAction pos playerIndex
-doAIAction (Increase pos _) playerIndex
-    = increaseCellAction pos playerIndex
-doAIAction (NeedDefend pos _ poses) playerIndex
-    = defendCellAction poses playerIndex
-doAIAction (ParanoidNeedDefend pos _ poses) playerIndex
-    = defendCellAction poses playerIndex
-doAIAction (BorderNeedDefend pos _ poses) playerIndex
-    = defendCellAction poses playerIndex
-doAIAction (Conquer pos _) playerIndex
-    = attackCellAction pos playerIndex
-doAIAction (ReduceDefence pos _ _ poses) playerIndex
-    = reduceDefenceCellAction poses playerIndex
-doAIAction (Attack pos _) playerIndex
-    = attackCellAction pos playerIndex
-doAIAction (ShieldCharge _) playerIndex
-    = shieldAction playerIndex
-doAIAction ShieldActivate playerIndex
-    = shieldAction playerIndex
+doAIAction (FreeCapture pos _) playerInd
+    = increaseCellAction pos playerInd
+doAIAction (Increase pos _) playerInd
+    = increaseCellAction pos playerInd
+doAIAction (NeedDefend _pos _ poses) playerInd
+    = defendCellAction poses playerInd
+doAIAction (ParanoidNeedDefend _pos _ poses) playerInd
+    = defendCellAction poses playerInd
+doAIAction (BorderNeedDefend _pos _ poses) playerInd
+    = defendCellAction poses playerInd
+doAIAction (Conquer pos _) playerInd
+    = attackCellAction pos playerInd
+doAIAction (ReduceDefence _pos _ _ poses) playerInd
+    = reduceDefenceCellAction poses playerInd
+doAIAction (Attack pos _) playerInd
+    = attackCellAction pos playerInd
+doAIAction (ShieldCharge _) playerInd
+    = shieldAction playerInd
+doAIAction ShieldActivate playerInd
+    = shieldAction playerInd
+doAIAction _ _ = error "Wrong PossibleAction in GameLogic.AI.Actions.doAIAction"
 
-increaseCellAction pos playerIndex
-    = increaseCell pos playerIndex . setSelectedPos pos playerIndex
+increaseCellAction :: WorldPos -> Int -> GameData -> GameData
+increaseCellAction pos playerInd
+    = increaseCell pos playerInd . setSelectedPos pos playerInd
 
 defendCellAction :: [WorldPos] -> Int -> GameData -> GameData
-defendCellAction poses playerIndex game
-    = increaseCellAction pos playerIndex $ game & rndGen .~ gen'
+defendCellAction poses playerInd game
+    = increaseCellAction pos playerInd $ game & rndGen .~ gen'
     where (ind, gen') = randomR (0, length poses - 1) $ game ^. rndGen
           pos = poses !! ind
 
-reduceDefenceCellAction poses playerIndex game
+reduceDefenceCellAction :: [WorldPos] -> Int -> GameData -> GameData
+reduceDefenceCellAction poses playerInd game
     | null poses
     = game
     | otherwise 
-    = reduceDefenceCellAction' poses playerIndex game
+    = reduceDefenceCellAction' poses playerInd game
 
 reduceDefenceCellAction' :: [WorldPos] -> Int -> GameData -> GameData
-reduceDefenceCellAction' poses playerIndex game
-    = attackCellAction pos playerIndex $ game & rndGen .~ gen'
+reduceDefenceCellAction' poses playerInd game
+    = attackCellAction pos playerInd $ game & rndGen .~ gen'
     where (ind, gen') = randomR (0, length poses - 1) $ game ^. rndGen
           pos = poses !! ind
 
-attackCellAction pos playerIndex
-    = attackCell pos playerIndex . setSelectedPos pos playerIndex
+attackCellAction :: WorldPos -> Int -> GameData -> GameData
+attackCellAction pos playerInd
+    = attackCell pos playerInd . setSelectedPos pos playerInd

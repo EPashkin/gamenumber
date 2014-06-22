@@ -7,16 +7,18 @@ import GameLogic.Data.Cell
 
 
 type WorldPos = (Int, Int)
+
+startWorldPos :: WorldPos
 startWorldPos = (1,1)
 
 --TODO: find way do only + -
 instance (Num a,Num b) => Num (a, b) where
     (a,b) + (c,d) = (a+c, b+d)
-    (a,b) * (c,d) = undefined
+    (_a,_b) * (_c,_d) = undefined
     (a,b) - (c,d) = (a-c, b-d)
-    abs     (a,b) = undefined 
-    signum  (a,b) = undefined 
-    fromInteger i = undefined
+    abs     (_a,_b) = undefined
+    signum  (_a,_b) = undefined
+    fromInteger _i = undefined
 
 type World = Array WorldPos Cell
 
@@ -34,7 +36,7 @@ mapW func world = fmap func (assocs world)
 
 {-# INLINABLE mapWR #-}
 mapWR :: ((WorldPos, Cell) -> a) -> (WorldPos, WorldPos) -> World -> [a]
-mapWR func range world = fmap func . filter (inRange range . fst) $ assocs world
+mapWR func range' world = fmap func . filter (inRange range' . fst) $ assocs world
 
 -- find first pos owned by playerIndex
 -- can generate error is no pos
@@ -62,6 +64,7 @@ getNearestWorldPoses world = filter (isPosInWorld world) . getNearestPoses
 getNearestPoses :: WorldPos -> [WorldPos]
 getNearestPoses pos = fmap (\add -> pos + add) nearestCellsPosAdds    
 
+nearestCellsPosAdds :: [WorldPos]
 nearestCellsPosAdds
     = [
         (-1, -1),

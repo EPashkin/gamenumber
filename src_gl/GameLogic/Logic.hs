@@ -25,15 +25,15 @@ type WorldAction = WorldPos -> GameData -> GameData
 
 setCenterPosLimited :: WorldAction
 setCenterPosLimited pos game = 
-    game & centerPos .~ pos' & {- traceTest game pos' -} doSelectCellAction pos'
+    game & centerPos .~ pos' & {- _traceTest game pos' -} doSelectCellAction pos'
     where pos' = limitPosToWorld pos game
 
 setCenterPos :: WorldAction
 setCenterPos pos = iif (isPosInGame pos)
     $ set centerPos pos . doSelectCellAction pos
 
-traceTest :: GameData -> WorldPos -> a -> a
-traceTest game pos =
+_traceTest :: GameData -> WorldPos -> a -> a
+_traceTest game pos =
     traceShow (calcPossibleAction game 2 10 pos)
     $ traceShow (calcPossibleActions game 2)
 

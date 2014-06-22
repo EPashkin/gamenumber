@@ -48,6 +48,7 @@ actionWeight ReduceDefence{} = 5
 actionWeight Attack{} = 1
 actionWeight (ShieldCharge pl) = 100 + 2 * pl ^. shieldStrength
 actionWeight ShieldActivate = 10000
+actionWeight _ = error "Wrong PossibleAction in GameLogic.AI.PossibleAction.actionWeight" 
 
 calcPossibleActions :: GameData -> Int -> [PossibleAction]
 calcPossibleActions game playerInd
@@ -74,8 +75,8 @@ aggroRect game playerInd
           maxY = toRange rng $ spY + aggro
 
 calcPossibleAction :: GameData -> Int -> Int -> WorldPos -> PossibleAction
-calcPossibleAction game playerInd free pos
-    = calcPossibleAction' pos cell strengths free
+calcPossibleAction game playerInd free' pos
+    = calcPossibleAction' pos cell strengths free'
         ownerPl defencePositions reduceDefencePositions
     where strengths = calcStrengthsForPlayerEx game playerInd pos
           Just cell = game ^? cellOfGame pos
@@ -85,7 +86,7 @@ calcPossibleAction game playerInd free pos
 
 calcPossibleAction' :: WorldPos -> Cell -> StrengthsEx -> Int -> Player
     -> [WorldPos] -> [WorldPos] -> PossibleAction
-calcPossibleAction' pos cell (same, others, sameStrength, deltaStrength) free
+calcPossibleAction' pos cell (same, others, sameStrength, deltaStrength) free'
   ownerPl defencePositions reduceDefencePositions
     | sameStrength == 0
     = NoAction pos cell
@@ -120,12 +121,12 @@ calcPossibleAction' pos cell (same, others, sameStrength, deltaStrength) free
     && (deltaStrength > 0 || (deltaStrength == 0 && sameStrength > ownerStrength))
     = Conquer pos cell
     | not (isOwnedBy samePlayerIndex cell)
-    && free >= 2
+    && free' >= 2
     && deltaStrength == 0
     && not (null reduceDefencePositions)
     = ReduceDefence pos cell (isShieldWorking ownerPl) reduceDefencePositions
     | not (isOwnedBy samePlayerIndex cell)
-    && free >= 2
+    && free' >= 2
     = Attack pos cell
     | otherwise
     = Unknown pos cell
@@ -142,8 +143,8 @@ getReduceDefencePositions game pos
     = filter p $ getNearestWorldPoses w pos
     where w = game ^. world
           Just playerInd = w ^? ix pos . playerIndex
-          p pos = isOwnedBy playerInd cell
-                  where Just cell = w ^? ix pos
+          p pos' = isOwnedBy playerInd cell
+                  where Just cell = w ^? ix pos'
 
 canBeSafeIncreased :: GameData -> Int -> WorldPos -> Bool
 canBeSafeIncreased game playerInd pos
@@ -173,4 +174,4 @@ calcPossibleShieldAction game playerInd
     = []
     where Just pl = game ^? playerOfGame playerInd
           shieldStr = pl ^. shieldStrength
-          worldArea = getWorldSize (game ^. world) ^ 2
+          worldArea = getWorldSize (game ^. world) ^ (2 :: Int)

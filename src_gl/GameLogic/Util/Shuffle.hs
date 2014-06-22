@@ -15,7 +15,7 @@ fisherYates gen l =
   where
     toElems (x, y) = (elems x, y)
     numerate = zip [1..]
-    initial x gen = (singleton 0 x, gen)
+    initial x gen' = (singleton 0 x, gen')
 
 shuffle :: RandomGen g => g -> [a] -> ([a], g)
 shuffle = fisherYates

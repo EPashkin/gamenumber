@@ -26,15 +26,16 @@ isPosInGame pos = (`isPosInWorld` pos) . view world
 limitPosToWorld :: WorldPos -> GameData -> WorldPos
 limitPosToWorld pos = limitPosToWorld' pos . getWorldSize . view world
 
-limitPosToWorld' (x, y) max
+limitPosToWorld' :: WorldPos -> Int -> WorldPos
+limitPosToWorld' (x, y) size
     | x < 1
-    = limitPosToWorld' (1, y) max
-    | x > max
-    = limitPosToWorld' (max, y) max
+    = limitPosToWorld' (1, y) size
+    | x > size
+    = limitPosToWorld' (size, y) size
     | y < 1
-    = limitPosToWorld' (x, 1) max
-    | y > max
-    = limitPosToWorld' (x, max) max
+    = limitPosToWorld' (x, 1) size
+    | y > size
+    = limitPosToWorld' (x, size) size
     | otherwise
     = (x,y)
 
@@ -61,6 +62,7 @@ updateCellList cells cell
           same' = case same of
                   [] -> cell
                   [cell'] -> cell' & value %~ (+ (cell ^. value))
+                  _ -> error "Wrong list in GameLogic.Util.updateCellList"
 
 type StrengthsEx = (Cell, [Cell], Int, Int)
 
@@ -79,6 +81,7 @@ calcStrengthsForPlayer game playerInd pos
           same' = case same of
                   [] -> mkCell 0 playerInd
                   [cell] -> cell
+                  _ -> error "Wrong list in GameLogic.Util.calcStrengthsForPlayer"
           p = flip compare `on` view value
 
 getDeltaOtherStrength :: Int -> [Cell] -> Int
@@ -87,7 +90,7 @@ getDeltaOtherStrength sameStrength cells
 
 getOthersStrength :: [Cell] -> Cell
 getOthersStrength [] = mkCell 0 0
-getOthersStrength (c:cs) = c
+getOthersStrength (c:_) = c
 
 getOtherStrength :: Int -> [Cell] -> Int
 getOtherStrength _ [] = 0
