@@ -52,7 +52,7 @@ actionWeight _ = error "Wrong PossibleAction in GameLogic.AI.PossibleAction.acti
 
 calcPossibleActions :: GameData -> Int -> [PossibleAction]
 calcPossibleActions game playerInd
-    = filter (not.isNoAction) actions ++ calcPossibleShieldAction game playerInd
+    = filter (not.isNoAction) actions <> calcPossibleShieldAction game playerInd
     where ((minX, minY), (maxX, maxY)) = aggroRect game playerInd
           poses = [(x,y) | x <- [minX..maxX], y <- [minY..maxY]]
           actions = fmap (calcPossibleAction game playerInd free') poses

@@ -1,6 +1,10 @@
-module GameLogic.Util where
+module GameLogic.Util
+    ( module GameLogic.Util
+    , module M
+    ) where
 
 import Data.List
+import Data.Monoid as M ((<>))
 import Data.Function (on)
 import Control.Lens
 import GameLogic.Data.Cell

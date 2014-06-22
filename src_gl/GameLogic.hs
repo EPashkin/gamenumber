@@ -7,6 +7,7 @@ import GameLogic.StartLogic as GL
 import GameLogic.Data.Facade as GL
 import GameLogic.Util as GL
     ( toRange
+    , (<>)
     )
 import GameLogic.Action.ModifyPlayer as GL
     ( decreaseGamePlayerFree

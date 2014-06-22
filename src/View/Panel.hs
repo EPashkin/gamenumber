@@ -20,7 +20,7 @@ drawPanel state = do
     color panelBkColor $ rectangleSolid panelWidth height
     translate (V2 10 20) $ drawPosition state
     fps <- getFPS
-    let fpsText = "FPS:" ++ show fps
+    let fpsText = "FPS:" <> show fps
     translate (V2 (panelWidth - 60) 20) . color black $ text fnt 15 fpsText
     translate (V2 0 30) . drawPlayers fnt ownerPlayerInd $ g ^. players
     translate (shiftMiniMap height) $ drawMiniMap g
@@ -30,7 +30,7 @@ drawPanel state = do
 drawPosition :: StateData -> Frame ()
 drawPosition state
     = color black $ text (state ^. font) panelFontSize str
-    where str = "Position: " ++ show x ++ "x" ++ show y
+    where str = "Position: " <> show x <> "x" <> show y
           Just (x,y) = state ^? game . playerOfGame activePlayerIndex . selectedPos
 
 drawPlayers :: Font -> Int -> Players -> Frame()
