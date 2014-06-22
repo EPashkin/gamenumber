@@ -14,20 +14,43 @@ cabal-version:       >=1.10
 
 executable gamenumber
   main-is:             Main.hs
-  -- other-modules:       
-  -- other-extensions:    
+  build-depends:       base >=4.6 && <4.7,
+                       gamenumber,
+                       mtl,
+                       AC-Boolean,
+                       lens,
+                       free,
+                       free-game
+  hs-source-dirs:      src
+  default-language:    Haskell2010
+  ghc-options:         -O2 -threaded
+
+library
   build-depends:       base >=4.6 && <4.7,
                        random,
                        array,
                        containers,
                        mtl,
                        bytestring,
-                       AC-Boolean,
                        binary,
-                       lens,
-                       transformers,
-                       free,
-                       free-game
-  hs-source-dirs:      src
+                       lens
+  hs-source-dirs:      src_gl
   default-language:    Haskell2010
   ghc-options:         -O2 -threaded
+  exposed-modules:     GameLogic
+  other-modules:       GameLogic.Logic
+                       GameLogic.StartLogic
+                       GameLogic.Util
+                       GameLogic.Data.Facade
+                       GameLogic.Data.Cell
+                       GameLogic.Data.Game
+                       GameLogic.Data.Players
+                       GameLogic.Data.Settings
+                       GameLogic.Data.World
+                       GameLogic.AI.Actions
+                       GameLogic.AI.PossibleAction
+                       GameLogic.Action.Attack
+                       GameLogic.Action.Defend
+                       GameLogic.Action.ModifyPlayer
+                       GameLogic.Action.Shield
+                       GameLogic.Util.Shuffle
