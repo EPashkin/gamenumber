@@ -2,7 +2,7 @@ module View.Panel
     ( drawPanel
     ) where
 
-import Control.Lens
+import Control.Lens hiding (index)
 import View.GameState
 import View.Convert
 import GameLogic
@@ -12,7 +12,7 @@ import Middleware.FreeGame.Facade
 --TODO: Collapsible panel
 drawPanel :: StateData -> Frame ()
 drawPanel state = do 
-    let (width, height) = state ^. windowSize
+    let (_width, height) = state ^. windowSize
         fnt = state ^. font
         g = state ^. game
         Just activePlayerPosition = g ^? playerOfGame activePlayerIndex . selectedPos
@@ -38,7 +38,7 @@ drawPlayers fnt ownerPlayerInd
    = (`evalStateT` 1) . sequence_ . mapP (drawPlayer fnt ownerPlayerInd)
 
 drawPlayer :: Font -> Int -> (Int, Player) -> StateT Int Frame ()
-drawPlayer font ownerPlayerInd (index, player)
+drawPlayer fnt ownerPlayerInd (index, player)
     | not ( isAlive player)
     = return ()
     | otherwise
@@ -47,7 +47,7 @@ drawPlayer font ownerPlayerInd (index, player)
     let shiftY = fromIntegral ind * playerInfoHeight
         clr = playerColor index
     translate (V2 (panelWidth/2) shiftY) . color clr
-        . lift . drawPlayerInfoParts font $ player
+        . lift . drawPlayerInfoParts fnt $ player
     when (ownerPlayerInd == index)
         . translate (V2 0 shiftY) . color clr $ lift drawOwnerFlag
     put (ind+1)
@@ -57,8 +57,8 @@ drawOwnerFlag = line [V2 0 (-5), V2 10 (-5)] >> line [V2 5 0, V2 5 (-10)]
 
 drawPlayerInfoParts :: Font -> Player -> Frame ()
 drawPlayerInfoParts fnt player = mapM_ p playerInfoParts
-    where p (shift, p) = translate (V2 (playerInfoWidth*shift) 0)
-                             . text fnt panelFontSize $ p player
+    where p (shift, f) = translate (V2 (playerInfoWidth*shift) 0)
+                             . text fnt panelFontSize $ f player
 
 playerInfoParts :: [(Double, Player -> String)]
 playerInfoParts = [(-0.50, show.view num)
@@ -95,12 +95,12 @@ drawPaused state
            . color black $ text (state ^. font) panelFontSize "PAUSED"
 
 drawMiniMap :: GameData -> Frame ()
-drawMiniMap game = draw $ sequence_ cells
+drawMiniMap game' = draw $ sequence_ cells
     where cells :: (Applicative f, Monad f, Picture2D f, Local f) => [f ()]
           cells = mapW (drawMiniMapCell mapCellScale) w 
           --swap for testing drawing speed degradation
           --cells = fmap (drawMiniMapCell mapCellScale) [((x,y), mkCell 1 1) | x<-[1..wSize], y<-[1..wSize]]
-          w = game ^. world
+          w = game' ^. world
           wSize = getWorldSize w
           mapCellScale = mapSize / fromIntegral wSize
 

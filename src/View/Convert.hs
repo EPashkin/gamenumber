@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -fno-warn-missing-signatures #-}
 module View.Convert where
 
 import Control.Lens
@@ -33,4 +34,5 @@ worldPosOfWindowPos game (x, y) =
 worldShiftX = - panelWidth / 2 :: Coord
 
 --position of minimap in panel
+shiftMiniMap :: Coord -> V2 Coord
 shiftMiniMap height = V2 10 (height - 10 - mapSize)

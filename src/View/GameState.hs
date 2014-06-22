@@ -1,8 +1,8 @@
 {-# LANGUAGE TemplateHaskell #-}
 module View.GameState
     ( module ST
-    , GameStateA(..)
-    , GameState(..)
+    , GameStateA()
+    , GameState()
     , overIOGameState
     , StateData(_game, _windowSize, _font)
     , newState
@@ -15,7 +15,7 @@ module View.GameState
 import Debug.Trace
 import Control.Lens
 import FreeGame
-import Control.Monad.State.Lazy as ST
+import Control.Monad.State.Lazy as ST hiding (state)
 import GameLogic
 import View.Convert
 
@@ -39,12 +39,13 @@ data StateData = StateData { _game :: GameData
 makeLenses ''StateData
 
 newState :: Font -> IO StateData
-newState font = do
+newState fnt = do
     --runStartupTest
-    game <- newGame
-    return $ StateData game (100, 100) font
+    game' <- newGame
+    return $ StateData game' (100, 100) fnt
 
-runStartupTest = do
+_runStartupTest :: IO ()
+_runStartupTest = do
     traceIO "Testing"
     traceIO . show $ getNearestPoses (2,3)
 

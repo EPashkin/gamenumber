@@ -21,14 +21,14 @@ drawState state = do
     translate (V2 shiftX 0) $ drawPanel state
 
 drawGame :: Font -> (WorldPos, WorldPos) -> GameData -> Frame ()
-drawGame fnt visibleR game = do
-   let cells = mapWR (drawCell fnt) visibleR $ game ^. world
-   let (shiftX, shiftY) = windowPosOfWorldPos game startWorldPos
+drawGame fnt visibleR game' = do
+   let cells = mapWR (drawCell fnt) visibleR $ game' ^. world
+   let (shiftX, shiftY) = windowPosOfWorldPos game' startWorldPos
    translate (V2 shiftX shiftY) $ sequence_ cells
 
    translate (V2 shiftX shiftY) $ if True --TODO: game field :: showEnemySelected
-   then drawSelecteds game
-   else drawSelected game activePlayerIndex
+   then drawSelecteds game'
+   else drawSelected game' activePlayerIndex
 
 drawCell :: Font -> (WorldPos, Cell) -> Frame ()
 drawCell fnt (pos, cell)
@@ -44,14 +44,15 @@ drawCell fnt (pos, cell)
          shiftY = drawScale * 0.80
 
 drawSelecteds :: GameData -> Frame ()
-drawSelecteds game = sequence_ . reverse . mapPIndices (drawSelected game) $ game ^. players
+drawSelecteds game' = sequence_ . reverse . mapPIndices (drawSelected game')
+    $ game' ^. players
 
 drawSelected :: GameData -> Int -> Frame ()
-drawSelected game playerIndex
-   = when (num' > 0 || playerIndex == activePlayerIndex)
-       $ drawSelectedCellBox pos color
-   where color = playerColor playerIndex
-         Just pl = game ^? playerOfGame playerIndex
+drawSelected game' playerInd
+   = when (num' > 0 || playerInd == activePlayerIndex)
+       $ drawSelectedCellBox pos clr
+   where clr = playerColor playerInd
+         Just pl = game' ^? playerOfGame playerInd
          pos = pl ^. selectedPos
          num' = pl ^. num
 
@@ -77,7 +78,6 @@ translateCell (x,y) =
 visibleRange :: StateData -> (WorldPos, WorldPos)
 visibleRange state = ((minX, minY), (maxX, maxY))
     where game' = state ^. game
-          Just pl = game' ^? playerOfGame activePlayerIndex
           (cX, cY) = game' ^. centerPos
           (width, height) = state ^. windowSize
           dX = floor $ ((width - panelWidth ) / 2 / drawScale) + 0.5

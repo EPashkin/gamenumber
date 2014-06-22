@@ -1,6 +1,5 @@
 module View.Logic where
 
-import Debug.Trace
 import Control.Lens
 import Middleware.FreeGame.Facade
 import GameLogic
@@ -78,12 +77,13 @@ decreaseSpeed = iif ((/=) minBound . view (game . gameSpeed))
     $ game . gameSpeed %~ pred
 
 doWithWindowPosOnGame :: WorldAction -> WindowGameAction
-doWithWindowPosOnGame action pos game = action pos' game
-    where pos' = worldPosOfWindowPos game pos
+doWithWindowPosOnGame action pos game' = action pos' game'
+    where pos' = worldPosOfWindowPos game' pos
 
 doWithWindowPosInField :: WorldAction -> WindowAction
 doWithWindowPosInField action pos = game %~ doWithWindowPosOnGame action pos
 
+emptyPanelAction :: PanelAction
 emptyPanelAction _ _ = id
 
 doWithWindowPosInPanel :: PanelAction -> WindowAction
@@ -105,7 +105,7 @@ doWithWindowPos2 action panelAction pos@(x, y) state
           (w,h) = state ^. windowSize
 
 inPanel :: WindowActionA Bool
-inPanel (x, y) = (>=) x . panelLeftX
+inPanel (x, _y) = (>=) x . panelLeftX
 
 panelLeftX :: StateData -> Coord
 panelLeftX = flip (-) panelWidth . fst . view windowSize
