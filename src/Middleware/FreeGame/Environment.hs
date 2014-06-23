@@ -8,7 +8,7 @@ import View.GameState
 
 data EnvironmentInfo = EnvironmentInfo
      { _drawState :: StateData -> Frame()
-     , _runGameStep :: StateData -> StateData
+     , _runGameStep :: GameState
      , _eventHandler :: GameState
      , _state :: StateData
      }
@@ -29,7 +29,7 @@ gameLoop info = do
 
 doFrame :: EnvironmentInfo -> Frame StateData
 doFrame info = do
-    state' <- execStateT (eventHandler >> modify runGameStep) state
+    state' <- execStateT (eventHandler >> runGameStep) state
     drawState state'
     return state'
     where state = _state info

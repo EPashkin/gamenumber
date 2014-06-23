@@ -8,33 +8,28 @@ import View.Logic
 
 eventHandler :: GameState
 eventHandler = do
-    updateWindowSize'
+    Box _ (V2 w h) <- getBoundingBox
+    updateWindowSize (w, h)
+
     mouseEvents
-    whenM (keyDown KeyP) $ modify doChangePaused
-    whenM (keyDown KeyS) $ modify doShieldAction
-    whenM (keyDown KeyF1) $ modify doHelpPlayer
+    whenM (keyDown KeyP) doChangePaused
+    whenM (keyDown KeyS) doShieldAction
+    whenM (keyDown KeyF1) doHelpPlayer
     whenM (keyDown KeyF2) $ overIOGameState doSave
     whenM (keyDown KeyF3) $ overIOGameState doLoad
-    whenM (keyDown KeyPadAdd B.|| keyDown KeyEqual)
-        $ modify increaseSpeed
-    whenM (keyDown KeyPadSubtract B.|| keyDown KeyMinus)
-        $ modify decreaseSpeed
-
-updateWindowSize' :: GameState
-updateWindowSize' = do
-    Box _ (V2 w h) <- getBoundingBox
-    modify $ updateWindowSize (w, h)
+    whenM (keyDown KeyPadAdd B.|| keyDown KeyEqual) increaseSpeed
+    whenM (keyDown KeyPadSubtract B.|| keyDown KeyMinus) decreaseSpeed
 
 mouseEvents :: GameState
 mouseEvents = do
     V2 x y <- mousePosition
     let pos = (x, y)
     l <- mouseButtonL
-    state <- get 
+    curL <- inPlacementMode
     
-    whenM mouseButtonR . modify $ centering pos
-    case (l, inPlacementMode state) of
-        (True, False) -> modify $ startPlacement pos
-        (True, True)  -> modify $ drawing pos
-        (False, True) -> modify stopPlacement
+    whenM mouseButtonR $ centering pos
+    case (l, curL) of
+        (True, False) -> startPlacement pos
+        (True, True)  -> drawing pos
+        (False, True) -> stopPlacement
         _             -> return ()

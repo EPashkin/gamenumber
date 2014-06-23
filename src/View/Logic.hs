@@ -1,5 +1,6 @@
 module View.Logic where
 
+import Data.Maybe
 import Control.Lens
 import Middleware.FreeGame.Facade
 import GameLogic
@@ -7,23 +8,24 @@ import View.Convert
 import View.GameState
 
 
-type WindowActionA a = (Coord, Coord) -> StateData -> a
-type WindowAction = WindowActionA StateData
+type WindowActionA a = (Coord, Coord) -> GameStateA a
+type WindowAction = WindowActionA ()
 type WindowGameAction = (Coord, Coord) -> GameData -> GameData
 type PanelAction = Coord -> WindowGameAction
 
-runGameStep :: StateData -> StateData
-runGameStep = game %~ doGameStep
+
+runGameStep :: GameState
+runGameStep = game %= doGameStep
 
 startPlacement :: WindowAction
-startPlacement pos = set placementModeOfGame True
-    . doWithWindowPos doSelectCellAction pos
+startPlacement pos = placementModeOfGame .= True
+    >> doWithWindowPos doSelectCellAction pos
 
-stopPlacement :: StateData -> StateData
-stopPlacement = set placementModeOfGame False
+stopPlacement :: GameState
+stopPlacement = placementModeOfGame .= False
 
-inPlacementMode :: StateData -> Bool
-inPlacementMode = view placementModeOfGame 
+inPlacementMode :: GameStateA Bool
+inPlacementMode = use placementModeOfGame
 
 placementModeOfGame :: Lens' StateData Bool
 placementModeOfGame = game . placementMode
@@ -43,7 +45,7 @@ drawing :: WindowAction
 drawing = doWithWindowPos doSelectCellAction
 
 updateWindowSize :: WindowAction
-updateWindowSize = set windowSize
+updateWindowSize = (.=) windowSize
 
 doSave :: StateData -> IO StateData
 doSave state = do 
@@ -56,56 +58,58 @@ doLoad state = do
     g' <- doLoadGame "gamenumber.gn" g
     return $ set game g' state
 
-doHelpPlayer :: StateData -> StateData
-doHelpPlayer state
-    = state & game .~ g'
-    where g = state ^. game
-          Just g' = decreaseGamePlayerFree activePlayerIndex (-10, g)
+doHelpPlayer :: GameState
+doHelpPlayer = game %= p
+    where p g = fromMaybe g $ decreaseGamePlayerFree activePlayerIndex (-10, g)
 
-doChangePaused :: StateData -> StateData
-doChangePaused = game . paused %~ not
+doChangePaused :: GameState
+doChangePaused = game . paused %= not
 
-doShieldAction :: StateData -> StateData
-doShieldAction = game %~ shieldAction activePlayerIndex
+doShieldAction :: GameState
+doShieldAction = game %= shieldAction activePlayerIndex
 
-increaseSpeed :: StateData -> StateData
-increaseSpeed = iif ((/=) maxBound . view (game . gameSpeed))
-    $ game . gameSpeed %~ succ
+increaseSpeed :: GameState
+increaseSpeed = game . gameSpeed %= succ'
+    where succ' gs = if gs == maxBound then gs
+                     else succ gs
 
-decreaseSpeed :: StateData -> StateData
-decreaseSpeed = iif ((/=) minBound . view (game . gameSpeed))
-    $ game . gameSpeed %~ pred
+decreaseSpeed :: GameState
+decreaseSpeed = game . gameSpeed %= pred'
+    where pred' gs = if gs == minBound then gs
+                     else pred gs
 
 doWithWindowPosOnGame :: WorldAction -> WindowGameAction
 doWithWindowPosOnGame action pos game' = action pos' game'
     where pos' = worldPosOfWindowPos game' pos
 
 doWithWindowPosInField :: WorldAction -> WindowAction
-doWithWindowPosInField action pos = game %~ doWithWindowPosOnGame action pos
+doWithWindowPosInField action pos = game %= doWithWindowPosOnGame action pos
 
 emptyPanelAction :: PanelAction
 emptyPanelAction _ _ = id
 
 doWithWindowPosInPanel :: PanelAction -> WindowAction
-doWithWindowPosInPanel panelAction (x,y) state
-    = state & game %~ panelAction h (x', y)
-    where x' = x - panelLeftX state
-          (_,h) = state ^. windowSize
+doWithWindowPosInPanel panelAction (x,y) = do
+    leftX <- panelLeftX
+    let x' = x - leftX
+    (_,h) <- use windowSize
+    game %= panelAction h (x', y)
 
 doWithWindowPos :: WorldAction -> WindowAction
 doWithWindowPos = (`doWithWindowPos2` emptyPanelAction)
 
 doWithWindowPos2 :: WorldAction -> PanelAction -> WindowAction
-doWithWindowPos2 action panelAction pos@(x, y) state
-    | inPanel pos state
-    = doWithWindowPosInPanel panelAction pos state
-    | otherwise
-    = doWithWindowPosInField action pos' state
-    where pos' = (x - worldShiftX - w/2, y - h/2)
-          (w,h) = state ^. windowSize
+doWithWindowPos2 action panelAction pos@(x, y) = do
+    state <- get
+    let (w,h) = state ^. windowSize
+        pos' = (x - worldShiftX - w/2, y - h/2)
+    b <- inPanel pos
+    if b
+    then doWithWindowPosInPanel panelAction pos
+    else doWithWindowPosInField action pos'
 
 inPanel :: WindowActionA Bool
-inPanel (x, _y) = (>=) x . panelLeftX
+inPanel (x, _y) = panelLeftX >>= \leftX -> return $ x >= leftX
 
-panelLeftX :: StateData -> Coord
-panelLeftX = flip (-) panelWidth . fst . view windowSize
+panelLeftX :: GameStateA Coord
+panelLeftX = use (windowSize . _1) >>= \w -> return $ w - panelWidth
