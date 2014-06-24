@@ -9,7 +9,7 @@ import View.GameState
 
 
 type WindowAction a = (Coord, Coord) -> GameState a
-type WindowGameAction a = (Coord, Coord) -> StateT GameData Frame a
+type WindowGameAction a = (Coord, Coord) -> GameState' a
 type PanelAction a = Coord -> WindowGameAction a
 
 

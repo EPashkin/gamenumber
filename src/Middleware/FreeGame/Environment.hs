@@ -7,7 +7,7 @@ import FreeGame
 import View.GameState
 
 data EnvironmentInfo = EnvironmentInfo
-     { _drawState :: StateData -> Frame()
+     { _drawState :: GameState ()
      , _runGameStep :: GameState ()
      , _eventHandler :: GameState ()
      , _state :: StateData
@@ -28,10 +28,7 @@ gameLoop info = do
         $ tick >> gameLoop info{_state = state''}
 
 doFrame :: EnvironmentInfo -> Frame StateData
-doFrame info = do
-    state' <- execStateT (eventHandler >> runGameStep) state
-    drawState state'
-    return state'
+doFrame info = execStateT (eventHandler >> runGameStep >> drawState) state
     where state = _state info
           drawState = _drawState info
           runGameStep = _runGameStep info

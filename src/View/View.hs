@@ -9,26 +9,26 @@ import View.Convert
 import GameLogic
 import Middleware.FreeGame.Facade
 
-drawState :: StateData -> Frame ()
-drawState state = do
-    let fnt = view font state
-    let (w,h) = state ^. windowSize
+drawState :: GameState ()
+drawState = do
+    fnt <- use font
+    (w,h) <- use windowSize
     let worldShift = V2 (w/2 + worldShiftX) (h/2)
         shiftX = w - panelWidth
 
-    let visibleR = visibleRange state
-    translate worldShift . drawGame fnt visibleR $ state ^. game
-    translate (V2 shiftX 0) $ drawPanel state
+    visibleR <- gets visibleRange
+    zoom game . translate worldShift $ drawGame fnt visibleR
+    translate (V2 shiftX 0) drawPanel
 
-drawGame :: Font -> (WorldPos, WorldPos) -> GameData -> Frame ()
-drawGame fnt visibleR game' = do
-   let cells = mapWR (drawCell fnt) visibleR $ game' ^. world
-   let (shiftX, shiftY) = windowPosOfWorldPos game' startWorldPos
-   translate (V2 shiftX shiftY) $ sequence_ cells
+drawGame :: Font -> (WorldPos, WorldPos) -> GameState' ()
+drawGame fnt visibleR = do
+   cells <- mapWR (drawCell fnt) visibleR <$> use world
+   (shiftX, shiftY) <- gets $ flip windowPosOfWorldPos startWorldPos
+   lift . translate (V2 shiftX shiftY) $ sequence_ cells
 
    translate (V2 shiftX shiftY) $ if True --TODO: game field :: showEnemySelected
-   then drawSelecteds game'
-   else drawSelected game' activePlayerIndex
+   then drawSelecteds
+   else drawSelected activePlayerIndex
 
 drawCell :: Font -> (WorldPos, Cell) -> Frame ()
 drawCell fnt (pos, cell)
@@ -43,18 +43,17 @@ drawCell fnt (pos, cell)
          shiftX = drawScale * 0.17
          shiftY = drawScale * 0.80
 
-drawSelecteds :: GameData -> Frame ()
-drawSelecteds game' = sequence_ . reverse . mapPIndices (drawSelected game')
-    $ game' ^. players
+drawSelecteds :: GameState' ()
+drawSelecteds = use players >>= sequence_ . reverse . mapPIndices drawSelected
 
-drawSelected :: GameData -> Int -> Frame ()
-drawSelected game' playerInd
-   = when (num' > 0 || playerInd == activePlayerIndex)
-       $ drawSelectedCellBox pos clr
-   where clr = playerColor playerInd
-         Just pl = game' ^? playerOfGame playerInd
-         pos = pl ^. selectedPos
-         num' = pl ^. num
+drawSelected :: Int -> GameState' ()
+drawSelected playerInd = do
+   Just pl <- gets . preview $ playerOfGame playerInd
+   let clr = playerColor playerInd
+       pos = pl ^. selectedPos
+       num' = pl ^. num
+   when (num' > 0 || playerInd == activePlayerIndex)
+       . lift $ drawSelectedCellBox pos clr
 
 drawSelectedCellBox :: WorldPos -> Color -> Frame ()
 drawSelectedCellBox pos clr =
