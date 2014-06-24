@@ -3,7 +3,6 @@ module View.GameState
     ( module ST
     , GameStateA()
     , GameState()
-    , overIOGameState
     , StateData(_game, _windowSize, _font)
     , newState
     -- lens
@@ -23,9 +22,6 @@ import View.Convert
 type GameStateA a = StateT StateData Frame a
 
 type GameState = GameStateA ()
-
-overIOGameState :: (StateData -> IO StateData) -> GameState
-overIOGameState f = get >>= (liftIO . f) >>= put
 
 instance (Show Font) where
   show _ = "Font"
@@ -48,4 +44,3 @@ _runStartupTest :: IO ()
 _runStartupTest = do
     traceIO "Testing"
     traceIO . show $ getNearestPoses (2,3)
-

@@ -15,8 +15,8 @@ eventHandler = do
     whenM (keyDown KeyP) doChangePaused
     whenM (keyDown KeyS) doShieldAction
     whenM (keyDown KeyF1) doHelpPlayer
-    whenM (keyDown KeyF2) $ overIOGameState doSave
-    whenM (keyDown KeyF3) $ overIOGameState doLoad
+    whenM (keyDown KeyF2) doSave
+    whenM (keyDown KeyF3) doLoad
     whenM (keyDown KeyPadAdd B.|| keyDown KeyEqual) increaseSpeed
     whenM (keyDown KeyPadSubtract B.|| keyDown KeyMinus) decreaseSpeed
 

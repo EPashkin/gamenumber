@@ -47,16 +47,14 @@ drawing = doWithWindowPos doSelectCellAction
 updateWindowSize :: WindowAction
 updateWindowSize = (.=) windowSize
 
-doSave :: StateData -> IO StateData
-doSave state = do 
-    doSaveGame "gamenumber.gn" $ state ^. game
-    return state
+doSave :: GameState
+doSave = calcIOGameData (doSaveGame "gamenumber.gn")
 
-doLoad :: StateData -> IO StateData
-doLoad state = do
-    let g = state ^. game
-    g' <- doLoadGame "gamenumber.gn" g
-    return $ set game g' state
+doLoad :: GameState
+doLoad = calcIOGameData (doLoadGame "gamenumber.gn") >>= assign game
+
+calcIOGameData :: (GameData -> IO a) -> GameStateA a
+calcIOGameData f = use game >>= liftIO . f
 
 doHelpPlayer :: GameState
 doHelpPlayer = game %= p
