@@ -1,7 +1,6 @@
 {-# LANGUAGE TemplateHaskell #-}
 module View.GameState
     ( module ST
-    , GameStateA()
     , GameState()
     , StateData(_game, _windowSize, _font)
     , newState
@@ -19,9 +18,7 @@ import GameLogic
 import View.Convert
 
 
-type GameStateA a = StateT StateData Frame a
-
-type GameState = GameStateA ()
+type GameState a = StateT StateData Frame a
 
 instance (Show Font) where
   show _ = "Font"

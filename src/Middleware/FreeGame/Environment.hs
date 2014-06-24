@@ -8,8 +8,8 @@ import View.GameState
 
 data EnvironmentInfo = EnvironmentInfo
      { _drawState :: StateData -> Frame()
-     , _runGameStep :: GameState
-     , _eventHandler :: GameState
+     , _runGameStep :: GameState ()
+     , _eventHandler :: GameState ()
      , _state :: StateData
      }
 

@@ -6,7 +6,7 @@ import View.GameState
 import View.Logic
 
 
-eventHandler :: GameState
+eventHandler :: GameState ()
 eventHandler = do
     Box _ (V2 w h) <- getBoundingBox
     updateWindowSize (w, h)
@@ -20,7 +20,7 @@ eventHandler = do
     whenM (keyDown KeyPadAdd B.|| keyDown KeyEqual) increaseSpeed
     whenM (keyDown KeyPadSubtract B.|| keyDown KeyMinus) decreaseSpeed
 
-mouseEvents :: GameState
+mouseEvents :: GameState ()
 mouseEvents = do
     V2 x y <- mousePosition
     let pos = (x, y)
