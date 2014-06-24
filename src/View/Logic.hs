@@ -48,13 +48,10 @@ updateWindowSize :: WindowAction
 updateWindowSize = (.=) windowSize
 
 doSave :: GameState
-doSave = calcIOGameData (doSaveGame "gamenumber.gn")
+doSave = zoom game $ get >>= liftIO . doSaveGame "gamenumber.gn"
 
 doLoad :: GameState
-doLoad = calcIOGameData (doLoadGame "gamenumber.gn") >>= assign game
-
-calcIOGameData :: (GameData -> IO a) -> GameStateA a
-calcIOGameData f = use game >>= liftIO . f
+doLoad = zoom game $ get >>= liftIO . doLoadGame "gamenumber.gn" >>= put
 
 doHelpPlayer :: GameState
 doHelpPlayer = game %= p
