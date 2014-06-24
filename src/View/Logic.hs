@@ -10,7 +10,7 @@ import View.GameState
 
 type WindowActionA a = (Coord, Coord) -> GameStateA a
 type WindowAction = WindowActionA ()
-type WindowGameAction = (Coord, Coord) -> GameData -> GameData
+type WindowGameAction = (Coord, Coord) -> StateT GameData Frame ()
 type PanelAction = Coord -> WindowGameAction
 
 
@@ -39,7 +39,7 @@ setCenterPosByMiniMap height (x,y)
     where V2 x' y' = V2 x y - shiftMiniMap height
 
 setCenterPosOnMiniMap :: WindowGameAction
-setCenterPosOnMiniMap (x,y) = setCenterPos (floor x, floor y)
+setCenterPosOnMiniMap (x,y) = modify $ setCenterPos (floor x, floor y)
 
 drawing :: WindowAction
 drawing = doWithWindowPos doSelectCellAction
@@ -74,21 +74,22 @@ decreaseSpeed = game . gameSpeed %= pred'
                      else pred gs
 
 doWithWindowPosOnGame :: WorldAction -> WindowGameAction
-doWithWindowPosOnGame action pos game' = action pos' game'
-    where pos' = worldPosOfWindowPos game' pos
+doWithWindowPosOnGame action pos
+    = get >>= modify . action . flip worldPosOfWindowPos pos
 
 doWithWindowPosInField :: WorldAction -> WindowAction
-doWithWindowPosInField action pos = game %= doWithWindowPosOnGame action pos
+doWithWindowPosInField action pos
+    = zoom game $ doWithWindowPosOnGame action pos
 
 emptyPanelAction :: PanelAction
-emptyPanelAction _ _ = id
+emptyPanelAction _ _ = return ()
 
 doWithWindowPosInPanel :: PanelAction -> WindowAction
 doWithWindowPosInPanel panelAction (x,y) = do
     leftX <- panelLeftX
     let x' = x - leftX
     (_,h) <- use windowSize
-    game %= panelAction h (x', y)
+    zoom game $ panelAction h (x', y)
 
 doWithWindowPos :: WorldAction -> WindowAction
 doWithWindowPos = (`doWithWindowPos2` emptyPanelAction)
