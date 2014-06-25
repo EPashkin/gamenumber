@@ -2,11 +2,11 @@ module Application.Game.Logic where
 
 import qualified Data.Boolean as B
 import Middleware.FreeGame.Facade
-import View.GameState
+import View.ViewState
 import View.Logic
 
 
-eventHandler :: GameState ()
+eventHandler :: ViewState ()
 eventHandler = do
     Box _ (V2 w h) <- getBoundingBox
     updateWindowSize (w, h)
@@ -20,7 +20,7 @@ eventHandler = do
     whenM (keyDown KeyPadAdd B.|| keyDown KeyEqual) increaseSpeed
     whenM (keyDown KeyPadSubtract B.|| keyDown KeyMinus) decreaseSpeed
 
-mouseEvents :: GameState ()
+mouseEvents :: ViewState ()
 mouseEvents = do
     V2 x y <- mousePosition
     let pos = (x, y)

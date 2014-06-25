@@ -5,28 +5,28 @@ import Control.Lens
 import Middleware.FreeGame.Facade
 import GameLogic
 import View.Convert
-import View.GameState
+import View.ViewState
 
 
-type WindowAction a = (Coord, Coord) -> GameState a
-type WindowGameAction a = (Coord, Coord) -> GameState' a
+type WindowAction a = (Coord, Coord) -> ViewState a
+type WindowGameAction a = (Coord, Coord) -> GameState a
 type PanelAction a = Coord -> WindowGameAction a
 
 
-runGameStep :: GameState ()
+runGameStep :: ViewState ()
 runGameStep = game %= doGameStep
 
 startPlacement :: WindowAction ()
 startPlacement pos = placementModeOfGame .= True
     >> doWithWindowPos doSelectCellAction pos
 
-stopPlacement :: GameState ()
+stopPlacement :: ViewState ()
 stopPlacement = placementModeOfGame .= False
 
-inPlacementMode :: GameState Bool
+inPlacementMode :: ViewState Bool
 inPlacementMode = use placementModeOfGame
 
-placementModeOfGame :: Lens' StateData Bool
+placementModeOfGame :: Lens' ViewData Bool
 placementModeOfGame = game . placementMode
 
 centering :: WindowAction ()
@@ -46,28 +46,28 @@ drawing = doWithWindowPos doSelectCellAction
 updateWindowSize :: WindowAction ()
 updateWindowSize = (.=) windowSize
 
-doSave :: GameState ()
+doSave :: ViewState ()
 doSave = zoom game $ get >>= liftIO . doSaveGame "gamenumber.gn"
 
-doLoad :: GameState ()
+doLoad :: ViewState ()
 doLoad = zoom game $ get >>= liftIO . doLoadGame "gamenumber.gn" >>= put
 
-doHelpPlayer :: GameState ()
+doHelpPlayer :: ViewState ()
 doHelpPlayer = game %= p
     where p g = fromMaybe g $ decreaseGamePlayerFree activePlayerIndex (-10, g)
 
-doChangePaused :: GameState ()
+doChangePaused :: ViewState ()
 doChangePaused = game . paused %= not
 
-doShieldAction :: GameState ()
+doShieldAction :: ViewState ()
 doShieldAction = game %= shieldAction activePlayerIndex
 
-increaseSpeed :: GameState ()
+increaseSpeed :: ViewState ()
 increaseSpeed = game . gameSpeed %= succ'
     where succ' gs = if gs == maxBound then gs
                      else succ gs
 
-decreaseSpeed :: GameState ()
+decreaseSpeed :: ViewState ()
 decreaseSpeed = game . gameSpeed %= pred'
     where pred' gs = if gs == minBound then gs
                      else pred gs
@@ -106,5 +106,5 @@ doWithWindowPos2 action panelAction pos@(x, y) = do
 inPanel :: WindowAction Bool
 inPanel (x, _y) = panelLeftX >>= \leftX -> return $ x >= leftX
 
-panelLeftX :: GameState Coord
+panelLeftX :: ViewState Coord
 panelLeftX = use (windowSize . _1) >>= \w -> return $ w - panelWidth

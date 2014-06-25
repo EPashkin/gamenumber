@@ -3,14 +3,14 @@ module View.Panel
     ) where
 
 import Control.Lens hiding (index)
-import View.GameState
+import View.ViewState
 import View.Convert
 import GameLogic
 import Middleware.FreeGame.Facade
 
 --TODO: Pause checkbox
 --TODO: Collapsible panel
-drawPanel :: GameState ()
+drawPanel :: ViewState ()
 drawPanel = do
     state <- get
     let (_width, height) = state ^. windowSize
@@ -29,7 +29,7 @@ drawPanel = do
       translate (V2 110 (height - 10)) $ drawPaused state
       translate (V2 95 (height - 70)) $ drawGameSpeed state
 
-drawPosition :: StateData -> Frame ()
+drawPosition :: ViewData -> Frame ()
 drawPosition state
     = color black $ text (state ^. font) panelFontSize str
     where str = "Position: " <> show x <> "x" <> show y
@@ -91,7 +91,7 @@ aggrText player
     | otherwise 
     = ""
 
-drawPaused :: StateData -> Frame ()
+drawPaused :: ViewData -> Frame ()
 drawPaused state
     = when (state ^. game . paused)
            . color black $ text (state ^. font) panelFontSize "PAUSED"
@@ -120,7 +120,7 @@ drawMiniMapCell mapCellScale (pos, cell)
           rect = rectangleSolid mapCellScale mapCellScale
           clr = playerColor $ cell ^. playerIndex
 
-drawGameSpeed :: StateData -> Frame ()
+drawGameSpeed :: ViewData -> Frame ()
 drawGameSpeed state = do
     let gs = state ^. game . gameSpeed
         gaudgeLeft = panelWidth * 0.065

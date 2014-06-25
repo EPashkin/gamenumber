@@ -1,9 +1,9 @@
 {-# LANGUAGE TemplateHaskell #-}
-module View.GameState
+module View.ViewState
     ( module ST
+    , ViewState()
     , GameState()
-    , GameState'()
-    , StateData(_game, _windowSize, _font)
+    , ViewData(_game, _windowSize, _font)
     , newState
     -- lens
     , game
@@ -19,27 +19,26 @@ import GameLogic
 import View.Convert
 
 
---TODO: Rename to ViewState and GameState
 --TODO: Generalize GameState by monad, move to GameLogic
-type GameState a = StateT StateData Frame a
-type GameState' a = StateT GameData Frame a
+type ViewState a = StateT ViewData Frame a
+type GameState a = StateT GameData Frame a
 
 instance (Show Font) where
   show _ = "Font"
 
-data StateData = StateData { _game :: GameData
+data ViewData = ViewData { _game :: GameData
                    , _windowSize :: (Coord, Coord) -- current window size
                    , _font :: Font
                    }
   deriving (Show)
 
-makeLenses ''StateData
+makeLenses ''ViewData
 
-newState :: Font -> IO StateData
+newState :: Font -> IO ViewData
 newState fnt = do
     --runStartupTest
     game' <- newGame
-    return $ StateData game' (100, 100) fnt
+    return $ ViewData game' (100, 100) fnt
 
 _runStartupTest :: IO ()
 _runStartupTest = do

@@ -3,13 +3,13 @@ module View.View
     ) where
 
 import Control.Lens
-import View.GameState
+import View.ViewState
 import View.Panel
 import View.Convert
 import GameLogic
 import Middleware.FreeGame.Facade
 
-drawState :: GameState ()
+drawState :: ViewState ()
 drawState = do
     fnt <- use font
     (w,h) <- use windowSize
@@ -20,7 +20,7 @@ drawState = do
     zoom game . translate worldShift $ drawGame fnt visibleR
     translate (V2 shiftX 0) drawPanel
 
-drawGame :: Font -> (WorldPos, WorldPos) -> GameState' ()
+drawGame :: Font -> (WorldPos, WorldPos) -> GameState ()
 drawGame fnt visibleR = do
    cells <- mapWR (drawCell fnt) visibleR <$> use world
    (shiftX, shiftY) <- gets $ flip windowPosOfWorldPos startWorldPos
@@ -43,10 +43,10 @@ drawCell fnt (pos, cell)
          shiftX = drawScale * 0.17
          shiftY = drawScale * 0.80
 
-drawSelecteds :: GameState' ()
+drawSelecteds :: GameState ()
 drawSelecteds = use players >>= sequence_ . reverse . mapPIndices drawSelected
 
-drawSelected :: Int -> GameState' ()
+drawSelected :: Int -> GameState ()
 drawSelected playerInd = do
    Just pl <- gets . preview $ playerOfGame playerInd
    let clr = playerColor playerInd
@@ -74,7 +74,7 @@ translateCell (x,y) =
        yy = (fromIntegral y - 1) * drawScale
    in translate (V2 xx yy)
 
-visibleRange :: StateData -> (WorldPos, WorldPos)
+visibleRange :: ViewData -> (WorldPos, WorldPos)
 visibleRange state = ((minX, minY), (maxX, maxY))
     where game' = state ^. game
           (cX, cY) = game' ^. centerPos

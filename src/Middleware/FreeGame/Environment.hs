@@ -4,13 +4,13 @@ module Middleware.FreeGame.Environment
     ) where
 
 import FreeGame
-import View.GameState
+import View.ViewState
 
 data EnvironmentInfo = EnvironmentInfo
-     { _drawState :: GameState ()
-     , _runGameStep :: GameState ()
-     , _eventHandler :: GameState ()
-     , _state :: StateData
+     { _drawState :: ViewState ()
+     , _runGameStep :: ViewState ()
+     , _eventHandler :: ViewState ()
+     , _state :: ViewData
      }
 
 runEnvironment :: Int -> EnvironmentInfo -> IO (Maybe ())
@@ -23,11 +23,11 @@ runEnvironment ticksPerSecond info
 
 gameLoop :: EnvironmentInfo -> Game ()
 gameLoop info = do
-    state'' <- lift $ doFrame info
+    state' <- lift $ doFrame info
     unlessM (keyPress KeyEscape)
-        $ tick >> gameLoop info{_state = state''}
+        $ tick >> gameLoop info{_state = state'}
 
-doFrame :: EnvironmentInfo -> Frame StateData
+doFrame :: EnvironmentInfo -> Frame ViewData
 doFrame info = execStateT (eventHandler >> runGameStep >> drawState) state
     where state = _state info
           drawState = _drawState info
