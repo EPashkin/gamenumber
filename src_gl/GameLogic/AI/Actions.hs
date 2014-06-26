@@ -23,11 +23,9 @@ doAIsGameStep game = foldl p game plInds
          p g plInd = doAIGameStep plInd g
 
 doAIGameStep :: Int -> GameData -> GameData
-doAIGameStep playerInd game
-    | free' < 1
-    = game
-    | otherwise
-    = doAIActions actions playerInd game
+doAIGameStep playerInd game =
+    if free' < 1 then game
+    else doAIActions actions playerInd game
     where Just pl = game ^? playerOfGame playerInd
           free' = pl ^. free
           actions = calcPossibleActions game playerInd
@@ -78,13 +76,6 @@ defendCellAction poses playerInd game
 
 reduceDefenceCellAction :: [WorldPos] -> Int -> GameData -> GameData
 reduceDefenceCellAction poses playerInd game
-    | null poses
-    = game
-    | otherwise 
-    = reduceDefenceCellAction' poses playerInd game
-
-reduceDefenceCellAction' :: [WorldPos] -> Int -> GameData -> GameData
-reduceDefenceCellAction' poses playerInd game
     = attackCellAction pos playerInd $ game & rndGen .~ gen'
     where (ind, gen') = randomR (0, length poses - 1) $ game ^. rndGen
           pos = poses !! ind
