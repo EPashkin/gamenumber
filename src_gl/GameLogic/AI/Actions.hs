@@ -26,7 +26,7 @@ doAIGameStep :: Int -> GameData -> GameData
 doAIGameStep playerInd game =
     if free' < 1 then game
     else doAIActions actions playerInd game
-    where Just pl = game ^? playerOfGame playerInd
+    where pl = game ^?! playerOfGame playerInd
           free' = pl ^. free
           actions = calcPossibleActions game playerInd
 

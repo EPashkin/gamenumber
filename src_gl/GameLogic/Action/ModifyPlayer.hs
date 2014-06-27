@@ -15,4 +15,4 @@ decreaseGamePlayerFree playerInd (cost, game)
     = Just $ game & playerOfGame playerInd . free -~ cost
     | otherwise
     = Nothing
-    where Just curFree = game ^? playerOfGame playerInd . free
+    where curFree = game ^?! playerOfGame playerInd . free

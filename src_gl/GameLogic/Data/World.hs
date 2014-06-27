@@ -56,7 +56,7 @@ getNearestOwnedCells playerInd world
 getNearestCells :: World -> WorldPos -> [(WorldPos, Cell)]
 getNearestCells world = fmap p . getNearestWorldPoses world
     where p pos' = (pos', cell)
-            where Just cell = world ^? ix pos'
+            where cell = world ^?! ix pos'
 
 getNearestWorldPoses :: World -> WorldPos -> [WorldPos]
 getNearestWorldPoses world = filter (isPosInWorld world) . getNearestPoses  

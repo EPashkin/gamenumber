@@ -34,7 +34,7 @@ mkGameDef world' players' gen
     , _placementMode = False
     , _paused = True
     , _gameSpeed = Normal
-    } where Just pos = players' ^? ix activePlayerIndex . selectedPos
+    } where pos = players' ^?! ix activePlayerIndex . selectedPos
 
 {-# INLINE cellOfGame #-}
 cellOfGame :: WorldPos -> Traversal' GameData Cell 

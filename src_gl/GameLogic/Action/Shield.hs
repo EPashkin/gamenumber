@@ -20,7 +20,7 @@ maybeShieldAction :: Int -> GameData -> Maybe (Int, GameData)
 maybeShieldAction playerIndex game
     = playerShieldAction pl
     >>= (\(cost, pl') -> Just (cost, game & playerOfGame playerIndex .~ pl') )
-    where Just pl = game ^? playerOfGame playerIndex
+    where pl = game ^?! playerOfGame playerIndex
 
 
 playerShieldAction :: Player -> Maybe (Int, Player)

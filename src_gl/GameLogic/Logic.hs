@@ -56,7 +56,7 @@ doHumanGameStep game
     = doCellAction pos game
     | otherwise
     = game
-    where Just pos = game ^? playerOfGame activePlayerIndex . selectedPos
+    where pos = game ^?! playerOfGame activePlayerIndex . selectedPos
 
 updatePlayersStats :: GameData -> GameData
 updatePlayersStats game =
@@ -82,4 +82,4 @@ doCellAction' pos playerInd game
     = increaseCell pos playerInd game
     | otherwise
     = attackCell pos playerInd game
-    where Just cell = game ^? cellOfGame pos
+    where cell = game ^?! cellOfGame pos
