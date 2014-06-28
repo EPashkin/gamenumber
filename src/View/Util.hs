@@ -15,7 +15,7 @@ import View.ViewState
 
 
 type WindowAction a = (Coord, Coord) -> ViewState a
-type WindowGameAction a = (Coord, Coord) -> GameState a
+type WindowGameAction a = (Coord, Coord) -> GameStateF a
 type PanelAction a = Coord -> WindowGameAction a
 
 placementModeOfGame :: Lens' ViewData Bool

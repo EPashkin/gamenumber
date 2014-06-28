@@ -2,13 +2,14 @@
 module View.ViewState
     ( module ST
     , ViewState()
-    , GameState()
+    , GameStateF()
     , ViewData(_game, _windowSize, _font)
     , newState
     -- lens
     , game
     , windowSize
     , font
+    , Frame()
     ) where
 
 import Debug.Trace
@@ -19,9 +20,8 @@ import GameLogic
 import View.Convert
 
 
---TODO: Generalize GameState by monad, move to GameLogic
 type ViewState a = StateT ViewData Frame a
-type GameState a = StateT GameData Frame a
+type GameStateF a = GameState Frame a
 
 instance (Show Font) where
   show _ = "Font"

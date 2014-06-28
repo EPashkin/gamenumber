@@ -20,7 +20,7 @@ drawState = do
     zoom game . translate worldShift $ drawGame fnt visibleR
     translate (V2 shiftX 0) drawPanel
 
-drawGame :: Font -> (WorldPos, WorldPos) -> GameState ()
+drawGame :: Font -> (WorldPos, WorldPos) -> GameStateF ()
 drawGame fnt visibleR = do
    cells <- mapWR (drawCell fnt) visibleR <$> use world
    (shiftX, shiftY) <- gets $ flip windowPosOfWorldPos startWorldPos
@@ -43,10 +43,10 @@ drawCell fnt (pos, cell)
          shiftX = drawScale * 0.17
          shiftY = drawScale * 0.80
 
-drawSelecteds :: GameState ()
+drawSelecteds :: GameStateF ()
 drawSelecteds = use players >>= sequence_ . reverse . mapPIndices drawSelected
 
-drawSelected :: Int -> GameState ()
+drawSelected :: Int -> GameStateF ()
 drawSelected playerInd = do
    Just pl <- gets . preview $ playerOfGame playerInd
    let clr = playerColor playerInd

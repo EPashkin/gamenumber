@@ -1,4 +1,3 @@
-{-# LANGUAGE Rank2Types #-}
 module GameLogic.Data.World where
 
 import Data.Array

@@ -1,5 +1,4 @@
 {-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE Rank2Types #-}
 module GameLogic.Data.Players where
 
 import System.Random

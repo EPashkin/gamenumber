@@ -9,12 +9,14 @@ module GameLogic.Logic
 import Debug.Trace
 import Control.Lens
 import Control.Category ((>>>))
+import Control.Bool
 import GameLogic.Data.Settings
 import GameLogic.Data.Cell
 import GameLogic.Data.World
 import GameLogic.Data.Game
 import GameLogic.Data.Players
 import GameLogic.Util
+import GameLogic.GameState
 import GameLogic.AI.Actions
 import GameLogic.AI.PossibleAction
 import GameLogic.Action.Defend
@@ -41,8 +43,8 @@ doSelectCellAction :: WorldAction
 doSelectCellAction pos = iif (isPosInGame pos)
     $ setSelectedPos pos activePlayerIndex
     
-doGameStep :: GameData -> GameData
-doGameStep = iif (not . view paused) doGameStep'
+doGameStep :: GameState m ()
+doGameStep = unlessM (use paused) $ modify doGameStep'
     
 doGameStep' :: GameData -> GameData
 doGameStep' =
