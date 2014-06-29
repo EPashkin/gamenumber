@@ -9,21 +9,20 @@ import GameLogic.Data.World
 import GameLogic.Data.Game
 import GameLogic.Data.Players
 import GameLogic.Util
+import GameLogic.GameState
 import GameLogic.AI.PossibleAction
 import GameLogic.Action.Attack
 import GameLogic.Action.Defend
 import GameLogic.Action.Shield
 
 
-doAIsGameStep :: GameData -> GameData
-doAIsGameStep game = foldl p game plInds
-   where pls = game ^. players
-         --TODO: use all player indexes
-         plInds =  {-take 1 $ -}fmap fst . filter (isAI . snd) $ mapP id pls
-         p g plInd = doAIGameStep plInd g
+doAIsGameStep :: GameState ()
+doAIsGameStep = do
+   plInds <- uses players $ {-take 1 $ -}fmap fst . filter (isAI . snd) . mapP id
+   modify $ flip (foldl doAIGameStep) plInds
 
-doAIGameStep :: Int -> GameData -> GameData
-doAIGameStep playerInd game =
+doAIGameStep :: GameData -> Int -> GameData
+doAIGameStep game playerInd =
     if free' < 1 then game
     else doAIActions actions playerInd game
     where pl = game ^?! playerOfGame playerInd

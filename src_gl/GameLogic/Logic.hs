@@ -8,7 +8,6 @@ module GameLogic.Logic
 
 import Debug.Trace
 import Control.Lens
-import Control.Category ((>>>))
 import Control.Bool
 import GameLogic.Data.Settings
 import GameLogic.Data.Cell
@@ -42,29 +41,27 @@ _traceTest game pos =
 doSelectCellAction :: WorldAction
 doSelectCellAction pos = iif (isPosInGame pos)
     $ setSelectedPos pos activePlayerIndex
-    
+
 doGameStep :: GameState ()
-doGameStep = unlessM (use paused) $ modify doGameStep'
-    
-doGameStep' :: GameData -> GameData
-doGameStep' =
-    updatePlayersStats
-    >>> doHumanGameStep
-    >>> doAIsGameStep
+doGameStep = unlessM (use paused)
+    $ updatePlayersStats
+    >> doHumanGameStep
+    >> doAIsGameStep
 
-doHumanGameStep :: GameData -> GameData
-doHumanGameStep game
-    | game ^. placementMode
-    = doCellAction pos game
-    | otherwise
-    = game
-    where pos = game ^?! playerOfGame activePlayerIndex . selectedPos
+doHumanGameStep :: GameState ()
+doHumanGameStep = do
+    pos <- gets (^?! playerOfGame activePlayerIndex . selectedPos)
+    whenM (use placementMode) . modify $ doCellAction pos
 
-updatePlayersStats :: GameData -> GameData
-updatePlayersStats game =
-    let maxnum = maximum $ remainDivMin : game ^.. players . each . num
-        remainDiv = maxnum * remainDivMult (game ^. gameSpeed)
-    in game & players. each %~ updatePlayerStats remainDiv
+updatePlayersStats :: GameState ()
+updatePlayersStats = do
+    remainDiv <- gets calcRemainDiv
+    players . each %= updatePlayerStats remainDiv
+
+calcRemainDiv :: GameData -> Int
+calcRemainDiv game = maxnum * remainDivMult (game ^. gameSpeed)
+    where getPlayersNums = toListOf $ players . each . num
+          maxnum = maximum $ remainDivMin : getPlayersNums game
 
 updatePlayerStats :: Int -> Player -> Player
 updatePlayerStats remainDiv pl =
@@ -77,7 +74,7 @@ updatePlayerStats remainDiv pl =
 
 doCellAction :: WorldAction
 doCellAction pos = iif (isPosInGame pos) $ doCellAction' pos activePlayerIndex
-    
+
 doCellAction' :: WorldPos -> Int -> GameData -> GameData
 doCellAction' pos playerInd game
     | cell ^. playerIndex == playerInd || isFree cell
