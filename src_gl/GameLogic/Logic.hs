@@ -22,8 +22,6 @@ import GameLogic.Action.Defend
 import GameLogic.Action.Attack
 
 
-type WorldAction = WorldPos -> GameState ()
-
 setCenterPosLimited :: WorldAction
 setCenterPosLimited pos = do
     pos' <- gets $ limitPosToWorld pos
@@ -76,13 +74,11 @@ updatePlayerStats remainDiv pl =
 
 doCellAction :: WorldAction
 doCellAction pos = whenM (isPosInGame pos)
-    . modify $ doCellAction' pos activePlayerIndex
+    $ doCellAction' activePlayerIndex pos
 
---TODO: monadize
-doCellAction' :: WorldPos -> Int -> GameData -> GameData
-doCellAction' pos playerInd game
-    | cell ^. playerIndex == playerInd || isFree cell
-    = increaseCell pos playerInd game
-    | otherwise
-    = attackCell pos playerInd game
-    where cell = game ^?! cellOfGame pos
+doCellAction' :: Int -> WorldAction
+doCellAction' playerInd pos = do
+    cell <- gets (^?! cellOfGame pos)
+    ifThenElse (cell ^. playerIndex == playerInd || isFree cell)
+        (modify $ increaseCell pos playerInd)
+        (modify $ attackCell pos playerInd)
