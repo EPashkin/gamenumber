@@ -23,7 +23,7 @@ drawState = do
 drawGame :: Font -> (WorldPos, WorldPos) -> GameStateF ()
 drawGame fnt visibleR = do
    cells <- mapWR (drawCell fnt) visibleR <$> use world
-   (shiftX, shiftY) <- gets $ flip windowPosOfWorldPos startWorldPos
+   (shiftX, shiftY) <- gets $ windowPosOfWorldPos startWorldPos
    lift . translate (V2 shiftX shiftY) $ sequence_ cells
 
    translate (V2 shiftX shiftY) $ if True --TODO: game field :: showEnemySelected

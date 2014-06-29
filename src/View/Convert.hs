@@ -17,15 +17,15 @@ playerInfoWidth = panelWidth*0.9
 playerInfoHeight = 20 :: Coord
 mapSize = 64 :: Coord
 
-windowPosOfWorldPos :: GameData -> WorldPos -> (Coord, Coord)
-windowPosOfWorldPos game pos =
+windowPosOfWorldPos :: WorldPos -> GameData -> (Coord, Coord)
+windowPosOfWorldPos pos game =
    let centerPos' = view centerPos game
        xf = (fromIntegral (fst (pos - centerPos')) - 0.5) * drawScale
        yf = (fromIntegral (snd (pos - centerPos')) - 0.5) * drawScale
    in (xf, yf)
 
-worldPosOfWindowPos :: GameData -> (Coord, Coord) -> WorldPos
-worldPosOfWindowPos game (x, y) =
+worldPosOfWindowPos :: (Coord, Coord) -> GameData -> WorldPos
+worldPosOfWindowPos (x, y) game =
    let centerPos' = view centerPos game
        xi = floor (x / drawScale + 0.5) + fst centerPos'
        yi = floor (y / drawScale + 0.5) + snd centerPos'
