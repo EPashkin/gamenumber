@@ -34,7 +34,7 @@ doWithWindowPos2 action panelAction pos@(x, y) = do
 
 doWithWindowPosOnGame :: WorldAction -> WindowGameAction ()
 doWithWindowPosOnGame action pos
-    = get >>= modify . action . flip worldPosOfWindowPos pos
+    = framed $ gets (flip worldPosOfWindowPos pos) >>= action
 
 doWithWindowPosInField :: WorldAction -> WindowAction ()
 doWithWindowPosInField action pos

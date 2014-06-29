@@ -6,26 +6,38 @@ module GameLogic.Util
 import Data.List
 import Data.Monoid as M ((<>))
 import Data.Function (on)
+import Control.Bool
 import Control.Lens
 import GameLogic.Data.Cell
 import GameLogic.Data.World
 import GameLogic.Data.Game
 import GameLogic.Data.Players
+import GameLogic.GameState
 
 
 infixl 1 >>==
 (>>==) :: Functor m => m a -> (a -> b) -> m b
 (>>==) ma f = fmap f ma 
 
+--TODO: remove when unused
 iif :: (a -> Bool) -> (a -> a) -> a -> a
 iif bf f val = if bf val then f val else val
 
-setSelectedPos :: WorldPos -> Int -> GameData -> GameData
-setSelectedPos pos playerInd = iif (isPosInGame pos)
+setSelectedPos :: WorldPos -> Int -> GameState()
+setSelectedPos pos playerInd = whenM (isPosInGame pos)
+    $ playerOfGame playerInd . selectedPos .= pos
+
+--TODO: remove when unused
+setSelectedPos' :: WorldPos -> Int -> GameData -> GameData
+setSelectedPos' pos playerInd = iif (isPosInGame' pos)
     $ playerOfGame playerInd . selectedPos .~ pos
-    
-isPosInGame :: WorldPos -> GameData -> Bool
-isPosInGame pos = (`isPosInWorld` pos) . view world
+
+--TODO: remove when unused
+isPosInGame' :: WorldPos -> GameData -> Bool
+isPosInGame' pos = (`isPosInWorld` pos) . view world
+
+isPosInGame :: WorldPos -> GameState Bool
+isPosInGame pos = uses world (`isPosInWorld` pos)
 
 limitPosToWorld :: WorldPos -> GameData -> WorldPos
 limitPosToWorld pos = limitPosToWorld' pos . getWorldSize . view world

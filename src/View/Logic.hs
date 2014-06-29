@@ -31,7 +31,7 @@ setCenterPosByMiniMap height (x,y)
     where V2 x' y' = V2 x y - shiftMiniMap height
 
 setCenterPosOnMiniMap :: WindowGameAction ()
-setCenterPosOnMiniMap (x,y) = modify $ setCenterPos (floor x, floor y)
+setCenterPosOnMiniMap (x,y) = framed $ setCenterPos (floor x, floor y)
 
 drawing :: WindowAction ()
 drawing = doWithWindowPos doSelectCellAction

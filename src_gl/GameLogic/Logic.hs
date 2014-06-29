@@ -22,24 +22,26 @@ import GameLogic.Action.Defend
 import GameLogic.Action.Attack
 
 
-type WorldAction = WorldPos -> GameData -> GameData
+type WorldAction = WorldPos -> GameState ()
 
 setCenterPosLimited :: WorldAction
-setCenterPosLimited pos game = 
-    game & centerPos .~ pos' & {- _traceTest game pos' -} doSelectCellAction pos'
-    where pos' = limitPosToWorld pos game
+setCenterPosLimited pos = do
+    pos' <- gets $ limitPosToWorld pos
+    centerPos .= pos' >> {- _traceTest pos' >> -} doSelectCellAction pos'
 
 setCenterPos :: WorldAction
-setCenterPos pos = iif (isPosInGame pos)
-    $ set centerPos pos . doSelectCellAction pos
+setCenterPos pos = whenM (isPosInGame pos)
+    $ modify (set centerPos pos) >> doSelectCellAction pos
 
-_traceTest :: GameData -> WorldPos -> a -> a
-_traceTest game pos =
+_traceTest :: WorldPos -> GameState ()
+_traceTest pos = do
+    game <- get
     traceShow (calcPossibleAction game 2 10 pos)
-    $ traceShow (calcPossibleActions game 2)
+      $ traceShow (calcPossibleActions game 2)
+      $ return ()
 
 doSelectCellAction :: WorldAction
-doSelectCellAction pos = iif (isPosInGame pos)
+doSelectCellAction pos = whenM (isPosInGame pos)
     $ setSelectedPos pos activePlayerIndex
 
 doGameStep :: GameState ()
@@ -51,7 +53,7 @@ doGameStep = unlessM (use paused)
 doHumanGameStep :: GameState ()
 doHumanGameStep = do
     pos <- gets (^?! playerOfGame activePlayerIndex . selectedPos)
-    whenM (use placementMode) . modify $ doCellAction pos
+    whenM (use placementMode) $ doCellAction pos
 
 updatePlayersStats :: GameState ()
 updatePlayersStats = do
@@ -73,8 +75,10 @@ updatePlayerStats remainDiv pl =
     in pl & set remain remain' . set free free3
 
 doCellAction :: WorldAction
-doCellAction pos = iif (isPosInGame pos) $ doCellAction' pos activePlayerIndex
+doCellAction pos = whenM (isPosInGame pos)
+    . modify $ doCellAction' pos activePlayerIndex
 
+--TODO: monadize
 doCellAction' :: WorldPos -> Int -> GameData -> GameData
 doCellAction' pos playerInd game
     | cell ^. playerIndex == playerInd || isFree cell
