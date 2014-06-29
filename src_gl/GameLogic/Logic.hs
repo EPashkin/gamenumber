@@ -43,7 +43,7 @@ doSelectCellAction :: WorldAction
 doSelectCellAction pos = iif (isPosInGame pos)
     $ setSelectedPos pos activePlayerIndex
     
-doGameStep :: GameState m ()
+doGameStep :: GameState ()
 doGameStep = unlessM (use paused) $ modify doGameStep'
     
 doGameStep' :: GameData -> GameData

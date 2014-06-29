@@ -5,6 +5,7 @@ module View.ViewState
     , GameStateF()
     , ViewData(_game, _windowSize, _font)
     , newState
+    , framed
     -- lens
     , game
     , windowSize
@@ -21,7 +22,7 @@ import View.Convert
 
 
 type ViewState a = StateT ViewData Frame a
-type GameStateF a = GameState Frame a
+type GameStateF a = StateT GameData Frame a
 
 instance (Show Font) where
   show _ = "Font"
@@ -44,3 +45,6 @@ _runStartupTest :: IO ()
 _runStartupTest = do
     traceIO "Testing"
     traceIO . show $ getNearestPoses (2,3)
+
+framed :: GameState a -> GameStateF a
+framed = mapStateT $ return . runIdentity

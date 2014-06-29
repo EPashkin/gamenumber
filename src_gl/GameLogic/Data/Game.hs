@@ -1,4 +1,4 @@
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TemplateHaskell, Rank2Types #-}
 module GameLogic.Data.Game where
 
 import Debug.Trace

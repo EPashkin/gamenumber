@@ -10,7 +10,7 @@ import View.Util
 
 
 runGameStep :: ViewState ()
-runGameStep = zoom game doGameStep
+runGameStep = zoom game $ framed doGameStep
 
 startPlacement :: WindowAction ()
 startPlacement pos = placementModeOfGame .= True

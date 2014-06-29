@@ -7,4 +7,4 @@ import Control.Monad.State.Lazy as ST hiding (state)
 import GameLogic.Data.Game
 
 
-type GameState m a = Monad m => StateT GameData m a
+type GameState a = State GameData a
