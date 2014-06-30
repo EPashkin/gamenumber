@@ -57,6 +57,7 @@ library
                        GameLogic.Action.ModifyPlayer
                        GameLogic.Action.Shield
                        GameLogic.Util.Shuffle
+                       GameLogic.Util.RandomState
 
 source-repository head
   type: git

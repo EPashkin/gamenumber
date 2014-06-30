@@ -1,13 +1,13 @@
 {-# LANGUAGE TemplateHaskell #-}
 module GameLogic.Data.Players where
 
-import System.Random
-import Control.Monad.State
+import Control.Monad.State.Lazy
 import Data.Array as Arr
 import qualified Data.Binary as B
 import Control.Lens
 import GameLogic.Data.Settings
 import GameLogic.Data.World
+import GameLogic.Util.RandomState
 
 
 data Player = Player { _num :: Int    -- sum values of all owned cells
@@ -66,17 +66,10 @@ mapP func = fmap func . assocs
 mapPIndices :: (Int -> a) -> Players -> [a]
 mapPIndices func = fmap func . Arr.indices
 
-getRndAggro :: RandomGen g => State g Int
-getRndAggro = do
-  gen <- get
-  let (value, gen') = randomR (aiAggroMin, aiAggroMax) gen
-  put gen'
-  return value
-
 getNRndAggros :: RandomGen g => Int -> State g [Int]
 getNRndAggros 0 = return []
 getNRndAggros n = do
-  value <- getRndAggro
+  value <- randomRSt (aiAggroMin, aiAggroMax)
   list <- getNRndAggros (n-1)
   return (value:list)
 
