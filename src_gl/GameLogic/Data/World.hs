@@ -1,3 +1,4 @@
+{-# LANGUAGE Rank2Types #-}
 module GameLogic.Data.World where
 
 import Data.Array
@@ -24,6 +25,15 @@ type World = Array WorldPos Cell
 mkEmptyWorld :: Int -> World
 mkEmptyWorld size = array (startWorldPos, (size, size))
     [(pos, mkCell 0 0) | x <- [1..size], y <- [1..size], let pos = (x,y)]
+
+setWorldCell :: WorldPos -> World -> Cell -> World
+setWorldCell pos world cell = world // [(pos, cell)]
+
+getWorldCell :: WorldPos -> World -> Cell
+getWorldCell pos world = world ! pos
+
+toCell :: WorldPos -> Lens' World Cell
+toCell pos = lens (getWorldCell pos) (setWorldCell pos)
 
 getWorldSize :: World -> Int
 getWorldSize = fst . snd . bounds 
@@ -55,7 +65,7 @@ getNearestOwnedCells playerInd world
 getNearestCells :: World -> WorldPos -> [(WorldPos, Cell)]
 getNearestCells world = fmap p . getNearestWorldPoses world
     where p pos' = (pos', cell)
-            where cell = world ^?! ix pos'
+            where cell = world ^. toCell pos'
 
 getNearestWorldPoses :: World -> WorldPos -> [WorldPos]
 getNearestWorldPoses world = filter (isPosInWorld world) . getNearestPoses  

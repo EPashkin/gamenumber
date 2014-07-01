@@ -1,4 +1,4 @@
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TemplateHaskell, Rank2Types #-}
 module GameLogic.Data.Players where
 
 import Control.Monad.State.Lazy
@@ -48,6 +48,15 @@ mkPlayers num' world gen = (players, gen')
           lPlayerNums = [2..num']
           (lRandoms, gen') = runState (getNRndAggros (num' - 1)) gen
           list = zip lPlayerNums lRandoms
+
+setPlayer :: Int -> Players -> Player -> Players
+setPlayer pos pls cell = pls // [(pos, cell)]
+
+getPlayer :: Int -> Players -> Player
+getPlayer ind pls = pls ! ind
+
+toPlayer :: Int -> Lens' Players Player
+toPlayer pos = lens (getPlayer pos) (setPlayer pos)
 
 {-# INLINE isAI #-}
 isAI :: Player -> Bool

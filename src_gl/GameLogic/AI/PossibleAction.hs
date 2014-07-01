@@ -56,7 +56,7 @@ calcPossibleActions game playerInd
     where ((minX, minY), (maxX, maxY)) = aggroRect game playerInd
           poses = [(x,y) | x <- [minX..maxX], y <- [minY..maxY]]
           actions = fmap (calcPossibleAction game playerInd free') poses
-          free' = game ^?! playerOfGame playerInd . free
+          free' = game ^. playerOfGame playerInd . free
 
 aggroRect :: GameData -> Int -> (WorldPos, WorldPos)
 aggroRect game playerInd
@@ -64,7 +64,7 @@ aggroRect game playerInd
     = (startWorldPos, (size, size))
     | otherwise
     = ((minX, minY), (maxX, maxY))
-    where pl = game ^?! playerOfGame playerInd
+    where pl = game ^. playerOfGame playerInd
           (spX, spY) = pl ^. selectedPos
           aggro = pl ^. aggr `div` 2
           size = getWorldSize $ view world game
@@ -79,10 +79,10 @@ calcPossibleAction game playerInd free' pos
     = calcPossibleAction' pos cell strengths free'
         ownerPl defencePositions reduceDefencePositions
     where strengths = calcStrengthsForPlayerEx game playerInd pos
-          cell = game ^?! cellOfGame pos
+          cell = game ^. cellOfGame pos
           defencePositions = getDefencePositions game playerInd pos
           reduceDefencePositions = getReduceDefencePositions game pos
-          ownerPl = game ^?! playerOfGame (cell ^. playerIndex)
+          ownerPl = game ^. playerOfGame (cell ^. playerIndex)
 
 calcPossibleAction' :: WorldPos -> Cell -> StrengthsEx -> Int -> Player
     -> [WorldPos] -> [WorldPos] -> PossibleAction
@@ -142,9 +142,9 @@ getReduceDefencePositions :: GameData -> WorldPos -> [WorldPos]
 getReduceDefencePositions game pos
     = filter p $ getNearestWorldPoses w pos
     where w = game ^. world
-          playerInd = w ^?! ix pos . playerIndex
+          playerInd = w ^. toCell pos . playerIndex
           p pos' = isOwnedBy playerInd cell
-                   where cell = w ^?! ix pos'
+                   where cell = w ^. toCell pos'
 
 canBeSafeIncreased :: GameData -> Int -> WorldPos -> Bool
 canBeSafeIncreased game playerInd pos
@@ -158,7 +158,7 @@ canBeSafeIncreased game playerInd pos
     = True
     | otherwise
     = False
-    where cell = game ^?! cellOfGame pos
+    where cell = game ^. cellOfGame pos
           (_, _, sameStrength, deltaStrength)
               = calcStrengthsForPlayerEx game playerInd pos
 
@@ -172,6 +172,6 @@ calcPossibleShieldAction game playerInd
     = return $ ShieldCharge pl
     | otherwise
     = []
-    where pl = game ^?! playerOfGame playerInd
+    where pl = game ^. playerOfGame playerInd
           shieldStr = pl ^. shieldStrength
           worldArea = getWorldSize (game ^. world) ^ (2 :: Int)

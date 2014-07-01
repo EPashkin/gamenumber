@@ -33,15 +33,15 @@ mkGameDef world' players' gen
     , _placementMode = False
     , _paused = True
     , _gameSpeed = Normal
-    } where pos = players' ^?! ix activePlayerIndex . selectedPos
+    } where pos = players' ^. toPlayer activePlayerIndex . selectedPos
 
 {-# INLINE cellOfGame #-}
-cellOfGame :: WorldPos -> Traversal' GameData Cell 
-cellOfGame pos = world . ix pos
+cellOfGame :: WorldPos -> Lens' GameData Cell 
+cellOfGame pos = world . toCell pos
 
 {-# INLINE playerOfGame #-}
-playerOfGame :: Int -> Traversal' GameData Player 
-playerOfGame pos = players . ix pos
+playerOfGame :: Int -> Lens' GameData Player 
+playerOfGame ind = players . toPlayer ind
 
 doSaveGame :: FilePath -> GameData -> IO ()
 doSaveGame filePath game = handle handler $ encodeFile filePath game

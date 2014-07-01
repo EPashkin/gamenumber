@@ -16,8 +16,8 @@ drawPanel = do
     let (_width, height) = state ^. windowSize
         fnt = state ^. font
         g = state ^. game
-        activePlayerPosition = g ^?! playerOfGame activePlayerIndex . selectedPos
-        ownerPlayerInd = g ^?! cellOfGame activePlayerPosition . playerIndex
+        activePlayerPosition = g ^. playerOfGame activePlayerIndex . selectedPos
+        ownerPlayerInd = g ^. cellOfGame activePlayerPosition . playerIndex
     lift $ do
       color panelBkColor $ rectangleSolid panelWidth height
       translate (V2 10 20) $ drawPosition state
@@ -33,7 +33,7 @@ drawPosition :: ViewData -> Frame ()
 drawPosition state
     = color black $ text (state ^. font) panelFontSize str
     where str = "Position: " <> show x <> "x" <> show y
-          (x,y) = state ^?! game . playerOfGame activePlayerIndex . selectedPos
+          (x,y) = state ^. game . playerOfGame activePlayerIndex . selectedPos
 
 drawPlayers :: Font -> Int -> Players -> Frame()
 drawPlayers fnt ownerPlayerInd

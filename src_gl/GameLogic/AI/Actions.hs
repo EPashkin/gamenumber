@@ -23,7 +23,7 @@ doAIsGameStep = do
 
 doAIGameStep :: Int -> GameState ()
 doAIGameStep playerInd = do
-    free' <- gets (^?! playerOfGame playerInd . free)
+    free' <- use $ playerOfGame playerInd . free
     actions <- gets $ flip calcPossibleActions playerInd
     when (free' >= 1) $ doAIActions actions playerInd
 

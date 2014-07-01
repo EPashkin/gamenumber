@@ -35,7 +35,7 @@ _traceTest :: WorldPos -> GameState ()
 _traceTest pos = do
     game <- get
     traceShow (calcPossibleAction game 2 10 pos)
-      $ traceShow (calcPossibleActions game 2)
+      . traceShow (calcPossibleActions game 2)
       $ return ()
 
 doSelectCellAction :: WorldAction
@@ -50,7 +50,7 @@ doGameStep = unlessM (use paused)
 
 doHumanGameStep :: GameState ()
 doHumanGameStep = do
-    pos <- gets (^?! playerOfGame activePlayerIndex . selectedPos)
+    pos <- use $ playerOfGame activePlayerIndex . selectedPos
     whenM (use placementMode) $ doCellAction pos
 
 updatePlayersStats :: GameState ()
@@ -78,7 +78,7 @@ doCellAction pos = whenM (isPosInGame pos)
 
 doCellAction' :: Int -> WorldAction
 doCellAction' playerInd pos = do
-    cell <- gets (^?! cellOfGame pos)
+    cell <- use $ cellOfGame pos
     ifThenElse (cell ^. playerIndex == playerInd || isFree cell)
         (modify $ increaseCell pos playerInd)
         (modify $ attackCell pos playerInd)
