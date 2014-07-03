@@ -4,33 +4,32 @@ module GameLogic.Action.Shield
     ) where
 
 import Control.Lens
-import Data.Maybe
 import GameLogic.Data.Settings
 import GameLogic.Data.Game
 import GameLogic.Data.Players
 import GameLogic.Action.ModifyPlayer
+import GameLogic.GameState
 
 
-shieldAction :: Int -> GameData -> GameData
-shieldAction playerInd game
-    = fromMaybe game $ maybeShieldAction playerInd game
-    >>= decreaseGamePlayerFree playerInd
+shieldAction :: Int -> GameState ()
+shieldAction playerInd = fromMaybeState $ maybeShieldAction playerInd
 
-maybeShieldAction :: Int -> GameData -> Maybe (Int, GameData)
-maybeShieldAction playerIndex game
-    = playerShieldAction pl
-    >>= (\(cost, pl') -> Just (cost, game & playerOfGame playerIndex .~ pl') )
-    where pl = game ^. playerOfGame playerIndex
+maybeShieldAction :: Int -> MaybeGameState ()
+maybeShieldAction playerIndex =
+    zoom (playerOfGame playerIndex) playerShieldAction
+    >>= decreaseGamePlayerFree playerIndex
 
+playerShieldAction :: StateT Player Maybe Int
+playerShieldAction = mkState playerShieldAction'
 
-playerShieldAction :: Player -> Maybe (Int, Player)
-playerShieldAction player
+playerShieldAction' :: Player -> (Int, Player)
+playerShieldAction' player 
     | player ^. shieldActive
-    = Just (0, player & shieldActive .~ False)
+    = (0, player & shieldActive .~ False)
     | player ^. shieldStrength >= shieldActivationStrength
-    = Just (0, player & shieldActive .~ True)
+    = (0, player & shieldActive .~ True)
     | otherwise
-    = Just (1, player & shieldStrength +~ 1)
+    = (1, player & shieldStrength +~ 1)
 
 isShieldWorking :: Player -> Bool
 isShieldWorking player

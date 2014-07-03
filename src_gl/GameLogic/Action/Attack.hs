@@ -31,7 +31,7 @@ maybeAttackCell pos playerInd game
 conquerCell :: WorldPos -> Int -> GameData -> Maybe GameData
 conquerCell pos playerInd game
     = Just (1, game & cellOfGame pos .~ mkCell 1 playerInd)
-    >>= decreaseGamePlayerFree playerInd
+    >>= decreaseGamePlayerFree' playerInd
     >>== increasePlayerNum 1 playerInd
     >>== increasePlayerNum (-oldVal) oldPl
     where oldCell = game ^. cellOfGame pos
@@ -41,7 +41,7 @@ conquerCell pos playerInd game
 decreaseCell :: WorldPos -> Int -> GameData -> Maybe GameData
 decreaseCell pos playerInd game
     = decreaseCellOrShield pos game
-    >>= decreaseGamePlayerFree playerInd
+    >>= decreaseGamePlayerFree' playerInd
 
 decreaseCellOrShield :: WorldPos -> GameData -> Maybe (Int, GameData)
 decreaseCellOrShield pos game

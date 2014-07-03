@@ -11,7 +11,7 @@ import GameLogic.Util as GL
     , (<>)
     )
 import GameLogic.Action.ModifyPlayer as GL
-    ( decreaseGamePlayerFree
+    ( helpPlayer
     )
 import GameLogic.Action.Shield as GL
     ( shieldAction

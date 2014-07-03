@@ -20,7 +20,7 @@ increaseCell pos playerInd game
 increaseCellWithMax :: WorldPos -> Int -> Int -> GameData -> Maybe GameData
 increaseCellWithMax pos playerInd maxVal game
       = updateGameCellWithCost pos playerInd game (increaseCellWithMax' maxVal)
-      >>= decreaseGamePlayerFree playerInd
+      >>= decreaseGamePlayerFree' playerInd
       >>== increasePlayerNum 1 playerInd
 
 increaseCellWithMax' :: Int -> Int -> Cell -> Maybe (Int, Cell)

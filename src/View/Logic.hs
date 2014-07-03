@@ -46,14 +46,13 @@ doLoad :: ViewState ()
 doLoad = zoom game $ get >>= liftIO . doLoadGame "gamenumber.gn" >>= put
 
 doHelpPlayer :: ViewState ()
-doHelpPlayer = game %= p
-    where p g = fromMaybe g $ decreaseGamePlayerFree activePlayerIndex (-10, g)
+doHelpPlayer = zoom game . framed $ helpPlayer activePlayerIndex
 
 doChangePaused :: ViewState ()
 doChangePaused = game . paused %= not
 
 doShieldAction :: ViewState ()
-doShieldAction = game %= shieldAction activePlayerIndex
+doShieldAction = zoom game . framed $ shieldAction activePlayerIndex
 
 increaseSpeed :: ViewState ()
 increaseSpeed = game . gameSpeed %= succ'

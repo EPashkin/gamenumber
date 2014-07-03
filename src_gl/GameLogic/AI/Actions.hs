@@ -56,9 +56,9 @@ doAIAction (ReduceDefence _pos _ _ poses) playerInd
 doAIAction (Attack pos _) playerInd
     = attackCellAction pos playerInd
 doAIAction (ShieldCharge _) playerInd
-    = modify $ shieldAction playerInd
+    = shieldAction playerInd
 doAIAction ShieldActivate playerInd
-    = modify $ shieldAction playerInd
+    = shieldAction playerInd
 doAIAction _ _ = error "Wrong PossibleAction in GameLogic.AI.Actions.doAIAction"
 
 increaseCellAction :: WorldPos -> Int -> GameState ()
