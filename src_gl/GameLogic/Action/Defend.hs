@@ -3,39 +3,34 @@ module GameLogic.Action.Defend
     ) where
 
 import Control.Lens
-import Data.Maybe
+import Control.Conditional
 import GameLogic.Util
+import GameLogic.GameState
 import GameLogic.Data.Settings
 import GameLogic.Data.Cell
 import GameLogic.Data.World
 import GameLogic.Data.Game
+import GameLogic.Data.Players
 import GameLogic.Action.ModifyPlayer
 
 
-increaseCell :: WorldPos -> Int -> GameData -> GameData
-increaseCell pos playerInd game
-    = fromMaybe game $ increaseCellWithMax pos playerInd maxVal game
-    where maxVal = min maxCellValue $ calcSumOwnedNearest game playerInd pos
+increaseCell :: WorldPos -> Int -> GameState ()
+increaseCell pos playerInd = do
+    game <- get
+    let maxVal = min maxCellValue $ calcSumOwnedNearest game playerInd pos
+    fromMaybeState $ increaseCellWithMax pos playerInd maxVal
 
-increaseCellWithMax :: WorldPos -> Int -> Int -> GameData -> Maybe GameData
-increaseCellWithMax pos playerInd maxVal game
-      = updateGameCellWithCost pos playerInd game (increaseCellWithMax' maxVal)
-      >>= decreaseGamePlayerFree' playerInd
-      >>== increasePlayerNum 1 playerInd
+increaseCellWithMax :: WorldPos -> Int -> Int -> MaybeGameState ()
+increaseCellWithMax pos playerInd maxVal = do
+      cost <- zoom (cellOfGame pos) $ increaseCellWithMax' maxVal playerInd
+      decreaseGamePlayerFree playerInd cost
+      playerOfGame playerInd . num += 1
 
-increaseCellWithMax' :: Int -> Int -> Cell -> Maybe (Int, Cell)
-increaseCellWithMax' maxVal playerInd cell
-       | cell ^. playerIndex == playerInd
-       && cell ^. value < maxVal
-       = Just . (,) 1 $ cell & value +~ 1
-       | isFree cell
-       && maxVal >= 1
-       = Just . (,) 1 $ mkCell 1 playerInd
-       | otherwise
-       = Nothing
-
-updateGameCellWithCost :: WorldPos-> Int -> GameData -> (Int -> Cell -> Maybe (Int, Cell))
-      -> Maybe (Int, GameData)
-updateGameCellWithCost pos playerInd game action
-    = game ^? cellOfGame pos >>= action playerInd
-      >>= (\(val, cell) -> Just . (,) val $ game & cellOfGame pos .~ cell)
+increaseCellWithMax' :: Int -> Int -> StateT Cell Maybe Int
+increaseCellWithMax' maxVal playerInd
+   = condPlusM
+       [(gets (isOwnedBy playerInd) <&&> uses value (< maxVal)
+           , value += 1 >> return 1)
+       ,(gets isFree <&&> return (maxVal >= 1)
+           , put (mkCell 1 playerInd) >> return 1)
+       ]

@@ -33,6 +33,7 @@ library
                        containers,
                        mtl,
                        control-bool,
+                       cond,
                        bytestring,
                        binary,
                        lens

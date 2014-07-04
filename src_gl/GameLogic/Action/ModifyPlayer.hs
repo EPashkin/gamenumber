@@ -6,8 +6,9 @@ import GameLogic.Data.Players
 import GameLogic.GameState
 
 
-increasePlayerNum :: Int -> Int -> GameData -> GameData
-increasePlayerNum inc playerInd
+--TODO: remove when unused
+increasePlayerNum' :: Int -> Int -> GameData -> GameData
+increasePlayerNum' inc playerInd
     = playerOfGame playerInd . num +~ inc
 
 --TODO: remove when unused

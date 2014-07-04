@@ -29,7 +29,7 @@ setCenterPosLimited pos = do
 
 setCenterPos :: WorldAction
 setCenterPos pos = whenM (isPosInGame pos)
-    $ modify (set centerPos pos) >> doSelectCellAction pos
+    $ (centerPos .= pos) >> doSelectCellAction pos
 
 _traceTest :: WorldPos -> GameState ()
 _traceTest pos = do
@@ -80,5 +80,5 @@ doCellAction' :: Int -> WorldAction
 doCellAction' playerInd pos = do
     cell <- use $ cellOfGame pos
     ifThenElse (cell ^. playerIndex == playerInd || isFree cell)
-        (modify $ increaseCell pos playerInd)
+        (increaseCell pos playerInd)
         (modify $ attackCell pos playerInd)

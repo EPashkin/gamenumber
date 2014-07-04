@@ -63,7 +63,7 @@ doAIAction _ _ = error "Wrong PossibleAction in GameLogic.AI.Actions.doAIAction"
 
 increaseCellAction :: WorldPos -> Int -> GameState ()
 increaseCellAction pos playerInd
-    = modify (increaseCell pos playerInd) >> setSelectedPos pos playerInd
+    = increaseCell pos playerInd >> setSelectedPos pos playerInd
 
 defendCellAction :: [WorldPos] -> Int -> GameState ()
 defendCellAction poses playerInd = do
