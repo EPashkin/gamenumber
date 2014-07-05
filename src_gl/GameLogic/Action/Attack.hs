@@ -2,9 +2,10 @@ module GameLogic.Action.Attack
     ( attackCell
     ) where
 
-import Control.Lens
-import Data.Maybe
+import Control.Lens hiding ((<|), (|>))
+import Control.Conditional
 import GameLogic.Util
+import GameLogic.GameState
 import GameLogic.Data.Cell
 import GameLogic.Data.World
 import GameLogic.Data.Game
@@ -13,45 +14,47 @@ import GameLogic.Action.ModifyPlayer
 import GameLogic.Action.Shield
 
 
-attackCell :: WorldPos -> Int -> GameData -> GameData
-attackCell pos playerInd game
-    = fromMaybe game $ maybeAttackCell pos playerInd game
+attackCell :: WorldPos -> Int -> GameState ()
+attackCell pos playerInd
+    = fromMaybeState $ maybeAttackCell pos playerInd
 
-maybeAttackCell :: WorldPos -> Int -> GameData -> Maybe GameData
-maybeAttackCell pos playerInd game
-    | deltaStrength > 0 || (deltaStrength == 0 && sameStrength > ownerStrength)
-    = conquerCell pos playerInd game
-    | otherwise
-    = decreaseCell pos playerInd game
-    where (_, others, sameStrength, deltaStrength)
-              = calcStrengthsForPlayerEx game playerInd pos
-          ownerInd = game ^. cellOfGame pos . playerIndex
-          ownerStrength = getOtherStrength ownerInd others
+maybeAttackCell :: WorldPos -> Int -> MaybeGameState ()
+maybeAttackCell pos playerInd = do
+    (_, others, sameStrength, deltaStrength)
+        <- gets $ calcStrengthsForPlayer playerInd pos
+    ownerInd <- use $ cellOfGame pos . playerIndex
+    let ownerStrength = getOtherStrength ownerInd others
+    conquerCell pos playerInd
+        <| deltaStrength > 0 
+        || (deltaStrength == 0 && sameStrength > ownerStrength) |>
+        decreaseCell pos playerInd
 
-conquerCell :: WorldPos -> Int -> GameData -> Maybe GameData
-conquerCell pos playerInd game
-    = Just (1, game & cellOfGame pos .~ mkCell 1 playerInd)
-    >>= decreaseGamePlayerFree' playerInd
-    >>== increasePlayerNum' 1 playerInd
-    >>== increasePlayerNum' (-oldVal) oldPl
-    where oldCell = game ^. cellOfGame pos
-          oldPl = oldCell ^. playerIndex
-          oldVal = oldCell ^. value
+conquerCell :: WorldPos -> Int -> MaybeGameState ()
+conquerCell pos playerInd = do
+    oldCell <- use $ cellOfGame pos
+    let oldPl = oldCell ^. playerIndex
+    let oldVal = oldCell ^. value
+    cellOfGame pos .= mkCell 1 playerInd
+    decreaseGamePlayerFree playerInd 1
+    playerOfGame playerInd . num += 1
+    playerOfGame oldPl . num += (-oldVal)
 
-decreaseCell :: WorldPos -> Int -> GameData -> Maybe GameData
-decreaseCell pos playerInd game
-    = decreaseCellOrShield pos game
-    >>= decreaseGamePlayerFree' playerInd
+decreaseCell :: WorldPos -> Int -> MaybeGameState ()
+decreaseCell pos playerInd = do
+    cost <- decreaseCellOrShield pos
+    decreaseGamePlayerFree playerInd cost
 
-decreaseCellOrShield :: WorldPos -> GameData -> Maybe (Int, GameData)
-decreaseCellOrShield pos game
-    | isShieldWorking oldPl
-    = Just (2, game & playerOfGame oldPlInd . free -~ 1)
-    | otherwise
-    = Just (2, game & (cellOfGame pos %~ decreaseCell')
-      . increasePlayerNum' (-1) oldPlInd)
-    where oldPlInd = game ^. cellOfGame pos . playerIndex
-          oldPl = game ^. playerOfGame oldPlInd
+decreaseCellOrShield :: WorldPos -> MaybeGameState Int
+decreaseCellOrShield pos = do
+    oldPlInd <- use $ cellOfGame pos . playerIndex
+    oldPl <- use $ playerOfGame oldPlInd
+    playerOfGame oldPlInd . free -= 1
+        >> return 2
+        <| isShieldWorking oldPl |>
+        do
+            cellOfGame pos %= decreaseCell'
+            playerOfGame oldPlInd . num -= 1
+            return 2
 
 decreaseCell' :: Cell -> Cell
 decreaseCell' cell

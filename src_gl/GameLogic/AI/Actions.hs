@@ -79,4 +79,4 @@ reduceDefenceCellAction poses playerInd = do
 
 attackCellAction :: WorldPos -> Int -> GameState ()
 attackCellAction pos playerInd
-    = modify (attackCell pos playerInd) >> setSelectedPos pos playerInd
+    = attackCell pos playerInd >> setSelectedPos pos playerInd

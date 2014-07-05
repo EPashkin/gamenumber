@@ -15,6 +15,7 @@ import GameLogic.Data.Players
 import GameLogic.GameState
 
 
+--TODO: remove when unused
 infixl 1 >>==
 (>>==) :: Functor m => m a -> (a -> b) -> m b
 (>>==) ma f = fmap f ma 
@@ -80,17 +81,17 @@ updateCellList cells cell
                   [cell'] -> cell' & value %~ (+ (cell ^. value))
                   _ -> error "Wrong list in GameLogic.Util.updateCellList"
 
-type StrengthsEx = (Cell, [Cell], Int, Int)
+type Strengths = (Cell, [Cell], Int, Int)
 
-calcStrengthsForPlayerEx :: GameData -> Int -> WorldPos -> StrengthsEx
-calcStrengthsForPlayerEx game playerInd pos
+calcStrengthsForPlayer :: Int -> WorldPos -> GameData -> Strengths
+calcStrengthsForPlayer playerInd pos game
     = (same, others, sameStrength, deltaStrength)
-    where (same, others) = calcStrengthsForPlayer game playerInd pos
+    where (same, others) = calcStrengthsForPlayer' playerInd pos game
           sameStrength = same ^. value
           deltaStrength = getDeltaOtherStrength sameStrength others
 
-calcStrengthsForPlayer :: GameData -> Int -> WorldPos -> (Cell, [Cell])
-calcStrengthsForPlayer game playerInd pos
+calcStrengthsForPlayer' :: Int -> WorldPos -> GameData -> (Cell, [Cell])
+calcStrengthsForPlayer' playerInd pos game
     = (same', sortBy p others)
     where cells = calcSumAllNearest game pos
           (same, others) = partition (isOwnedBy playerInd) cells

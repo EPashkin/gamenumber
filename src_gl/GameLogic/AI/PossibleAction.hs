@@ -78,13 +78,13 @@ calcPossibleAction :: GameData -> Int -> Int -> WorldPos -> PossibleAction
 calcPossibleAction game playerInd free' pos
     = calcPossibleAction' pos cell strengths free'
         ownerPl defencePositions reduceDefencePositions
-    where strengths = calcStrengthsForPlayerEx game playerInd pos
+    where strengths = calcStrengthsForPlayer playerInd pos game
           cell = game ^. cellOfGame pos
           defencePositions = getDefencePositions game playerInd pos
           reduceDefencePositions = getReduceDefencePositions game pos
           ownerPl = game ^. playerOfGame (cell ^. playerIndex)
 
-calcPossibleAction' :: WorldPos -> Cell -> StrengthsEx -> Int -> Player
+calcPossibleAction' :: WorldPos -> Cell -> Strengths -> Int -> Player
     -> [WorldPos] -> [WorldPos] -> PossibleAction
 calcPossibleAction' pos cell (same, others, sameStrength, deltaStrength) free'
   ownerPl defencePositions reduceDefencePositions
@@ -160,7 +160,7 @@ canBeSafeIncreased game playerInd pos
     = False
     where cell = game ^. cellOfGame pos
           (_, _, sameStrength, deltaStrength)
-              = calcStrengthsForPlayerEx game playerInd pos
+              = calcStrengthsForPlayer playerInd pos game
 
 calcPossibleShieldAction :: GameData -> Int -> [PossibleAction]
 calcPossibleShieldAction game playerInd

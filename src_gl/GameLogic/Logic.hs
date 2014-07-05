@@ -81,4 +81,4 @@ doCellAction' playerInd pos = do
     cell <- use $ cellOfGame pos
     increaseCell pos playerInd
         <| cell ^. playerIndex == playerInd || isFree cell |>
-        modify $ attackCell pos playerInd
+        attackCell pos playerInd
