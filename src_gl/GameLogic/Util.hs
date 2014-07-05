@@ -6,7 +6,7 @@ module GameLogic.Util
 import Data.List
 import Data.Monoid as M ((<>))
 import Data.Function (on)
-import Control.Bool
+import Control.Conditional
 import Control.Lens
 import GameLogic.Data.Cell
 import GameLogic.Data.World

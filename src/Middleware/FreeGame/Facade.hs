@@ -7,7 +7,12 @@ module Middleware.FreeGame.Facade
     , rectangleSolid
     ) where
 
-import FreeGame as G
+import FreeGame as G hiding
+    ( (<||>)
+    , (<&&>)
+    , whenM
+    , unlessM
+    )
 
 emptyCellColor :: Color
 emptyCellColor = clr 100 100 100 255

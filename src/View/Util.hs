@@ -8,7 +8,7 @@ module View.Util
     ) where
 
 import Control.Lens
-import Control.Bool
+import Control.Conditional
 import GameLogic
 import View.Convert
 import View.ViewState
@@ -28,9 +28,9 @@ doWithWindowPos2 :: WorldAction -> PanelAction () -> WindowAction ()
 doWithWindowPos2 action panelAction pos@(x, y) = do
     (w, h) <- use windowSize
     let pos' = (x - worldShiftX - w/2, y - h/2)
-    ifThenElseM (inPanel pos)
-        (doWithWindowPosInPanel panelAction pos)
-        (doWithWindowPosInField action pos')
+    doWithWindowPosInPanel panelAction pos 
+        <<| inPanel pos |>>
+        doWithWindowPosInField action pos'
 
 doWithWindowPosOnGame :: WorldAction -> WindowGameAction ()
 doWithWindowPosOnGame action pos

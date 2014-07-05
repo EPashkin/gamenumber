@@ -17,8 +17,7 @@ executable gamenumber
   build-depends:       base >=4.6 && <4.7,
                        gamenumber,
                        mtl,
-                       AC-Boolean,
-                       control-bool,
+                       cond,
                        lens,
                        free,
                        free-game
@@ -32,7 +31,6 @@ library
                        array,
                        containers,
                        mtl,
-                       control-bool,
                        cond,
                        bytestring,
                        binary,

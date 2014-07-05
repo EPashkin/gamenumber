@@ -1,6 +1,6 @@
 module Application.Game.Logic where
 
-import qualified Data.Boolean as B
+import Control.Conditional
 import Middleware.FreeGame.Facade
 import View.ViewState
 import View.Logic
@@ -17,8 +17,8 @@ eventHandler = do
     whenM (keyDown KeyF1) doHelpPlayer
     whenM (keyDown KeyF2) doSave
     whenM (keyDown KeyF3) doLoad
-    whenM (keyDown KeyPadAdd B.|| keyDown KeyEqual) increaseSpeed
-    whenM (keyDown KeyPadSubtract B.|| keyDown KeyMinus) decreaseSpeed
+    whenM (keyDown KeyPadAdd <||> keyDown KeyEqual) increaseSpeed
+    whenM (keyDown KeyPadSubtract <||> keyDown KeyMinus) decreaseSpeed
 
 mouseEvents :: ViewState ()
 mouseEvents = do

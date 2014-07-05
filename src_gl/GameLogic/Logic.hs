@@ -7,8 +7,8 @@ module GameLogic.Logic
     ) where
 
 import Debug.Trace
-import Control.Lens
-import Control.Bool
+import Control.Lens hiding ((<|), (|>))
+import Control.Conditional
 import GameLogic.Data.Settings
 import GameLogic.Data.Cell
 import GameLogic.Data.World
@@ -79,6 +79,6 @@ doCellAction pos = whenM (isPosInGame pos)
 doCellAction' :: Int -> WorldAction
 doCellAction' playerInd pos = do
     cell <- use $ cellOfGame pos
-    ifThenElse (cell ^. playerIndex == playerInd || isFree cell)
-        (increaseCell pos playerInd)
-        (modify $ attackCell pos playerInd)
+    increaseCell pos playerInd
+        <| cell ^. playerIndex == playerInd || isFree cell |>
+        modify $ attackCell pos playerInd
