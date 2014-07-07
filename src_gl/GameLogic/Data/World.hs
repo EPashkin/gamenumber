@@ -3,6 +3,7 @@ module GameLogic.Data.World where
 
 import Data.Array
 import Control.Lens
+import Control.Applicative
 import GameLogic.Data.Cell
 
 
@@ -58,12 +59,12 @@ findPlayerPos playerInd
 isPosInWorld :: World -> WorldPos -> Bool
 isPosInWorld = inRange . bounds
 
-getNearestOwnedCells :: Int -> World -> WorldPos -> [(WorldPos, Cell)]
-getNearestOwnedCells playerInd world
-    = filter (isOwnedBy playerInd . snd) . getNearestCells world
+getNearestOwnedCells :: Int -> WorldPos -> World -> [(WorldPos, Cell)]
+getNearestOwnedCells playerInd pos
+    = filter (isOwnedBy playerInd . snd) . getNearestCells pos
 
-getNearestCells :: World -> WorldPos -> [(WorldPos, Cell)]
-getNearestCells world = fmap p . getNearestWorldPoses world
+getNearestCells :: WorldPos -> World -> [(WorldPos, Cell)]
+getNearestCells pos world = p <$> getNearestWorldPoses world pos
     where p pos' = (pos', cell)
             where cell = world ^. toCell pos'
 

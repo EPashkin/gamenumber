@@ -56,14 +56,14 @@ limitPosToWorld' (x, y) size
     | otherwise
     = (x,y)
 
-calcSumOwnedNearest :: GameData -> Int -> WorldPos -> Int
-calcSumOwnedNearest game playerInd
-    = foldl p 0 . getNearestOwnedCells playerInd (view world game)
+calcSumOwnedNearest :: Int -> WorldPos -> GameData -> Int
+calcSumOwnedNearest playerInd pos
+    = foldl p 0 . getNearestOwnedCells playerInd pos . view world
     where p acc val = (+) acc $ (view value . snd) val
 
-calcSumAllNearest :: GameData -> WorldPos -> [Cell]
-calcSumAllNearest game
-    = foldl p [] . getNearestCells (view world game)
+calcSumAllNearest :: WorldPos -> GameData -> [Cell]
+calcSumAllNearest pos
+    = foldl p [] . getNearestCells pos . view world
     where p acc = updateCellList acc . snd
 
 updateCellList :: [Cell] -> Cell -> [Cell]
@@ -93,7 +93,7 @@ calcStrengthsForPlayer playerInd pos game
 calcStrengthsForPlayer' :: Int -> WorldPos -> GameData -> (Cell, [Cell])
 calcStrengthsForPlayer' playerInd pos game
     = (same', sortBy p others)
-    where cells = calcSumAllNearest game pos
+    where cells = calcSumAllNearest pos game
           (same, others) = partition (isOwnedBy playerInd) cells
           same' = case same of
                   [] -> mkCell 0 playerInd

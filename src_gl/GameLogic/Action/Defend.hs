@@ -16,8 +16,8 @@ import GameLogic.Action.ModifyPlayer
 
 increaseCell :: WorldPos -> Int -> GameState ()
 increaseCell pos playerInd = do
-    game <- get
-    let maxVal = min maxCellValue $ calcSumOwnedNearest game playerInd pos
+    strength <- gets $ calcSumOwnedNearest playerInd pos
+    let maxVal = min maxCellValue strength
     fromMaybeState $ increaseCellWithMax pos playerInd maxVal
 
 increaseCellWithMax :: WorldPos -> Int -> Int -> MaybeGameState ()
