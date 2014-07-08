@@ -15,27 +15,9 @@ import GameLogic.Data.Players
 import GameLogic.GameState
 
 
---TODO: remove when unused
-infixl 1 >>==
-(>>==) :: Functor m => m a -> (a -> b) -> m b
-(>>==) ma f = fmap f ma 
-
---TODO: remove when unused
-iif :: (a -> Bool) -> (a -> a) -> a -> a
-iif bf f val = if bf val then f val else val
-
 setSelectedPos :: WorldPos -> Int -> GameState()
 setSelectedPos pos playerInd = whenM (isPosInGame pos)
     $ playerOfGame playerInd . selectedPos .= pos
-
---TODO: remove when unused
-setSelectedPos' :: WorldPos -> Int -> GameData -> GameData
-setSelectedPos' pos playerInd = iif (isPosInGame' pos)
-    $ playerOfGame playerInd . selectedPos .~ pos
-
---TODO: remove when unused
-isPosInGame' :: WorldPos -> GameData -> Bool
-isPosInGame' pos = (`isPosInWorld` pos) . view world
 
 isPosInGame :: WorldPos -> GameState Bool
 isPosInGame pos = uses world (`isPosInWorld` pos)
