@@ -4,11 +4,7 @@ module GameLogic.StartLogic
 
 import System.Random
 import Control.Lens
-import GameLogic.Data.Settings
-import GameLogic.Data.Cell
-import GameLogic.Data.World
-import GameLogic.Data.Players (mkPlayers)
-import GameLogic.Data.Game (GameData, mkGameDef)
+import GameLogic.Data.Facade
 import GameLogic.Util.Shuffle
 
 

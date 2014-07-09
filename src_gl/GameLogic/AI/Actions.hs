@@ -4,12 +4,9 @@ module GameLogic.AI.Actions
 
 import Data.List (find)
 import Control.Lens
-import GameLogic.Data.World
-import GameLogic.Data.Game
-import GameLogic.Data.Players
+import GameLogic.Data.Facade
 import GameLogic.Util
 import GameLogic.Util.RandomState
-import GameLogic.GameState
 import GameLogic.AI.PossibleAction
 import GameLogic.Action.Attack
 import GameLogic.Action.Defend

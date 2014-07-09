@@ -5,12 +5,7 @@ module GameLogic.Action.Defend
 import Control.Lens
 import Control.Conditional
 import GameLogic.Util
-import GameLogic.GameState
-import GameLogic.Data.Settings
-import GameLogic.Data.Cell
-import GameLogic.Data.World
-import GameLogic.Data.Game
-import GameLogic.Data.Players
+import GameLogic.Data.Facade
 import GameLogic.Action.ModifyPlayer
 
 

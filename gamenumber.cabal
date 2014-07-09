@@ -39,23 +39,24 @@ library
   default-language:    Haskell2010
   ghc-options:         -O2
   exposed-modules:     GameLogic
-  other-modules:       GameLogic.Logic
-                       GameLogic.StartLogic
-                       GameLogic.GameState
-                       GameLogic.Util
-                       GameLogic.Data.Facade
-                       GameLogic.Data.Cell
-                       GameLogic.Data.Game
-                       GameLogic.Data.Players
-                       GameLogic.Data.Settings
-                       GameLogic.Data.World
-                       GameLogic.AI.Actions
-                       GameLogic.AI.PossibleAction
-                       GameLogic.Action.Attack
-                       GameLogic.Action.Defend
-                       GameLogic.Action.ModifyPlayer
-                       GameLogic.Action.Shield
-                       GameLogic.Util.Shuffle
+  other-modules:       
+                       GameLogic.Logic,
+                       GameLogic.StartLogic,
+                       GameLogic.Util,
+                       GameLogic.Data.Facade,
+                       GameLogic.Data.Cell,
+                       GameLogic.Data.Game,
+                       GameLogic.Data.Players,
+                       GameLogic.Data.Settings,
+                       GameLogic.Data.World,
+                       GameLogic.Data.GameState,
+                       GameLogic.AI.Actions,
+                       GameLogic.AI.PossibleAction,
+                       GameLogic.Action.Attack,
+                       GameLogic.Action.Defend,
+                       GameLogic.Action.ModifyPlayer,
+                       GameLogic.Action.Shield,
+                       GameLogic.Util.Shuffle,
                        GameLogic.Util.RandomState
 
 source-repository head

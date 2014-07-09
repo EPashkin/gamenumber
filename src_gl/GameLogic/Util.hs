@@ -8,11 +8,7 @@ import Data.Monoid as M ((<>))
 import Data.Function (on)
 import Control.Conditional
 import Control.Lens
-import GameLogic.Data.Cell
-import GameLogic.Data.World
-import GameLogic.Data.Game
-import GameLogic.Data.Players
-import GameLogic.GameState
+import GameLogic.Data.Facade
 
 
 setSelectedPos :: WorldPos -> Int -> GameState()

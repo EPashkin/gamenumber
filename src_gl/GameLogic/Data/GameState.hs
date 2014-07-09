@@ -1,6 +1,6 @@
-module GameLogic.GameState
+module GameLogic.Data.GameState
     ( module ST
-    , module GameLogic.GameState
+    , module GameLogic.Data.GameState
     ) where
 
 import Data.Maybe

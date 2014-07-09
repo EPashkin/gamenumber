@@ -1,9 +1,7 @@
 module GameLogic.Action.ModifyPlayer where
 
 import Control.Lens
-import GameLogic.Data.Game
-import GameLogic.Data.Players
-import GameLogic.GameState
+import GameLogic.Data.Facade
 
 
 decreaseGamePlayerFree :: Int -> Int -> MaybeGameState ()

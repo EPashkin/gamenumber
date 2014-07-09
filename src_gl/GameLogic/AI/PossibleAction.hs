@@ -6,11 +6,7 @@ module GameLogic.AI.PossibleAction
     ) where
 
 import Control.Lens
-import GameLogic.Data.Settings
-import GameLogic.Data.Cell
-import GameLogic.Data.World
-import GameLogic.Data.Game
-import GameLogic.Data.Players
+import GameLogic.Data.Facade
 import GameLogic.Util
 import GameLogic.Action.Shield
 

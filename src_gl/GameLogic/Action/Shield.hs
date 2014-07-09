@@ -4,11 +4,8 @@ module GameLogic.Action.Shield
     ) where
 
 import Control.Lens
-import GameLogic.Data.Settings
-import GameLogic.Data.Game
-import GameLogic.Data.Players
+import GameLogic.Data.Facade
 import GameLogic.Action.ModifyPlayer
-import GameLogic.GameState
 
 
 shieldAction :: Int -> GameState ()
