@@ -18,7 +18,7 @@ runEnvironment ticksPerSecond info
     = runGame Resizable (Box (V2 0 0) (V2 800 550)) $ do
         setTitle "GameNumber"
         clearColor black
-        setFPS ticksPerSecond
+        setFPS $ fromIntegral ticksPerSecond
         gameLoop info
 
 gameLoop :: EnvironmentInfo -> Game ()
