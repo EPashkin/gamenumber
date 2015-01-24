@@ -12,9 +12,16 @@ build-type:          Simple
 extra-source-files:  README.md
 cabal-version:       >=1.10
 
+Flag Freegame
+  Description:         Enable building free-game executable
+  Default:             True
+
 executable gamenumber
   main-is:             Main.hs
-  build-depends:       base >=4.6,
+  if !flag(Freegame)
+    buildable:         False
+  else
+    build-depends:     base >=4.6,
                        gamenumber,
                        mtl,
                        cond,
