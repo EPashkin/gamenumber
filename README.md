@@ -49,3 +49,11 @@ Shield protects players cell from attacks for cost of free points.
 Shield must be charged up to 128 and then activated.
 
 Activated shield can be disabled to accumulate free points and then turned back on without spending free points.
+
+Package info
+----
+Package contains two executables:
+
+- gamenumber_fg using free-game graphics engine
+- gamenumber_gl using gloss
+
