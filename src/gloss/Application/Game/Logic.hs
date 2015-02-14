@@ -25,6 +25,12 @@ eventHandler (EventKey key keyState mods pos) state
     | SpecialKey KeyF3 == key
     , Down == keyState
     = doLoad state
+    | SpecialKey KeyPadAdd == key || Char '=' == key
+    , Down == keyState
+    = return $ increaseSpeed state
+    | SpecialKey KeyPadSubtract == key || Char '-' == key
+    , Down == keyState
+    = return $ decreaseSpeed state
     | Char 'p' == key
     , Down == keyState
     = return $ doChangePaused state

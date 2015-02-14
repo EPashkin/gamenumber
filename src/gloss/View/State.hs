@@ -69,6 +69,16 @@ doChangePaused = game . paused %~ not
 doShieldAction :: ViewData -> ViewData
 doShieldAction state = state & game %~ execState (shieldAction activePlayerIndex)
 
+increaseSpeed :: ViewData -> ViewData
+increaseSpeed = game . gameSpeed %~ succ'
+    where succ' gs = if gs == maxBound then gs
+                     else succ gs
+
+decreaseSpeed :: ViewData -> ViewData
+decreaseSpeed = game . gameSpeed %~ pred'
+    where pred' gs = if gs == minBound then gs
+                     else pred gs
+
 doWithWindowPosOnGame :: WorldAction -> (Float, Float) -> GameData-> GameData
 doWithWindowPosOnGame action pos game = execState (action pos') game
     where pos' = worldPosOfWindowPos game pos
