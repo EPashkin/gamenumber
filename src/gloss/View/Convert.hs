@@ -21,8 +21,8 @@ windowPosOfWorldPos game pos =
        yf = (fromIntegral (snd (pos - centerPos')) - 0.5) * drawScale
    in (xf, yf)
 
-worldPosOfWindowPos :: GameData -> (Coord, Coord) -> WorldPos
-worldPosOfWindowPos game (x, y) =
+worldPosOfWindowPos :: (Coord, Coord) -> GameData -> WorldPos
+worldPosOfWindowPos (x, y) game =
    let centerPos' = view centerPos game
        xi = floor (x / drawScale + 0.5) + fst centerPos'
        yi = floor (y / drawScale + 0.5) + snd centerPos'

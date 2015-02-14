@@ -94,13 +94,11 @@ decreaseSpeed = game . gameSpeed %~ pred'
                      else pred gs
 
 doWithWindowPosOnGame :: WorldAction -> WindowGameAction ()
-doWithWindowPosOnGame action pos = do
-    g <- get
-    let pos' = worldPosOfWindowPos g pos
-    action pos'
+doWithWindowPosOnGame action pos = gets (worldPosOfWindowPos pos) >>= action
 
 doWithWindowPosInField :: WorldAction -> WindowAction ()
-doWithWindowPosInField action pos = game %~ execState (doWithWindowPosOnGame action pos)
+doWithWindowPosInField action pos =
+    game %~ execState (doWithWindowPosOnGame action pos)
 
 doWithWindowPos :: WorldAction -> WindowAction ()
 doWithWindowPos action pos@(x, y) state
