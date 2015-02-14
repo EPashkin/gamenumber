@@ -11,6 +11,8 @@ category:            Game
 build-type:          Simple
 extra-source-files:  README.md
 cabal-version:       >=1.10
+data-dir:            Data
+data-files:          VL-PGothic-Regular.ttf
 
 Flag Freegame
   Description:         Enable building free-game executable
