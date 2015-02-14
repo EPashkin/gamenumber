@@ -16,7 +16,7 @@ data-files:          VL-PGothic-Regular.ttf
 
 Flag Freegame
   Description:         Enable building free-game executable
-  Default:             False
+  Default:             True
 
 Flag Gloss
   Description:         Enable building gloss executable
