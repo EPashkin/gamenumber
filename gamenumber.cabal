@@ -16,7 +16,7 @@ Flag Freegame
   Description:         Enable building free-game executable
   Default:             True
 
-executable gamenumber
+executable gamenumber_fg
   main-is:             Main.hs
   if !flag(Freegame)
     buildable:         False
@@ -28,7 +28,7 @@ executable gamenumber
                        lens,
                        free,
                        free-game >=1.1.80
-  hs-source-dirs:      src
+  hs-source-dirs:      src/freegame
   default-language:    Haskell2010
   ghc-options:         -O2 -threaded
 
