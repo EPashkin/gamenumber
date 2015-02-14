@@ -42,7 +42,7 @@ library
                        bytestring,
                        binary,
                        lens
-  hs-source-dirs:      src_gl
+  hs-source-dirs:      src/lib
   default-language:    Haskell2010
   ghc-options:         -O2
   exposed-modules:     GameLogic
