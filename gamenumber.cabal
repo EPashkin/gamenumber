@@ -16,6 +16,10 @@ data-files:          VL-PGothic-Regular.ttf
 
 Flag Freegame
   Description:         Enable building free-game executable
+  Default:             False
+
+Flag Gloss
+  Description:         Enable building gloss executable
   Default:             True
 
 executable gamenumber_fg
@@ -31,6 +35,25 @@ executable gamenumber_fg
                        free,
                        free-game >=1.1.80
   hs-source-dirs:      src/freegame
+  default-language:    Haskell2010
+  ghc-options:         -O2 -threaded
+
+executable gamenumber_gl
+  main-is:             Main.hs
+  if !flag(Gloss)
+    buildable:         False
+  else
+    build-depends:     base >=4.6,
+                       gamenumber,
+                       mtl,
+                       cond,
+                       lens,
+                       random,
+                       array,
+                       binary,
+                       containers,
+                       gloss
+  hs-source-dirs:      src/gloss
   default-language:    Haskell2010
   ghc-options:         -O2 -threaded
 
