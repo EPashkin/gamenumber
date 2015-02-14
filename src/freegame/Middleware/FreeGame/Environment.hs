@@ -16,7 +16,7 @@ data EnvironmentInfo = EnvironmentInfo
 runEnvironment :: Int -> EnvironmentInfo -> IO (Maybe ())
 runEnvironment ticksPerSecond info
     = runGame Resizable (Box (V2 0 0) (V2 800 550)) $ do
-        setTitle "GameNumber"
+        setTitle "GameNumber on free-game"
         clearColor black
         setFPS $ fromIntegral ticksPerSecond
         gameLoop info
