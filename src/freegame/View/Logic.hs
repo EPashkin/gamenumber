@@ -7,6 +7,7 @@ import GameLogic
 import View.Convert
 import View.ViewState
 import View.Util
+import Paths_gamenumber
 
 
 runGameStep :: ViewState ()
@@ -39,11 +40,23 @@ drawing = doWithWindowPos doSelectCellAction
 updateWindowSize :: WindowAction ()
 updateWindowSize = (.=) windowSize
 
+saveFileName :: IO FilePath
+saveFileName = getDataFileName "gamenumber.gn"
+
 doSave :: ViewState ()
-doSave = zoom game $ get >>= liftIO . doSaveGame "gamenumber.gn"
+doSave = zoom game $ do
+    g <- get
+    liftIO $ do
+        fileName <- saveFileName
+        doSaveGame fileName g
 
 doLoad :: ViewState ()
-doLoad = zoom game $ get >>= liftIO . doLoadGame "gamenumber.gn" >>= put
+doLoad = zoom game $ do
+    g <- get
+    g' <- liftIO $ do
+        fileName <- saveFileName
+        doLoadGame fileName g
+    put g'
 
 doHelpPlayer :: ViewState ()
 doHelpPlayer = zoom game . framed $ helpPlayer activePlayerIndex
