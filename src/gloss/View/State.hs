@@ -6,6 +6,8 @@ import Control.Lens
 import Middleware.Gloss.Facade (Picture)
 import GameLogic
 import View.Convert
+import Paths_gamenumber
+
 
 data ViewData = ViewData { _game :: GameData
                    , _windowSize :: (Int, Int) -- current window size
@@ -62,15 +64,20 @@ drawing = doWithWindowPos doSelectCellAction
 updateWindowSize :: (Int, Int) -> ViewAction
 updateWindowSize = set windowSize
 
+saveFileName :: IO FilePath
+saveFileName = getDataFileName "gamenumber.gn"
+
 doSave :: ViewActionIO
 doSave state = do 
-    doSaveGame "gamenumber.gn" $ state ^. game
+    fileName <- saveFileName
+    doSaveGame fileName $ state ^. game
     return state
 
 doLoad :: ViewActionIO
 doLoad state = do
     let g = state ^. game
-    g' <- doLoadGame "gamenumber.gn" g
+    fileName <- saveFileName
+    g' <- doLoadGame fileName g
     return $ set game g' state
 
 doHelpPlayer :: ViewAction
