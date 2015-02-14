@@ -10,7 +10,7 @@ import Middleware.Gloss.Facade
 
 --TODO: Pause checkbox
 --TODO: Collapsible panel
-drawPanel :: State -> Picture
+drawPanel :: ViewData -> Picture
 drawPanel state =
     let size = state ^. windowSize
         width = fromIntegral $ fst size
@@ -28,7 +28,7 @@ drawPanel state =
     in Translate shiftX 0 $ Pictures [rect, positionPic, playersPict, miniMapPict
                                      , pausedPict]
 
-drawPosition :: State -> Picture
+drawPosition :: ViewData -> Picture
 drawPosition state
     = Color black $ Scale panelTextScale panelTextScale $ Text str
     where str = "Position: " ++ show x ++ "x" ++ show y
@@ -78,7 +78,7 @@ aggrText player
     = ""
     where aggro = player ^. aggr
 
-drawPaused :: State -> Picture
+drawPaused :: ViewData -> Picture
 drawPaused state
     | state ^. game . paused
     = Color black $ drawInfoText "PAUSED"

@@ -11,78 +11,78 @@ import GameLogic.Action.ModifyPlayer
 import GameLogic.Action.Shield
 import View.Convert
 
-data State = State { _game :: Game
+data ViewData = ViewData { _game :: Game
                    , _windowSize :: (Int, Int) -- current window size
                    }
   deriving (Show)
   
-makeLenses ''State
+makeLenses ''ViewData
 
-newState :: IO State
+newState :: IO ViewData
 newState = do
     --runStartupTest
     game <- newGame
-    return $ State game (100, 100)
+    return $ ViewData game (100, 100)
 
 runStartupTest = do
     traceIO "Testing"
     traceIO . show $ getNearestPoses (2,3)
 
-runGameStep :: Float -> State -> IO State
+runGameStep :: Float -> ViewData -> IO ViewData
 runGameStep _ = return . over game doGameStep
 
-startPlacement :: (Float, Float) -> State -> State
+startPlacement :: (Float, Float) -> ViewData -> ViewData
 startPlacement pos = set placementModeOfGame True . doWithWindowPos doSelectCellAction pos
 
-stopPlacement :: State -> State
+stopPlacement :: ViewData -> ViewData
 stopPlacement = set placementModeOfGame False
 
-inPlacementMode :: State -> Bool
+inPlacementMode :: ViewData -> Bool
 inPlacementMode = view placementModeOfGame 
 
-placementModeOfGame :: Lens' State Bool
+placementModeOfGame :: Lens' ViewData Bool
 placementModeOfGame = game . placementMode
 
-centering :: (Float, Float) -> State -> State
+centering :: (Float, Float) -> ViewData -> ViewData
 centering = doWithWindowPos setCenterPosLimited
 
-drawing :: (Float, Float) -> State -> State
+drawing :: (Float, Float) -> ViewData -> ViewData
 drawing = doWithWindowPos doSelectCellAction
 
-updateWindowSize :: (Int, Int) -> State -> State
+updateWindowSize :: (Int, Int) -> ViewData -> ViewData
 updateWindowSize = set windowSize
 
-doSave :: State -> IO State
+doSave :: ViewData -> IO ViewData
 doSave state = do 
     doSaveGame "gamenumber.gn" $ state ^. game
     return state
 
-doLoad :: State -> IO State
+doLoad :: ViewData -> IO ViewData
 doLoad state = do
     let g = state ^. game
     g' <- doLoadGame "gamenumber.gn" g
     return $ set game g' state
 
-doHelpPlayer :: State -> State
+doHelpPlayer :: ViewData -> ViewData
 doHelpPlayer state
     = state & game .~ g'
     where g = state ^. game
           Just g' = decreaseGamePlayerFree activePlayerIndex (-10, g)
 
-doChangePaused :: State -> State
+doChangePaused :: ViewData -> ViewData
 doChangePaused = game . paused %~ not
 
-doShieldAction :: State -> State
+doShieldAction :: ViewData -> ViewData
 doShieldAction state = state & game %~ shieldAction activePlayerIndex
 
 doWithWindowPosOnGame :: (WorldPos -> Game -> Game) -> (Float, Float) -> Game-> Game
 doWithWindowPosOnGame action pos game = action pos' game
     where pos' = worldPosOfWindowPos game pos
 
-doWithWindowPosInField :: (WorldPos -> Game -> Game) -> (Float, Float) -> State -> State
+doWithWindowPosInField :: (WorldPos -> Game -> Game) -> (Float, Float) -> ViewData -> ViewData
 doWithWindowPosInField action pos = game %~ doWithWindowPosOnGame action pos
 
-doWithWindowPos :: (WorldPos -> Game-> Game) -> (Float, Float) -> State -> State
+doWithWindowPos :: (WorldPos -> Game-> Game) -> (Float, Float) -> ViewData -> ViewData
 doWithWindowPos action pos@(x, y) state
     | inPanel pos state
     = state
@@ -90,10 +90,10 @@ doWithWindowPos action pos@(x, y) state
     = doWithWindowPosInField action pos' state
     where pos' = (x - worldShiftX, y)
 
-inPanel :: (Float, Float) -> State -> Bool
+inPanel :: (Float, Float) -> ViewData -> Bool
 inPanel (x, y) state = x >= panelLeftX state
 
-panelLeftX :: State -> Float
+panelLeftX :: ViewData -> Float
 panelLeftX state = width/2 - panelWidth
     where size = state ^. windowSize
           width = fromIntegral $ fst size

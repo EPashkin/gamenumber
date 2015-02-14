@@ -10,7 +10,7 @@ import GameLogic.Data.Facade
 import GameLogic.Util
 import Middleware.Gloss.Facade
 
-drawState :: State -> IO Picture
+drawState :: ViewData -> IO Picture
 drawState state = do 
   let visibleR = visibleRange state
   world <- drawGame visibleR $ state ^. game
@@ -78,7 +78,7 @@ translateCell (x,y) pict =
        yy = (fromIntegral y - 0.5) * drawScale
    in Translate xx yy pict
 
-visibleRange :: State -> (WorldPos, WorldPos)
+visibleRange :: ViewData -> (WorldPos, WorldPos)
 visibleRange state = ((minX, minY), (maxX, maxY))
     where game' = state ^. game
           Just pl = game' ^? players. ix activePlayerIndex
