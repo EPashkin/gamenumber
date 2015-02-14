@@ -14,7 +14,9 @@ data ViewData = ViewData { _game :: GameData
   
 makeLenses ''ViewData
 
-type WindowAction = (Coord, Coord) -> ViewData -> ViewData
+type ViewAction = ViewData -> ViewData
+type ViewActionIO = ViewData -> IO ViewData
+type WindowAction a = (Coord, Coord) -> ViewAction
 type WindowGameAction a = (Coord, Coord) -> GameState a
 type PanelAction a = Coord -> WindowGameAction a
 
@@ -28,13 +30,13 @@ runStartupTest = do
     traceIO "Testing"
     traceIO . show $ getNearestPoses (2,3)
 
-runGameStep :: Float -> ViewData -> IO ViewData
+runGameStep :: Float -> ViewActionIO
 runGameStep _ = return . over game (execState doGameStep)
 
-startPlacement :: (Float, Float) -> ViewData -> ViewData
+startPlacement :: WindowAction ()
 startPlacement pos = set placementModeOfGame True . doWithWindowPos doSelectCellAction pos
 
-stopPlacement :: ViewData -> ViewData
+stopPlacement :: ViewAction
 stopPlacement = set placementModeOfGame False
 
 inPlacementMode :: ViewData -> Bool
@@ -43,7 +45,7 @@ inPlacementMode = view placementModeOfGame
 placementModeOfGame :: Lens' ViewData Bool
 placementModeOfGame = game . placementMode
 
-centering :: (Float, Float) -> ViewData -> ViewData
+centering :: WindowAction ()
 centering = doWithWindowPos2 setCenterPosLimited setCenterPosByMiniMap
 
 setCenterPosByMiniMap :: PanelAction ()
@@ -54,51 +56,53 @@ setCenterPosByMiniMap height (x, y) =
 setCenterPosOnMiniMap :: WindowGameAction ()
 setCenterPosOnMiniMap (x, y) = setCenterPos (floor x, floor y)
 
-drawing :: (Float, Float) -> ViewData -> ViewData
+drawing :: WindowAction ()
 drawing = doWithWindowPos doSelectCellAction
 
-updateWindowSize :: (Int, Int) -> ViewData -> ViewData
+updateWindowSize :: (Int, Int) -> ViewAction
 updateWindowSize = set windowSize
 
-doSave :: ViewData -> IO ViewData
+doSave :: ViewActionIO
 doSave state = do 
     doSaveGame "gamenumber.gn" $ state ^. game
     return state
 
-doLoad :: ViewData -> IO ViewData
+doLoad :: ViewActionIO
 doLoad state = do
     let g = state ^. game
     g' <- doLoadGame "gamenumber.gn" g
     return $ set game g' state
 
-doHelpPlayer :: ViewData -> ViewData
+doHelpPlayer :: ViewAction
 doHelpPlayer state
     = state & game %~ execState (helpPlayer activePlayerIndex)
 
-doChangePaused :: ViewData -> ViewData
+doChangePaused :: ViewAction
 doChangePaused = game . paused %~ not
 
-doShieldAction :: ViewData -> ViewData
+doShieldAction :: ViewAction
 doShieldAction state = state & game %~ execState (shieldAction activePlayerIndex)
 
-increaseSpeed :: ViewData -> ViewData
+increaseSpeed :: ViewAction
 increaseSpeed = game . gameSpeed %~ succ'
     where succ' gs = if gs == maxBound then gs
                      else succ gs
 
-decreaseSpeed :: ViewData -> ViewData
+decreaseSpeed :: ViewAction
 decreaseSpeed = game . gameSpeed %~ pred'
     where pred' gs = if gs == minBound then gs
                      else pred gs
 
-doWithWindowPosOnGame :: WorldAction -> (Float, Float) -> GameData-> GameData
-doWithWindowPosOnGame action pos game = execState (action pos') game
-    where pos' = worldPosOfWindowPos game pos
+doWithWindowPosOnGame :: WorldAction -> WindowGameAction ()
+doWithWindowPosOnGame action pos = do
+    g <- get
+    let pos' = worldPosOfWindowPos g pos
+    action pos'
 
-doWithWindowPosInField :: WorldAction -> WindowAction
-doWithWindowPosInField action pos = game %~ doWithWindowPosOnGame action pos
+doWithWindowPosInField :: WorldAction -> WindowAction ()
+doWithWindowPosInField action pos = game %~ execState (doWithWindowPosOnGame action pos)
 
-doWithWindowPos :: WorldAction -> WindowAction
+doWithWindowPos :: WorldAction -> WindowAction ()
 doWithWindowPos action pos@(x, y) state
     | inPanel pos state
     = state
@@ -106,7 +110,7 @@ doWithWindowPos action pos@(x, y) state
     = doWithWindowPosInField action pos' state
     where pos' = (x - worldShiftX, y)
 
-doWithWindowPos2 :: WorldAction -> PanelAction () -> WindowAction
+doWithWindowPos2 :: WorldAction -> PanelAction () -> WindowAction ()
 doWithWindowPos2 action panelAction pos@(x, y) state
     | inPanel pos state
     = doWithWindowPosInPanel panelAction pos state
@@ -115,19 +119,19 @@ doWithWindowPos2 action panelAction pos@(x, y) state
     where (w, h) = view windowSize state
           pos' = (x - worldShiftX, y)
 
-doWithWindowPosInPanel :: PanelAction () -> WindowAction
+doWithWindowPosInPanel :: PanelAction () -> WindowAction ()
 doWithWindowPosInPanel panelAction (x, y) state =
     state & game %~ f
     where x' = x - panelLeftX state
           (_, h) = state ^. windowSize
           f = execState $ panelAction (fromIntegral h) (x', y)
 
-inPanel :: (Float, Float) -> ViewData -> Bool
+inPanel :: (Coord, Coord) -> ViewData -> Bool
 inPanel (x, y) state = x >= panelLeftX state
 
-panelLeftX :: ViewData -> Float
+panelLeftX :: ViewData -> Coord
 panelLeftX state = width/2 - panelWidth
     where size = state ^. windowSize
           width = fromIntegral $ fst size
 
-worldShiftX = - panelWidth / 2 :: Float
+worldShiftX = - panelWidth / 2 :: Coord
