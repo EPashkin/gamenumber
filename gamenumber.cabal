@@ -48,10 +48,6 @@ executable gamenumber_gl
                        mtl,
                        cond,
                        lens,
-                       random,
-                       array,
-                       binary,
-                       containers,
                        gloss
   hs-source-dirs:      src/gloss
   default-language:    Haskell2010

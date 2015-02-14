@@ -1,7 +1,7 @@
 module View.Convert where
 
 import Control.Lens
-import GameLogic.Data.Facade
+import GameLogic
 
 --TODO: config
 drawScale = 8 * 4 :: Float
@@ -12,14 +12,14 @@ playerInfoWidth = panelWidth*0.9
 playerInfoHeight = 20 :: Float
 mapSize = 64 :: Float
 
-windowPosOfWorldPos :: Game -> WorldPos -> (Float, Float)
+windowPosOfWorldPos :: GameData -> WorldPos -> (Float, Float)
 windowPosOfWorldPos game pos =
    let centerPos' = view centerPos game
        xf = (fromIntegral (fst (pos - centerPos')) - 0.5) * drawScale
        yf = (fromIntegral (snd (pos - centerPos')) - 0.5) * drawScale
    in (xf, yf)
 
-worldPosOfWindowPos :: Game -> (Float, Float) -> WorldPos
+worldPosOfWindowPos :: GameData -> (Float, Float) -> WorldPos
 worldPosOfWindowPos game (x, y) =
    let centerPos' = view centerPos game
        xi = floor (x / drawScale + 0.5) + fst centerPos'

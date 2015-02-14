@@ -4,14 +4,10 @@ module View.State where
 import Debug.Trace
 import Control.Lens
 import Middleware.Gloss.Facade (Picture)
-import GameLogic.Data.Facade
-import GameLogic.Logic
-import GameLogic.StartLogic
-import GameLogic.Action.ModifyPlayer
-import GameLogic.Action.Shield
+import GameLogic
 import View.Convert
 
-data ViewData = ViewData { _game :: Game
+data ViewData = ViewData { _game :: GameData
                    , _windowSize :: (Int, Int) -- current window size
                    }
   deriving (Show)
@@ -29,7 +25,7 @@ runStartupTest = do
     traceIO . show $ getNearestPoses (2,3)
 
 runGameStep :: Float -> ViewData -> IO ViewData
-runGameStep _ = return . over game doGameStep
+runGameStep _ = return . over game (execState doGameStep)
 
 startPlacement :: (Float, Float) -> ViewData -> ViewData
 startPlacement pos = set placementModeOfGame True . doWithWindowPos doSelectCellAction pos
@@ -65,24 +61,22 @@ doLoad state = do
 
 doHelpPlayer :: ViewData -> ViewData
 doHelpPlayer state
-    = state & game .~ g'
-    where g = state ^. game
-          Just g' = decreaseGamePlayerFree activePlayerIndex (-10, g)
+    = state & game %~ execState (helpPlayer activePlayerIndex)
 
 doChangePaused :: ViewData -> ViewData
 doChangePaused = game . paused %~ not
 
 doShieldAction :: ViewData -> ViewData
-doShieldAction state = state & game %~ shieldAction activePlayerIndex
+doShieldAction state = state & game %~ execState (shieldAction activePlayerIndex)
 
-doWithWindowPosOnGame :: (WorldPos -> Game -> Game) -> (Float, Float) -> Game-> Game
-doWithWindowPosOnGame action pos game = action pos' game
+doWithWindowPosOnGame :: WorldAction -> (Float, Float) -> GameData-> GameData
+doWithWindowPosOnGame action pos game = execState (action pos') game
     where pos' = worldPosOfWindowPos game pos
 
-doWithWindowPosInField :: (WorldPos -> Game -> Game) -> (Float, Float) -> ViewData -> ViewData
+doWithWindowPosInField :: WorldAction -> (Float, Float) -> ViewData -> ViewData
 doWithWindowPosInField action pos = game %~ doWithWindowPosOnGame action pos
 
-doWithWindowPos :: (WorldPos -> Game-> Game) -> (Float, Float) -> ViewData -> ViewData
+doWithWindowPos :: WorldAction -> (Float, Float) -> ViewData -> ViewData
 doWithWindowPos action pos@(x, y) state
     | inPanel pos state
     = state

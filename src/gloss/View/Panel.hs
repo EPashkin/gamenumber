@@ -5,7 +5,7 @@ module View.Panel
 import Control.Lens
 import View.State
 import View.Convert
-import GameLogic.Data.Facade
+import GameLogic
 import Middleware.Gloss.Facade
 
 --TODO: Pause checkbox
@@ -56,8 +56,8 @@ drawInfoText :: String -> Picture
 drawInfoText = Translate 0 (-playerInfoHeight/2)
                . Scale panelTextScale panelTextScale . Text
 
-remainText :: Player -> String
-remainText player = show $ view remain player `div` remainDivMult
+--remainText :: Player -> String
+--remainText player = show $ (view remain player) `div` remainDivMult
 
 shieldText :: Player -> String
 shieldText player
@@ -85,7 +85,7 @@ drawPaused state
     | otherwise
     = Blank
 
-drawMiniMap :: Game -> Picture
+drawMiniMap :: GameData -> Picture
 drawMiniMap game = Pictures cells
     where cells = mapW (drawMiniMapCell mapCellScale) w
           --swap for testing drawing speed degradation
