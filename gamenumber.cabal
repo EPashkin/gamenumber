@@ -33,7 +33,7 @@ executable gamenumber_fg
                        cond,
                        lens,
                        free,
-                       free-game >=1.1.80
+                       free-game >=1.1.81
   hs-source-dirs:      src/freegame
   default-language:    Haskell2010
   ghc-options:         -threaded

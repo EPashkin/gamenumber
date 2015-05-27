@@ -55,7 +55,7 @@ drawSelected playerInd = do
    when (num' > 0 || playerInd == activePlayerIndex)
        . lift $ drawSelectedCellBox pos clr
 
-drawSelectedCellBox :: WorldPos -> Color -> Frame ()
+drawSelectedCellBox :: WorldPos -> Color Float -> Frame ()
 drawSelectedCellBox pos clr =
     draw $ translateCell pos . translate (V2 start start)
         . thickness 3 . color clr $ do
