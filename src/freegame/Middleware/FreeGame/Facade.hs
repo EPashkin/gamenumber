@@ -1,5 +1,7 @@
+{-# LANGUAGE UndecidableInstances, FlexibleInstances #-}
 module Middleware.FreeGame.Facade
     ( module G
+    , Drawable()
     , emptyCellColor
     , panelBkColor
     , playerColor
@@ -21,12 +23,12 @@ panelBkColor :: Color
 panelBkColor = clr 212 208 200 255
 
 playerColor :: Int -> Color
-playerColor playerInd = 
+playerColor playerInd =
     let (r, g, b) = playerColor' playerInd
     in clr (r*4) (g*4) (b*4) 255
 
 clr :: Float -> Float -> Float -> Float -> Color
-clr r g b a = Color (r/255) (g/255) (b/255) (a/255) 
+clr r g b a = Color (r/255) (g/255) (b/255) (a/255)
 
 playerColor' :: Int -> (Float, Float, Float)
 playerColor' (-1) = (0, 0,42)        -- possible background color
@@ -56,3 +58,7 @@ rectangleSolid w h = polygon $ rectPoints w h
 
 rectPoints :: Double -> Double -> [Vec2]
 rectPoints w h = [ V2 0 0, V2 w 0, V2 w h, V2 0 h]
+
+class (Applicative f, Monad f, Picture2D f, Local f) => Drawable f where { }
+
+instance (Applicative f, Monad f, Picture2D f, Local f) => Drawable f where { }
