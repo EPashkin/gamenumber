@@ -59,6 +59,7 @@ rectangleSolid w h = polygon $ rectPoints w h
 rectPoints :: Double -> Double -> [Vec2]
 rectPoints w h = [ V2 0 0, V2 w 0, V2 w h, V2 0 h]
 
+--TODO Remove when free-game 1.1.82 with UndecidableInstances, FlexibleInstances
 class (Applicative f, Monad f, Picture2D f, Local f) => Drawable f where { }
 
 instance (Applicative f, Monad f, Picture2D f, Local f) => Drawable f where { }
