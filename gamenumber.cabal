@@ -27,23 +27,23 @@ executable gamenumber_fg
   if !flag(Freegame)
     buildable:         False
   else
-    build-depends:     base >=4.6,
+    build-depends:     base >=4.6 && < 5,
                        gamenumber,
                        mtl,
                        cond,
                        lens,
                        free,
-                       free-game >=1.1.80
+                       free-game >=1.1.81
   hs-source-dirs:      src/freegame
   default-language:    Haskell2010
-  ghc-options:         -O2 -threaded
+  ghc-options:         -threaded
 
 executable gamenumber_gl
   main-is:             Main.hs
   if !flag(Gloss)
     buildable:         False
   else
-    build-depends:     base >=4.6,
+    build-depends:     base >=4.6 && < 5,
                        gamenumber,
                        mtl,
                        cond,
@@ -51,10 +51,10 @@ executable gamenumber_gl
                        gloss
   hs-source-dirs:      src/gloss
   default-language:    Haskell2010
-  ghc-options:         -O2 -threaded
+  ghc-options:         -threaded
 
 library
-  build-depends:       base >=4.6,
+  build-depends:       base >=4.6 && < 5,
                        random,
                        array,
                        containers,
@@ -65,7 +65,7 @@ library
                        lens
   hs-source-dirs:      src/lib
   default-language:    Haskell2010
-  ghc-options:         -O2
+  ghc-options:         
   exposed-modules:     GameLogic
   other-modules:       
                        GameLogic.Logic,

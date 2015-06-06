@@ -98,7 +98,7 @@ drawPaused state
 
 drawMiniMap :: GameData -> Frame ()
 drawMiniMap game' = draw $ sequence_ cells
-    where cells :: (Applicative f, Monad f, Picture2D f, Local f) => [f ()]
+    where cells :: Drawable f => [f ()]
           cells = mapW (drawMiniMapCell mapCellScale) w 
           --swap for testing drawing speed degradation
           --cells = fmap (drawMiniMapCell mapCellScale) [((x,y), mkCell 1 1) | x<-[1..wSize], y<-[1..wSize]]
@@ -106,8 +106,7 @@ drawMiniMap game' = draw $ sequence_ cells
           wSize = getWorldSize w
           mapCellScale = mapSize / fromIntegral wSize
 
-drawMiniMapCell :: (Applicative f, Monad f, Picture2D f, Local f)
-   => Double -> (WorldPos, Cell) -> f ()
+drawMiniMapCell :: Drawable f => Double -> (WorldPos, Cell) -> f ()
 drawMiniMapCell mapCellScale (pos, cell)
    | isFree cell
       = translateCell pos $ color emptyCellColor rect
