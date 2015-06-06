@@ -12,19 +12,6 @@ build-type:          Simple
 extra-source-files:  README.md
 cabal-version:       >=1.10
 
-executable gamenumber
-  main-is:             Main.hs
-  build-depends:       base >=4.6,
-                       gamenumber,
-                       mtl,
-                       cond,
-                       lens,
-                       free,
-                       free-game >=1.1.80
-  hs-source-dirs:      src
-  default-language:    Haskell2010
-  ghc-options:         -O2 -threaded
-
 library
   build-depends:       base >=4.6,
                        random,
@@ -35,9 +22,8 @@ library
                        bytestring,
                        binary,
                        lens
-  hs-source-dirs:      src_gl
+  hs-source-dirs:      src
   default-language:    Haskell2010
-  ghc-options:         -O2
   exposed-modules:     GameLogic
   other-modules:       
                        GameLogic.Logic,
